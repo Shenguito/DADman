@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pacman", "pacman\pacman.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuppetMaster", "PuppetMaster\PuppetMaster.csproj", "{7B32EEBF-D7F3-482A-A1BE-AC47F2C46DAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{02741EEB-2A63-4F8B-919C-963A7F7DC4FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComLibrary", "ComLibrary\ComLibrary.csproj", "{94771DE3-1EC6-4684-B182-E28E96068058}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{7B32EEBF-D7F3-482A-A1BE-AC47F2C46DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B32EEBF-D7F3-482A-A1BE-AC47F2C46DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B32EEBF-D7F3-482A-A1BE-AC47F2C46DAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02741EEB-2A63-4F8B-919C-963A7F7DC4FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02741EEB-2A63-4F8B-919C-963A7F7DC4FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02741EEB-2A63-4F8B-919C-963A7F7DC4FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02741EEB-2A63-4F8B-919C-963A7F7DC4FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94771DE3-1EC6-4684-B182-E28E96068058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94771DE3-1EC6-4684-B182-E28E96068058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94771DE3-1EC6-4684-B182-E28E96068058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94771DE3-1EC6-4684-B182-E28E96068058}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
