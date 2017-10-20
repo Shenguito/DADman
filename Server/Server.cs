@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace Server
 {
+    //client in server
+    class Client
+    {
+        public string nick;
+        public string url;
+    }
+
     class Server
     {
 

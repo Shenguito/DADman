@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 
 namespace pacman {
-    public partial class Form1 : Form {
+    public partial class ClientForm : Form {
 
         // direction player is moving in. Only one will be true
         bool goup;
@@ -34,9 +34,11 @@ namespace pacman {
         
         //x and y directions for the bi-direccional pink ghost
         int ghost3x = 5;
-        int ghost3y = 5;            
+        int ghost3y = 5;          
+        
 
-        public Form1() {
+
+        public ClientForm() {
             InitializeComponent();
             label2.Visible = false;
         }
@@ -118,7 +120,7 @@ namespace pacman {
             //for loop to check walls, ghosts and points
             foreach (Control x in this.Controls) {
                 // checking if the player hits the wall or the ghost, then game is over
-                if (x is PictureBox && x.Tag == "wall" || x.Tag == "ghost") {
+                if (x is PictureBox && (x.Tag == "wall" || x.Tag == "ghost")) {
                     if (((PictureBox)x).Bounds.IntersectsWith(pacman.Bounds)) {
                         pacman.Left = 0;
                         pacman.Top = 25;
@@ -160,8 +162,15 @@ namespace pacman {
 
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter) {
-                tbChat.Text += "\r\n" + tbMsg.Text; tbMsg.Clear(); tbMsg.Enabled = false; this.Focus();
+                tbChat.Text += "\r\n" + tbMsg.Text;
+                tbMsg.Clear();
+                tbMsg.Enabled = false;
+                this.Focus();
             }
+        }
+        public void updateChat(String nick, String msg)
+        {
+            tbChat.Text += nick + ": " + msg + "\r\n";
         }
     }
 }
