@@ -112,6 +112,12 @@
   <ItemGroup>
     <None Include="Resources\yellow_guy.gif" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ComLibrary\ComLibrary.csproj">
+      <Project>{927c88e2-8d8c-4b4a-89ba-4052e6f17c13}</Project>
+      <Name>ComLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

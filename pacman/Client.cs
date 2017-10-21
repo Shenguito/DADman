@@ -4,18 +4,18 @@ using System.Linq;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
 using System.Threading.Tasks;
+using ComLibrary;
 
 namespace pacman
 {
 
     public delegate void deluc(String nick, String msg);
-    class Client : MarshalByRefObject, IClient
+    class Client : MarshalByRefObject//, IClient
     {
 
         TcpChannel channel;
-        IServer server;
+        //IServer server;
         String nick;
-        int port;
 
         ClientForm form;
 
