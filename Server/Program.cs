@@ -12,7 +12,8 @@ namespace pacman
 
         static void Main(string[] args)
         {
-            
+            new Server();
+            Console.ReadLine();
         }
     }
 }

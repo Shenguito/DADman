@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ComLibrary;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Server
     {
         public string nick;
         public string url;
+        public IClient client;
     }
 
     class Server
