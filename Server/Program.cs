@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace pacman
+namespace Server
 {
     class Server
     {
 
         static void Main(string[] args)
         {
-            new Server();
+            new RemoteServer();
             Console.ReadLine();
         }
     }

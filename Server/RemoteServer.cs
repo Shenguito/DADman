@@ -16,7 +16,7 @@ namespace Server
         public IClient client;
     }
 
-    class Server
+    class RemoteServer
     {
 
         private ArrayList playersAlive;
@@ -27,7 +27,7 @@ namespace Server
         private ArrayList inputs;
         private int MSECROUND = 10; //game speed [communication refresh time]
 
-        public Server()
+        public RemoteServer()
         {
 
         }
