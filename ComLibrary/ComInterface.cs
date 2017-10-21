@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ComLibrary
 {
-    public interface IServer
+    interface IServer
     {
         void send(String nick, String msg);
         void connect(String nick, String url);
     }
-    public interface IClient
+    interface IClient
     {
         void broadcast(String nick, String msg);
     }
