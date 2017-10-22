@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    class Server
+    class Program
     {
 
         static void Main(string[] args)
         {
-            new RemoteServer();
+            
+            new Server();
             Console.ReadLine();
         }
     }
