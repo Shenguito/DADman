@@ -10,11 +10,11 @@ namespace pacman
 {
 
     public delegate void deluc(String nick, String msg);
-    class Client : MarshalByRefObject//, IClient
+    class Client : MarshalByRefObject, IClient
     {
 
         TcpChannel channel;
-        //IServer server;
+        IServer server;
         String nick;
 
         ClientForm form;
