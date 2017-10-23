@@ -1,9 +1,13 @@
-﻿using System;
+﻿using ComLibrary;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -34,13 +38,66 @@ namespace pacman {
         
         //x and y directions for the bi-direccional pink ghost
         int ghost3x = 5;
-        int ghost3y = 5;          
-        
+        int ghost3y = 5;
+
+        LoginForm formLogin;
+        TcpChannel channel;
+        IServer serverProxy;
+
 
 
         public ClientForm() {
-            InitializeComponent();
-            label2.Visible = false;
+            this.WindowState = FormWindowState.Minimized;
+            this.ShowInTaskbar = false;
+            formLogin = new LoginForm(this);
+            formLogin.Show();
+            //InitializeComponent();
+            //label2.Visible = false;
+
+        }
+
+        public void Init(string nickname, int port)
+        {
+            // Iniciar canal
+            channel = new TcpChannel(port);
+            ChannelServices.RegisterChannel(channel, false);
+
+            // Registro do Servidor
+            serverProxy = (IServer)Activator.GetObject(
+                typeof(IServer),
+                "tcp://localhost:8000/ChatServer" //lacking null verification
+            );
+
+            // Registro do cliente
+            RemoteClient rmc = new RemoteClient(nickname, this);
+            String clientServiceName = "ChatClient";
+            RemotingServices.Marshal(
+                rmc,
+                clientServiceName,
+                typeof(RemoteClient)
+            );
+
+            //try catch missed
+            if (serverProxy != null)
+            {
+                try
+                {
+                    serverProxy.connect(nickname, "tcp://localhost:" + port + "/" + clientServiceName);
+
+                    formLogin.Close();
+                    this.ShowInTaskbar = true;
+                    this.WindowState = FormWindowState.Normal;
+                    InitializeComponent();
+                    label2.Visible = false;
+                }
+                catch (Exception e)
+                {
+                    formLogin.LoginError();
+                }
+            }
+            else
+            {
+            }
         }
 
         private void keyisdown(object sender, KeyEventArgs e) {
@@ -161,11 +218,14 @@ namespace pacman {
         }
 
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter) {
-                tbChat.Text += "\r\n" + tbMsg.Text;
-                tbMsg.Clear();
-                tbMsg.Enabled = false;
-                this.Focus();
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (!tbMsg.Text.Trim().Equals("")) {
+                    tbChat.Text += "\r\n" + tbMsg.Text;
+                    tbMsg.Clear();
+                    tbMsg.Enabled = false;
+                    this.Focus();
+                }
             }
         }
         public void updateChat(String nick, String msg)
