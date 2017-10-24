@@ -109,12 +109,11 @@ namespace Server
 
         public void sendMove(string nick, string move)
         {
-            Console.WriteLine("cheguei");
             foreach (Client c in clientList)
             {
-                Console.WriteLine("cheguei1");
+                //Console.WriteLine("reach client foreach");
                 c.clientProxy.movePlayer(c.playernumber, move);
-                Console.WriteLine("player:"+ c.playernumber + " receive: "+move);
+                Console.WriteLine("player:"+ c.playernumber + " suposely receives: "+move);
             }
         }
 
