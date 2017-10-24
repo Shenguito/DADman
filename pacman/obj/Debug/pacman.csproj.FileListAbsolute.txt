@@ -16,4 +16,7 @@ C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.csproj.GenerateResou
 C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.csproj.CoreCompileInputs.cache
 C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.exe
 C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.pdb
-C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.Client.resources
+C:\Users\aaronB\Source\Repos\DADman\pacman\bin\Debug\ComLibrary.dll
+C:\Users\aaronB\Source\Repos\DADman\pacman\bin\Debug\ComLibrary.pdb
+C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.ClientForm.resources
+C:\Users\aaronB\Source\Repos\DADman\pacman\obj\Debug\pacman.LoginForm.resources
