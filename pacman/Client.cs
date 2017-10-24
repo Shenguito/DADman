@@ -25,6 +25,7 @@ namespace pacman
         TcpChannel channel;
         IServer server;
         String nick;
+
         ClientForm form;
 
         public RemoteClient(string nick, ClientForm form)
@@ -42,8 +43,9 @@ namespace pacman
         public void movePlayer(int playernumber, string move)
         {
             //TODO function crash
-            Console.WriteLine(nick + " received info that player " + playernumber + " moved " + move);
-            this.form.Invoke(new delmove(form.updateMove), new object[] { nick, move });
+            //this.form.updateMove(playernumber, move);
+            //this.form.Invoke(new deluc(form.updateChat), new object[] { nick, move });
+            //this.form.Invoke(new delmove(form.updateMove), new object[] { playernumber, move });
         }
 
         
