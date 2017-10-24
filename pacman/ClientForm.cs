@@ -245,14 +245,14 @@ namespace pacman {
                 }
             }
         }
-        public void updateChat(String nick, String msg)
+        public void updateChat(string nick, string msg)
         {
             tbChat.Text += nick + ": " + msg + "\r\n";
         }
 
         public void updateMove(int playernumber, string move)
         {
-            tbChat.Text += move+ "\r\n";
+            tbChat.Text += "move is supposely received: " + move+ "\r\n";
             //string playername = "pictureBoxPlayer" + playernumber.ToString();
             if (move.Equals("left"))
             {

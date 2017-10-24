@@ -6,7 +6,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 namespace pacman
 {
 
-    public delegate void deluc(String nick, String msg);
+    public delegate void deluc(string nick, string msg);
     public delegate void delmove(int playernumber, string move);
 
     class Client
@@ -38,6 +38,8 @@ namespace pacman
         public void broadcast(string nick, string msg)
         {
             this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+            //being here does not work too
+            //this.form.Invoke(new delmove(form.updateMove), new object[] { 1, msg });
         }
 
         public void movePlayer(int playernumber, string move)
