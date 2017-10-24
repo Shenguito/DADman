@@ -48,8 +48,7 @@ namespace Server
         ArrayList clientList = new ArrayList();
         public void connect(string nick, string url)
         {
-            Console.WriteLine("Connecting client with url = " + url + " ; with nick = " + nick);
-
+            
             Client c = new Client();
             IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),

@@ -17,6 +17,9 @@ using System.Windows.Forms;
 namespace pacman {
     public partial class ClientForm : Form {
 
+        string nickname;
+        int port;
+
         // direction player is moving in. Only one will be true
         bool goup;
         bool godown;
@@ -58,6 +61,9 @@ namespace pacman {
 
         public void Init(string nickname, int port)
         {
+
+            this.nickname = nickname;
+            this.port = port;
             // Iniciar canal
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
@@ -71,6 +77,8 @@ namespace pacman {
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(nickname, this);
             String clientServiceName = "ChatClient";
+
+            // ## dont know what this does
             RemotingServices.Marshal(
                 rmc,
                 clientServiceName,
@@ -221,7 +229,8 @@ namespace pacman {
             if (e.KeyCode == Keys.Enter)
             {
                 if (!tbMsg.Text.Trim().Equals("")) {
-                    tbChat.Text += "\r\n" + tbMsg.Text;
+                    tbChat.Text += nickname +": "+ tbMsg.Text + "\r\n";
+                    serverProxy.send(nickname, tbMsg.Text.ToString());
                     tbMsg.Clear();
                     tbMsg.Enabled = false;
                     this.Focus();
