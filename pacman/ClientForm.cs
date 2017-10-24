@@ -116,22 +116,22 @@ namespace pacman {
             if (e.KeyCode == Keys.Left) {
                 serverProxy.sendMove(nickname, "left");
                 goleft = true;
-                pictureBoxPlayer1.Image = Properties.Resources.Left;
+                //pictureBoxPlayer1.Image = Properties.Resources.Left;
             }
             if (e.KeyCode == Keys.Right) {
                 serverProxy.sendMove(nickname, "right");
                 goright = true;
-                pictureBoxPlayer1.Image = Properties.Resources.Right;
+               // pictureBoxPlayer1.Image = Properties.Resources.Right;
             }
             if (e.KeyCode == Keys.Up) {
                 serverProxy.sendMove(nickname, "up");
                 goup = true;
-                pictureBoxPlayer1.Image = Properties.Resources.Up;
+              //  pictureBoxPlayer1.Image = Properties.Resources.Up;
             }
             if (e.KeyCode == Keys.Down) {
                 serverProxy.sendMove(nickname, "down");
                 godown = true;
-                pictureBoxPlayer1.Image = Properties.Resources.down;
+               // pictureBoxPlayer1.Image = Properties.Resources.down;
             }
             if (e.KeyCode == Keys.Enter) {
                     tbMsg.Enabled = true; tbMsg.Focus();
@@ -252,27 +252,24 @@ namespace pacman {
 
         public void updateMove(int playernumber, string move)
         {
-            tbChat.Text += move+ "\r\n";
+            Console.WriteLine("I'm in updateMove()... playernumber " + playernumber + " moving " + move);
             //string playername = "pictureBoxPlayer" + playernumber.ToString();
             if (move.Equals("left"))
-            {
-                tbChat.Text += "left";
-                //pictureBoxPlayer1.Image = Properties.Resources.Left;
+            {   
+                
+                pictureBoxPlayer1.Image = Properties.Resources.Left;
             }
             if (move.Equals("right"))
-            {
-                tbChat.Text += "right";
-                //pictureBoxPlayer1.Image = Properties.Resources.Right;
+            {               
+                pictureBoxPlayer1.Image = Properties.Resources.Right;
             }
             if (move.Equals("up"))
             {
-                tbChat.Text += "up";
-                //pictureBoxPlayer1.Image = Properties.Resources.Up;
+                pictureBoxPlayer1.Image = Properties.Resources.Up;
             }
             if (move.Equals("down"))
             {
-                tbChat.Text += "down";
-                //pictureBoxPlayer1.Image = Properties.Resources.down;
+                pictureBoxPlayer1.Image = Properties.Resources.down;
             }
         }
     }
