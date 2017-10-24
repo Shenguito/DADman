@@ -16,21 +16,26 @@ namespace Server
     class Client
     {
         public string nick;
+        public int playernumber;
         public string url;
         public IClient clientProxy;
+        // defined at end
+        public int score;
     }
 
     class Server
     {
         private int MSECROUND = 10; //game speed [communication refresh time]
+        const int PORT = 8000;
+        static TcpChannel channel = new TcpChannel(PORT);
+        
 
         public Server()
         {
             createConnection();
         }
 
-        const int PORT = 8000;
-        static TcpChannel channel = new TcpChannel(PORT);
+        
         
         //not called
         private void createConnection()
@@ -42,10 +47,16 @@ namespace Server
                 WellKnownObjectMode.Singleton
             );
         }
+
+        
     }
     class RemoteServer : MarshalByRefObject, IServer
     {
         ArrayList clientList = new ArrayList();
+        private Dictionary<string, string> player_image_hashmap = new Dictionary<string, string>();
+        public int numberPlayersConnected = 0;
+
+
         public void connect(string nick, string url)
         {
             
@@ -55,13 +66,23 @@ namespace Server
                 url
             );
 
+            Console.WriteLine("Connected client with url = " + url + " ; with nick = " + nick);
+
+            numberPlayersConnected++;
+            //TODO nickname duplicate problem
+            //TODO max players = 6
             c.nick = nick;
             c.url = url;
             c.clientProxy = clientProxy;
+            c.playernumber = numberPlayersConnected;
 
             clientList.Add(c);
+            Console.WriteLine("Connected client " + nick+"player:"+numberPlayersConnected);
 
-            Console.WriteLine("Connected client with url = " + url + " ; with nick = " + nick);
+            //Creates a correspondence Nick - Player Number i.e. John - Player1
+
+            //unnecessary
+            //assignPlayer(c); 
 
         }
 
@@ -71,8 +92,8 @@ namespace Server
             // alternativa é lançar uma thread
             foreach (Client c in clientList)
             {
-                Console.WriteLine("Client: " + c.nick);
-                if (c.nick != nick)
+                Console.WriteLine("Delivering to client: " + c.nick);
+                if (!c.nick.Equals(nick))
                 {
                     try
                     {
@@ -85,5 +106,30 @@ namespace Server
                 }
             }
         }
+
+        public void sendMove(string nick, string move)
+        {
+            Console.WriteLine("cheguei");
+            foreach (Client c in clientList)
+            {
+                Console.WriteLine("cheguei1");
+                c.clientProxy.movePlayer(c.playernumber, move);
+                Console.WriteLine("player:"+ c.playernumber + " receive: "+move);
+            }
+        }
+
+        /*
+         * unnecessary
+        private void assignPlayer(Client c)
+        {
+            player_image_hashmap.Add(c.nick, "Player" + numberPlayersConnected);
+
+            foreach (KeyValuePair<string, string> entry in player_image_hashmap)
+            {
+                Console.WriteLine("INFO: " + entry.Key + " is " + entry.Value);
+            }
+
+        }
+        */
     }
 }

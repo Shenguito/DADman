@@ -93,6 +93,9 @@ namespace pacman {
                     serverProxy.connect(nickname, "tcp://localhost:" + port + "/" + clientServiceName);
 
                     formLogin.Close();
+
+                    //TODO loading for players
+
                     this.ShowInTaskbar = true;
                     this.WindowState = FormWindowState.Normal;
                     InitializeComponent();
@@ -108,22 +111,27 @@ namespace pacman {
             }
         }
 
+        //TODO move pacman
         private void keyisdown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Left) {
+                serverProxy.sendMove(nickname, "left");
                 goleft = true;
-                pacman.Image = Properties.Resources.Left;
+                pictureBoxPlayer1.Image = Properties.Resources.Left;
             }
             if (e.KeyCode == Keys.Right) {
+                serverProxy.sendMove(nickname, "right");
                 goright = true;
-                pacman.Image = Properties.Resources.Right;
+                pictureBoxPlayer1.Image = Properties.Resources.Right;
             }
             if (e.KeyCode == Keys.Up) {
+                serverProxy.sendMove(nickname, "up");
                 goup = true;
-                pacman.Image = Properties.Resources.Up;
+                pictureBoxPlayer1.Image = Properties.Resources.Up;
             }
             if (e.KeyCode == Keys.Down) {
+                serverProxy.sendMove(nickname, "down");
                 godown = true;
-                pacman.Image = Properties.Resources.down;
+                pictureBoxPlayer1.Image = Properties.Resources.down;
             }
             if (e.KeyCode == Keys.Enter) {
                     tbMsg.Enabled = true; tbMsg.Focus();
@@ -150,20 +158,20 @@ namespace pacman {
 
             //move player
             if (goleft) {
-                if (pacman.Left > (boardLeft))
-                    pacman.Left -= speed;
+                if (pictureBoxPlayer1.Left > (boardLeft))
+                    pictureBoxPlayer1.Left -= speed;
             }
             if (goright) {
-                if (pacman.Left < (boardRight))
-                pacman.Left += speed;
+                if (pictureBoxPlayer1.Left < (boardRight))
+                pictureBoxPlayer1.Left += speed;
             }
             if (goup) {
-                if (pacman.Top > (boardTop))
-                    pacman.Top -= speed;
+                if (pictureBoxPlayer1.Top > (boardTop))
+                    pictureBoxPlayer1.Top -= speed;
             }
             if (godown) {
-                if (pacman.Top < (boardBottom))
-                    pacman.Top += speed;
+                if (pictureBoxPlayer1.Top < (boardBottom))
+                    pictureBoxPlayer1.Top += speed;
             }
             //move ghosts
             redGhost.Left += ghost1;
@@ -186,16 +194,16 @@ namespace pacman {
             foreach (Control x in this.Controls) {
                 // checking if the player hits the wall or the ghost, then game is over
                 if (x is PictureBox && (x.Tag == "wall" || x.Tag == "ghost")) {
-                    if (((PictureBox)x).Bounds.IntersectsWith(pacman.Bounds)) {
-                        pacman.Left = 0;
-                        pacman.Top = 25;
+                    if (((PictureBox)x).Bounds.IntersectsWith(pictureBoxPlayer1.Bounds)) {
+                        pictureBoxPlayer1.Left = 0;
+                        pictureBoxPlayer1.Top = 25;
                         label2.Text = "GAME OVER";
                         label2.Visible = true;
                         timer1.Stop();
                     }
                 }
                 if (x is PictureBox && x.Tag == "coin") {
-                    if (((PictureBox)x).Bounds.IntersectsWith(pacman.Bounds)) {
+                    if (((PictureBox)x).Bounds.IntersectsWith(pictureBoxPlayer1.Bounds)) {
                         this.Controls.Remove(x);
                         score++;
                         //TODO check if all coins where "eaten"
@@ -240,6 +248,32 @@ namespace pacman {
         public void updateChat(String nick, String msg)
         {
             tbChat.Text += nick + ": " + msg + "\r\n";
+        }
+
+        public void updateMove(int playernumber, string move)
+        {
+            tbChat.Text += move+ "\r\n";
+            //string playername = "pictureBoxPlayer" + playernumber.ToString();
+            if (move.Equals("left"))
+            {
+                tbChat.Text += "left";
+                //pictureBoxPlayer1.Image = Properties.Resources.Left;
+            }
+            if (move.Equals("right"))
+            {
+                tbChat.Text += "right";
+                //pictureBoxPlayer1.Image = Properties.Resources.Right;
+            }
+            if (move.Equals("up"))
+            {
+                tbChat.Text += "up";
+                //pictureBoxPlayer1.Image = Properties.Resources.Up;
+            }
+            if (move.Equals("down"))
+            {
+                tbChat.Text += "down";
+                //pictureBoxPlayer1.Image = Properties.Resources.down;
+            }
         }
     }
 }

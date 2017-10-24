@@ -10,9 +10,11 @@ namespace ComLibrary
     {
         void send(String nick, String msg);
         void connect(String nick, String url);
+        void sendMove(String nick, String direction);
     }
     public interface IClient
     {
         void broadcast(String nick, String msg);
+        void movePlayer(int numberPlayer, string movement);
     }
 }

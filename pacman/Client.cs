@@ -1,16 +1,13 @@
-﻿using System;
+﻿using ComLibrary;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Remoting.Channels.Tcp;
-using System.Text;
-using System.Threading.Tasks;
-using ComLibrary;
-using System.Runtime.Remoting.Channels;
 
 namespace pacman
 {
 
     public delegate void deluc(String nick, String msg);
+    public delegate void delmove(int playernumber, string move);
 
     class Client
     {
@@ -42,5 +39,15 @@ namespace pacman
         {
             this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
         }
+
+        public void movePlayer(int playernumber, string move)
+        {
+            //TODO function crash
+            //this.form.updateMove(playernumber, move);
+            //this.form.Invoke(new deluc(form.updateChat), new object[] { nick, move });
+            //this.form.Invoke(new delmove(form.updateMove), new object[] { playernumber, move });
+        }
+
+        
     }
 }
