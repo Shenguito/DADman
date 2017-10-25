@@ -10,17 +10,24 @@ namespace PuppetMaster
     {
         static void Main(string[] args)
         {
+            ProcessLaucher processLaucher = new ProcessLaucher();
             Console.WriteLine("Welcome!");
             String text = Console.ReadLine();
             while (!text.Equals("exit"))
             {
                 if (text.Split()[0].Equals("StartClient"))
                 {
-                    Console.WriteLine(text);
+                    if(text.Split().Length ==6 && text.Split().Length == 7)
+                        processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
+                    else
+                        Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
                 }
                 else if(text.Split()[0].Equals("StartServer"))
                 {
-                    Console.WriteLine(text);
+                    if (text.Split().Length == 6)
+                        processLaucher.startServer(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5]);
+                    else
+                        Console.WriteLine("StartServer PID PCS_URL SERVER_URL MSEC_PER_ROUND NUM_PLAYERS");
                 }
                 else if (text.Split()[0].Equals("GlobalStatus"))
                 {
