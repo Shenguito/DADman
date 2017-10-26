@@ -1,5 +1,6 @@
 ﻿using ComLibrary;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -47,9 +48,11 @@ namespace pacman {
         TcpChannel channel;
         IServer serverProxy;
 
-
+        public ArrayList clients; 
+        //public Dictionary<string, IClient> clients { get => clients; set => clients = value; }
 
         public ClientForm() {
+            clients = new ArrayList();
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             formLogin = new LoginForm(this);
@@ -108,6 +111,7 @@ namespace pacman {
             }
             else
             {
+                //connection error problem
             }
         }
 
@@ -238,7 +242,11 @@ namespace pacman {
             {
                 if (!tbMsg.Text.Trim().Equals("")) {
                     tbChat.Text += nickname +": "+ tbMsg.Text + "\r\n";
-                    serverProxy.send(nickname, tbMsg.Text.ToString());
+                    //maybe a thread
+                    foreach(ClientChat client in clients) {
+                        if(!client.nick.Equals(nickname))
+                            client.clientProxy.send(nickname, tbMsg.Text.ToString());
+                    }
                     tbMsg.Clear();
                     tbMsg.Enabled = false;
                     this.Focus();

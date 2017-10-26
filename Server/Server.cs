@@ -36,8 +36,6 @@ namespace Server
         }
 
         
-        
-        //not called
         private void createConnection()
         {
             ChannelServices.RegisterChannel(channel, false);
@@ -53,7 +51,7 @@ namespace Server
     class RemoteServer : MarshalByRefObject, IServer
     {
         ArrayList clientList = new ArrayList();
-        private Dictionary<string, string> player_image_hashmap = new Dictionary<string, string>();
+        //private Dictionary<string, string> player_image_hashmap = new Dictionary<string, string>();
         public int numberPlayersConnected = 0;
 
 
@@ -79,13 +77,28 @@ namespace Server
             clientList.Add(c);
             Console.WriteLine("Connected client " + nick+"player:"+numberPlayersConnected);
 
+            //Thread
+            foreach (Client client in clientList)
+            {
+                Console.WriteLine("broadcast to:" + client.nick + " => " + url);
+                if (!client.nick.Equals(nick)) {
+                    ClientChat clientChat = new ClientChat(nick, url, clientProxy);
+                    try
+                    {
+                        client.clientProxy.broadcastClientURL(clientChat);
+                    }catch(Exception e)
+                    {
+                        Console.WriteLine("Exception: "+e.ToString());
+                    }
+                }
+            }
+
             //Creates a correspondence Nick - Player Number i.e. John - Player1
 
             //unnecessary
             //assignPlayer(c); 
-
         }
-
+        /*
         public void send(string nick, string msg)
         {
             Console.WriteLine("Sending message = " + msg + " ; from nick = " + nick);
@@ -106,15 +119,32 @@ namespace Server
                 }
             }
         }
-
+        */
         public void sendMove(string nick, string move)
         {
+            Console.WriteLine("player: " + nick + "receives: " + move);
+
             foreach (Client c in clientList)
             {
-                //Console.WriteLine("reach client foreach");
-                c.clientProxy.movePlayer(c.playernumber, move);
-                Console.WriteLine("player:"+ c.playernumber + " suposely receives: "+move);
+                if (!c.nick.Equals(nick))
+                {
+                    try
+                    {
+                        //Console.WriteLine("reach client foreach");
+                        c.clientProxy.movePlayer(c.playernumber, move);
+                        //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception on server send");
+                    }
+                }
             }
+        }
+
+        private static void sendMove2Player(Client c)
+        {
+
         }
 
         /*
