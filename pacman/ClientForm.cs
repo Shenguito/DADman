@@ -117,25 +117,27 @@ namespace pacman {
 
         //TODO move pacman
         private void keyisdown(object sender, KeyEventArgs e) {
+
+            
             if (e.KeyCode == Keys.Left) {
-                serverProxy.sendMove(nickname, "left");
-                goleft = true;
-                pictureBoxPlayer1.Image = Properties.Resources.Left;
+                Thread thread = new Thread(() => serverProxy.sendMove(nickname,"left"));
+                thread.Start();
+               
             }
             if (e.KeyCode == Keys.Right) {
-                serverProxy.sendMove(nickname, "right");
-                goright = true;
-                pictureBoxPlayer1.Image = Properties.Resources.Right;
+                Thread thread = new Thread(() => serverProxy.sendMove(nickname, "right"));
+                thread.Start();
+               
             }
             if (e.KeyCode == Keys.Up) {
-                serverProxy.sendMove(nickname, "up");
-                goup = true;
-                pictureBoxPlayer1.Image = Properties.Resources.Up;
+                Thread thread = new Thread(() => serverProxy.sendMove(nickname, "up"));
+                thread.Start();
+               
             }
             if (e.KeyCode == Keys.Down) {
-                serverProxy.sendMove(nickname, "down");
-                godown = true;
-                pictureBoxPlayer1.Image = Properties.Resources.down;
+                Thread thread = new Thread(() => serverProxy.sendMove(nickname, "down"));
+                thread.Start();
+               
             }
             if (e.KeyCode == Keys.Enter) {
                     tbMsg.Enabled = true; tbMsg.Focus();
@@ -258,29 +260,51 @@ namespace pacman {
             tbChat.Text += nick + ": " + msg + "\r\n";
         }
 
+        public PictureBox retrievePicture(int playerNumber)
+        {
+            if (playerNumber == 1)
+            {
+                return pictureBox1;
+            }
+            if (playerNumber == 2)
+            {
+                return pictureBox2;
+            }
+            if (playerNumber == 3)
+            {
+                return pictureBox3;
+            }
+            else
+            {
+                return pictureBox4;
+            }
+
+        }
+
         public void updateMove(int playernumber, string move)
         {
-            tbChat.Text += "move is supposely received: " + move+ "\r\n";
-            //string playername = "pictureBoxPlayer" + playernumber.ToString();
+            goleft = goright = goup = godown = false;
+            PictureBox pb = retrievePicture(playernumber);
+
             if (move.Equals("left"))
             {
-                tbChat.Text += "left";
-                //pictureBoxPlayer1.Image = Properties.Resources.Left;
+                goleft = true;
+                pb.Image = Properties.Resources.Left;
             }
             if (move.Equals("right"))
             {
-                tbChat.Text += "right";
-                //pictureBoxPlayer1.Image = Properties.Resources.Right;
+                goright = true;
+                pb.Image = Properties.Resources.Right;
             }
             if (move.Equals("up"))
             {
-                tbChat.Text += "up";
-                //pictureBoxPlayer1.Image = Properties.Resources.Up;
+                goup = true;
+                pb.Image = Properties.Resources.Up;
             }
             if (move.Equals("down"))
             {
-                tbChat.Text += "down";
-                //pictureBoxPlayer1.Image = Properties.Resources.down;
+                godown = true;
+                pb.Image = Properties.Resources.down;
             }
         }
     }
