@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -32,6 +33,8 @@ namespace Server
 
         public Server()
         {
+            Console.WriteLine("Path.PathSeparator={0}",
+                Path.PathSeparator);
             createConnection();
         }
 
