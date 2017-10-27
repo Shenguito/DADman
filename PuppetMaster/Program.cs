@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace PuppetMaster
 {
@@ -17,12 +18,12 @@ namespace PuppetMaster
             {
                 if (text.Split()[0].Equals("StartClient"))
                 {
-                    if(text.Split().Length ==6 && text.Split().Length == 7)
+                    if (text.Split().Length == 6 && text.Split().Length == 7)
                         processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
                     else
                         Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
                 }
-                else if(text.Split()[0].Equals("StartServer"))
+                else if (text.Split()[0].Equals("StartServer"))
                 {
                     if (text.Split().Length == 6)
                         processLaucher.startServer(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5]);
@@ -53,12 +54,23 @@ namespace PuppetMaster
                 {
                     Console.WriteLine(text);
                 }
-                
+
+                else if (text.Split()[0].Equals("Pacman"))
+                {
+                    // Process process = new Process();
+                    // // Configure the process using the StartInfo properties.
+                    //process.StartInfo.FileName = "process.exe";
+                    //process.StartInfo.Arguments = "-n";
+                    //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                    //process.Start();
+                    Process.Start(@"C:\Users\pedrot\source\repos\DADman\pacman\bin\Debug\pacman.exe");
+
+                }
 
 
 
 
-                Console.WriteLine(text);
+                    Console.WriteLine(text);
                 text = Console.ReadLine();
             }
         }
