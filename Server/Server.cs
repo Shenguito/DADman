@@ -33,8 +33,10 @@ namespace Server
 
         public Server()
         {
-            Console.WriteLine("Path.PathSeparator={0}",
+            /*
+            Console.WriteLine("Path.PathSeparator={0}", 
                 Path.PathSeparator);
+            */
             createConnection();
         }
 
@@ -129,19 +131,18 @@ namespace Server
 
             foreach (Client c in clientList)
             {
-                if (!c.nick.Equals(nick))
+                
+                try
                 {
-                    try
-                    {
-                        //Console.WriteLine("reach client foreach");
-                        c.clientProxy.movePlayer(c.playernumber, move);
-                        //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception on server send");
-                    }
+                    //Console.WriteLine("reach client foreach");
+                    c.clientProxy.movePlayer(c.playernumber, move);
+                    //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception on server sendMove");
+                }
+                
             }
         }
 
