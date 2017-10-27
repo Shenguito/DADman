@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ namespace PuppetMaster
             {
                 if (text.Split()[0].Equals("StartClient"))
                 {
+
                     if (text.Split().Length == 6 && text.Split().Length == 7)
                         processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
                     else
@@ -25,6 +27,17 @@ namespace PuppetMaster
                 }
                 else if (text.Split()[0].Equals("StartServer"))
                 {
+
+                    string path = Directory.GetCurrentDirectory();
+                    Process process = new Process();
+                    //Configure the process using the StartInfo properties.
+                    process.StartInfo.FileName = @"..\..\..\Server\bin\Debug\Server.exe";
+                    //process.StartInfo.Arguments = "-n";
+                    process.StartInfo.WorkingDirectory = path;
+                    //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                    process.Start();
+
+
                     if (text.Split().Length == 6)
                         processLaucher.startServer(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5]);
                     else
@@ -57,13 +70,14 @@ namespace PuppetMaster
 
                 else if (text.Split()[0].Equals("Pacman"))
                 {
-                    // Process process = new Process();
-                    // // Configure the process using the StartInfo properties.
-                    //process.StartInfo.FileName = "process.exe";
+                    string path = Directory.GetCurrentDirectory();
+                    Process process = new Process();
+                    //Configure the process using the StartInfo properties.
+                    process.StartInfo.FileName = @"..\..\..\pacman\bin\Debug\pacman.exe";
                     //process.StartInfo.Arguments = "-n";
+                    process.StartInfo.WorkingDirectory = path;
                     //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-                    //process.Start();
-                    Process.Start(@"C:\Users\pedrot\source\repos\DADman\pacman\bin\Debug\pacman.exe");
+                    process.Start();
 
                 }
 
