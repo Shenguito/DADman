@@ -138,7 +138,6 @@ namespace pacman {
             if (e.KeyCode == Keys.Down) {
                 Thread thread = new Thread(() => serverProxy.sendMove(nickname, "down"));
                 thread.Start();
-               
             }
             if (e.KeyCode == Keys.Enter) {
                     tbMsg.Enabled = true; tbMsg.Focus();
@@ -163,23 +162,7 @@ namespace pacman {
         private void timer1_Tick(object sender, EventArgs e) {
             label1.Text = "Score: " + score;
 
-            //move player
-            if (goleft) {
-                if (pictureBoxPlayer1.Left > (boardLeft))
-                    pictureBoxPlayer1.Left -= speed;
-            }
-            if (goright) {
-                if (pictureBoxPlayer1.Left < (boardRight))
-                pictureBoxPlayer1.Left += speed;
-            }
-            if (goup) {
-                if (pictureBoxPlayer1.Top > (boardTop))
-                    pictureBoxPlayer1.Top -= speed;
-            }
-            if (godown) {
-                if (pictureBoxPlayer1.Top < (boardBottom))
-                    pictureBoxPlayer1.Top += speed;
-            }
+            
             //move ghosts
             redGhost.Left += ghost1;
             yellowGhost.Left += ghost2;
@@ -228,7 +211,7 @@ namespace pacman {
                 pinkGhost.Top += ghost3y;
 
                 if (pinkGhost.Left < boardLeft ||
-                    pinkGhost.Left > boardRight ||
+                   pinkGhost.Left > boardRight ||
                     (pinkGhost.Bounds.IntersectsWith(pictureBox1.Bounds)) ||
                     (pinkGhost.Bounds.IntersectsWith(pictureBox2.Bounds)) ||
                     (pinkGhost.Bounds.IntersectsWith(pictureBox3.Bounds)) ||
@@ -265,19 +248,19 @@ namespace pacman {
         {
             if (playerNumber == 1)
             {
-                return pictureBox1;
+                return pictureBoxPlayer1;
             }
             if (playerNumber == 2)
             {
-                return pictureBox2;
+                return pictureBoxPlayer2;
             }
             if (playerNumber == 3)
             {
-                return pictureBox3;
+                return pictureBoxPlayer3;
             }
             else
             {
-                return pictureBox4;
+                return pictureBoxPlayer4;
             }
 
         }
@@ -289,23 +272,30 @@ namespace pacman {
 
             if (move.Equals("left"))
             {
-                goleft = true;
-                pb.Image = Properties.Resources.Left;
+                if (pb.Left > (boardLeft)){
+                    pb.Left -= speed;
+                    pb.Image = Properties.Resources.Left;
+                }
             }
             if (move.Equals("right"))
             {
-                goright = true;
-                pb.Image = Properties.Resources.Right;
+                if (pb.Left < (boardRight)) { 
+                    pb.Left += speed;
+                    pb.Image = Properties.Resources.Right;
+                }
             }
             if (move.Equals("up"))
             {
-                goup = true;
-                pb.Image = Properties.Resources.Up;
+                if (pb.Top > (boardTop)) { 
+                    pb.Top -= speed;
+                    pb.Image = Properties.Resources.Up;
+                }
             }
-            if (move.Equals("down"))
-            {
-                godown = true;
-                pb.Image = Properties.Resources.down;
+            if (move.Equals("down")) {
+                if (pb.Top < (boardBottom)){
+                    pb.Top += speed;
+                    pb.Image = Properties.Resources.down;
+                }
             }
         }
     }

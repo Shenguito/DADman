@@ -22,6 +22,7 @@ namespace Server
         public IClient clientProxy;
         // defined at end
         public int score;
+        internal int playerNumber;
     }
 
     class Server
@@ -56,7 +57,7 @@ namespace Server
     class RemoteServer : MarshalByRefObject, IServer
     {
         ArrayList clientList = new ArrayList();
-        //private Dictionary<string, string> player_image_hashmap = new Dictionary<string, string>();
+        private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
 
 
@@ -72,15 +73,15 @@ namespace Server
             Console.WriteLine("Connected client with url = " + url + " ; with nick = " + nick);
 
             numberPlayersConnected++;
-            //TODO nickname duplicate problem
-            //TODO max players = 6
+
             c.nick = nick;
             c.url = url;
             c.clientProxy = clientProxy;
             c.playernumber = numberPlayersConnected;
 
+
             clientList.Add(c);
-            Console.WriteLine("Connected client " + nick+"player:"+numberPlayersConnected);
+            Console.WriteLine("Connected client " + c.nick + "player:" + c.playernumber);
 
             //Thread
             foreach (Client client in clientList)
@@ -98,10 +99,7 @@ namespace Server
                 }
             }
 
-            //Creates a correspondence Nick - Player Number i.e. John - Player1
-
-            //unnecessary
-            //assignPlayer(c); 
+            assignPlayer(c); 
         }
         /*
         public void send(string nick, string msg)
@@ -125,9 +123,12 @@ namespace Server
             }
         }
         */
+
         public void sendMove(string nick, string move)
         {
             Console.WriteLine("player: " + nick + "receives: " + move);
+
+            int pl_number = player_image_hashmap[nick];
 
             foreach (Client c in clientList)
             {
@@ -135,7 +136,7 @@ namespace Server
                 try
                 {
                     //Console.WriteLine("reach client foreach");
-                    c.clientProxy.movePlayer(c.playernumber, move);
+                    c.clientProxy.movePlayer(pl_number, move);
                     //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
                 }
                 catch (Exception e)
@@ -151,18 +152,17 @@ namespace Server
 
         }
 
-        /*
-         * unnecessary
+       
         private void assignPlayer(Client c)
         {
-            player_image_hashmap.Add(c.nick, "Player" + numberPlayersConnected);
+            player_image_hashmap.Add(c.nick,c.playernumber);
 
-            foreach (KeyValuePair<string, string> entry in player_image_hashmap)
+            foreach (KeyValuePair<string, int> entry in player_image_hashmap)
             {
                 Console.WriteLine("INFO: " + entry.Key + " is " + entry.Value);
             }
 
         }
-        */
+        
     }
 }
