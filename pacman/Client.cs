@@ -2,7 +2,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 namespace pacman
 {
@@ -23,20 +29,31 @@ namespace pacman
     class RemoteClient : MarshalByRefObject, IClient
     {
 
+        
+
+
         TcpChannel channel;
         IServer server;
         String nick;
+        ClientChat ownClient = new ClientChat();
 
         ClientForm form;
-
-        ArrayList clientList = new ArrayList();
+        
 
 
         public RemoteClient(string nick, ClientForm form)
         {
+            ownClient.nick = nick;
+            ownClient.url = "tcp://localhost:" + form.port + "/ChatClient";
             this.nick = nick;
             this.form = form;
-            
+            //TODO
+            RemotingConfiguration.RegisterWellKnownServiceType(
+                typeof(RemoteClient),
+                "ChatClient",
+                WellKnownObjectMode.Singleton
+            );
+
         }
 
         public void broadcast(string nick, string msg)
@@ -46,16 +63,89 @@ namespace pacman
             //this.form.Invoke(new delmove(form.updateMove), new object[] { 1, msg });
         }
 
-        //not used yet
+        //I'm new member, and I'm receiving from old members
         public void receiveClient(ClientChat cc)
         {
-            //clientList.Add(cc);
+            
+            IClient clientProxy = (IClient)Activator.GetObject(
+                    typeof(IClient),
+                    cc.url);
+
+            // Registro do cliente
+            RemoteClient rmc = new RemoteClient(cc.nick, form);
+            String clientServiceName = "ChatClient";
+
+            // ## dont know what this does
+            RemotingServices.Marshal(
+                rmc,
+                clientServiceName,
+                typeof(RemoteClient)
+            );
+            form.clients.Add(cc, clientProxy);
         }
 
-        public void broadcastClientURL(ClientChat clientChat)
+        //Receiving new members
+        public void broadcastClientURL(String clientChat)
         {
-            Console.WriteLine("client add: " + clientChat.nick);
-            form.clients.Add(clientChat);
+            Console.WriteLine("client add: " + clientChat);
+            
+            if (!File.Exists(clientChat))
+            {
+                Console.WriteLine("client didn't be found" + clientChat);
+            }
+            
+            try
+            {
+
+                //TODO  error ClientChat couldn't be found
+
+                FileStream stream = new FileStream(clientChat,
+                          FileMode.Open
+                          //FileAccess.Read,
+                          //FileShare.Read
+                          );
+                IFormatter formatter = new BinaryFormatter();
+                try
+                {
+                    ClientChat client = (ClientChat)formatter.Deserialize(stream);
+
+
+
+                    Console.WriteLine("Adding client to form: " + client.nick + ": " + client.url);
+                    
+
+                    IClient clientProxy = (IClient)Activator.GetObject(
+                    typeof(IClient),
+                    client.url);
+
+                    // Registro do cliente
+                    RemoteClient rmc = new RemoteClient(client.nick, form);
+                    String clientServiceName = "ChatClient";
+
+                    // ## dont know what this does
+                    RemotingServices.Marshal(
+                        rmc,
+                        clientServiceName,
+                        typeof(RemoteClient)
+                    );
+                    
+                    clientProxy.receiveClient(ownClient);
+
+                    form.clients.Add(client, clientProxy);
+                }
+                catch (SerializationException es)
+                {
+                    Console.WriteLine("Failed to deserialize.Reason: " + es.Message);
+                }
+                finally{ stream.Close(); }
+                
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception Started:\r\n "+e.ToString()+"\r\nException ending");
+                //throw new ClientNotFoundException(e.Message);
+            }
+            
         }
 
         public void movePlayer(int playernumber, string move)
@@ -71,14 +161,15 @@ namespace pacman
         public void send(string nick, string msg)
         {
             // alternativa é lançar uma thread
-            foreach (ClientChat c in clientList)
+            Console.WriteLine("Client sending: "+nick+":"+msg);
+            foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
             {
-                Console.WriteLine("Delivering to client: " + c.nick);
-                if (!c.nick.Equals(nick))
+                Console.WriteLine("Delivering to client: " + entry.Key);
+                if (!entry.Key.nick.Equals(nick))
                 {
                     try
                     {
-                        c.clientProxy.broadcast(nick, msg);
+                        entry.Value.broadcast(nick, msg);
                     }
                     catch (Exception e)
                     {

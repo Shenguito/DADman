@@ -7,9 +7,12 @@ using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Server
 {
@@ -60,6 +63,44 @@ namespace Server
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
 
+        
+        /*
+        System.Xml.Serialization.XmlSerializer serializer =
+             new System.Xml.Serialization.XmlSerializer(typeof(Person));
+        
+        public bool AddPerson(Person p) {
+            TextWriter tw = new StreamWriter(p.IDCardNumber + ".person");
+            serializer.Serialize(tw, p);
+            tw.Close();
+            return true;
+        }
+
+        public Person GetPerson(uint IDCardNumber) {
+            TextReader tr = null;
+            if (!File.Exists(IDCardNumber + ".person")) {
+                throw new PersonNotFoundException("");
+            }
+            try {
+                tr = new StreamReader(IDCardNumber + ".person");
+                Person person = (Person) serializer.Deserialize(tr);
+                return person;
+            } catch (Exception e) {
+                throw new PersonNotFoundException(e.Message);
+            } finally {
+                tr.Close();
+            }
+        }
+
+        public bool DeletePerson(uint IDCardNumber) {
+            if (File.Exists(IDCardNumber + ".person")) {
+                File.Delete(IDCardNumber + ".person");
+            } else {
+                throw new PersonNotFoundException("");
+            }
+            return true;
+        }
+        */
+
 
         public void connect(string nick, string url)
         {
@@ -79,27 +120,65 @@ namespace Server
             c.clientProxy = clientProxy;
             c.playernumber = numberPlayersConnected;
 
-
             clientList.Add(c);
             Console.WriteLine("Connected client " + c.nick + "player:" + c.playernumber);
 
             //Thread
+            Console.WriteLine("broadcast to:" + c.nick + " => " + url);
+            ClientChat clientChat = new ClientChat();
+            clientChat.nick = c.nick;
+            clientChat.url = c.url;
+            String dir = @"..\..\..\ComLibrary\bin\Clients\";
+            String clientInfo = dir + "player" + c.playernumber + ".bin";
+
+            Stream stream = new FileStream(clientInfo,
+                     FileMode.Create
+                     //FileAccess.Write, FileShare.None
+                     );
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                formatter.Serialize(stream, clientChat);
+            }
+            catch (SerializationException es)
+            {
+                Console.WriteLine("Failed to serialize. Reason: " + es.Message);
+            }
+            finally
+            {
+                stream.Close();
+            }
             foreach (Client client in clientList)
             {
-                Console.WriteLine("broadcast to:" + client.nick + " => " + url);
-                if (!client.nick.Equals(nick)) {
-                    ClientChat clientChat = new ClientChat(nick, url, clientProxy);
-                    try
-                    {
-                        client.clientProxy.broadcastClientURL(clientChat);
-                    }catch(Exception e)
-                    {
-                        Console.WriteLine("Exception: "+e.ToString());
-                    }
+                
+                Console.WriteLine("Client : " + nick+" Client to sent:" + client.nick);
+                
+                try
+                {
+                    Console.WriteLine("Entrei na if: " + client.nick + " : " + clientInfo);
+                    Thread thread = new Thread(() => client.clientProxy.broadcastClientURL(clientInfo));
+                    thread.Start();
+                    Console.WriteLine("broadcastClientURL sent: " + clientInfo);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("IMPORTANTE Exception: didn't send broadcastClientURL");
+                }
+                
+                if (!File.Exists(clientInfo))
+                {
+                    Console.WriteLine("IMPORTANTE Exception: File Doesn't exist: "+ clientInfo);
+                }
+                else
+                {
+                    Console.WriteLine("IMPORTANTE Exception: File exists: "+ clientInfo);
                 }
             }
 
-            assignPlayer(c); 
+            //Creates a correspondence Nick - Player Number i.e. John - Player1
+
+            //unnecessary
+            //assignPlayer(c); 
         }
         /*
         public void send(string nick, string msg)
@@ -126,17 +205,24 @@ namespace Server
 
         public void sendMove(string nick, string move)
         {
-            Console.WriteLine("player: " + nick + "receives: " + move);
+            int playerNumber=0;
+            
+            foreach(Client c in clientList)
+            {
+                if (c.nick.Equals(nick))
+                    playerNumber = c.playernumber;
+            }
+            
+            Console.WriteLine("player"+ playerNumber + ": " + nick + "receives: " + move);
 
             int pl_number = player_image_hashmap[nick];
 
             foreach (Client c in clientList)
             {
-                
                 try
                 {
                     //Console.WriteLine("reach client foreach");
-                    c.clientProxy.movePlayer(pl_number, move);
+                    c.clientProxy.movePlayer(c.playernumber, move);
                     //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
                 }
                 catch (Exception e)
@@ -145,11 +231,6 @@ namespace Server
                 }
                 
             }
-        }
-
-        private static void sendMove2Player(Client c)
-        {
-
         }
 
        

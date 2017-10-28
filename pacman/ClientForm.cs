@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -20,7 +21,7 @@ namespace pacman {
     public partial class ClientForm : Form {
 
         string nickname;
-        int port;
+        public int port;
 
         // direction player is moving in. Only one will be true
         bool goup;
@@ -46,14 +47,16 @@ namespace pacman {
         int ghost3y = 5;
 
         LoginForm formLogin;
-        TcpChannel channel;
+        public TcpChannel channel;
         IServer serverProxy;
 
-        public ArrayList clients; 
+        public Dictionary<ClientChat, IClient> clients; 
         //public Dictionary<string, IClient> clients { get => clients; set => clients = value; }
 
         public ClientForm() {
-            clients = new ArrayList();
+
+
+            clients = new Dictionary<ClientChat, IClient>();
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             formLogin = new LoginForm(this);
@@ -65,6 +68,8 @@ namespace pacman {
 
         public void Init(string nickname, int port)
         {
+            
+
 
             this.nickname = nickname;
             this.port = port;
@@ -226,12 +231,21 @@ namespace pacman {
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
             {
+                /*//TODO TEST dicrtionary only contains himself
+                foreach(KeyValuePair<ClientChat, IClient> entry in clients)
+                {
+                    tbChat.Text += "PlayerName: " + entry.Key.nick + ":" + entry.Key.url+ "\r\n";
+                }
+                */
                 if (!tbMsg.Text.Trim().Equals("")) {
-                    tbChat.Text += nickname +": "+ tbMsg.Text + "\r\n";
-                    //maybe a thread
-                    foreach(ClientChat client in clients) {
-                        if(!client.nick.Equals(nickname))
-                            client.clientProxy.send(nickname, tbMsg.Text.ToString());
+                    foreach (KeyValuePair<ClientChat, IClient> entry in clients)
+                    {
+                        tbChat.AppendText ("exist: " + entry.Key.nick+" == "+nickname+ "\r\n");
+                        if (!entry.Key.nick.Equals(nickname)) {
+                            tbChat.AppendText(nickname + ": "+ tbMsg.Text + " to: "+ entry.Key.nick+ "\r\n");
+                            Thread thread = new Thread(() => entry.Value.send(nickname, tbMsg.Text.ToString()));
+                            thread.Start();
+                        }
                     }
                     tbMsg.Clear();
                     tbMsg.Enabled = false;
