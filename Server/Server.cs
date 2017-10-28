@@ -141,7 +141,7 @@ namespace Server
             //Creates a correspondence Nick - Player Number i.e. John - Player1
 
             //unnecessary
-            //assignPlayer(c); 
+            assignPlayer(c); 
         }
         /*
         public void send(string nick, string msg)
