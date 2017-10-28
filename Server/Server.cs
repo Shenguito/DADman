@@ -63,43 +63,6 @@ namespace Server
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
 
-        
-        /*
-        System.Xml.Serialization.XmlSerializer serializer =
-             new System.Xml.Serialization.XmlSerializer(typeof(Person));
-        
-        public bool AddPerson(Person p) {
-            TextWriter tw = new StreamWriter(p.IDCardNumber + ".person");
-            serializer.Serialize(tw, p);
-            tw.Close();
-            return true;
-        }
-
-        public Person GetPerson(uint IDCardNumber) {
-            TextReader tr = null;
-            if (!File.Exists(IDCardNumber + ".person")) {
-                throw new PersonNotFoundException("");
-            }
-            try {
-                tr = new StreamReader(IDCardNumber + ".person");
-                Person person = (Person) serializer.Deserialize(tr);
-                return person;
-            } catch (Exception e) {
-                throw new PersonNotFoundException(e.Message);
-            } finally {
-                tr.Close();
-            }
-        }
-
-        public bool DeletePerson(uint IDCardNumber) {
-            if (File.Exists(IDCardNumber + ".person")) {
-                File.Delete(IDCardNumber + ".person");
-            } else {
-                throw new PersonNotFoundException("");
-            }
-            return true;
-        }
-        */
 
 
         public void connect(string nick, string url)
@@ -128,12 +91,12 @@ namespace Server
             ClientChat clientChat = new ClientChat();
             clientChat.nick = c.nick;
             clientChat.url = c.url;
-            String dir = @"..\..\..\ComLibrary\bin\Clients\";
+            String dir = @"..\..\..\ComLibrary\bin\";
             String clientInfo = dir + "player" + c.playernumber + ".bin";
 
             Stream stream = new FileStream(clientInfo,
-                     FileMode.Create
-                     //FileAccess.Write, FileShare.None
+                     FileMode.Create,
+                     FileAccess.Write, FileShare.None
                      );
             BinaryFormatter formatter = new BinaryFormatter();
             try

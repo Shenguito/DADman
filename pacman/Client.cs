@@ -59,8 +59,6 @@ namespace pacman
         public void broadcast(string nick, string msg)
         {
             this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
-            //being here does not work too
-            //this.form.Invoke(new delmove(form.updateMove), new object[] { 1, msg });
         }
 
         //I'm new member, and I'm receiving from old members
@@ -96,13 +94,10 @@ namespace pacman
             
             try
             {
-
-                //TODO  error ClientChat couldn't be found
-
                 FileStream stream = new FileStream(clientChat,
-                          FileMode.Open
-                          //FileAccess.Read,
-                          //FileShare.Read
+                          FileMode.Open,
+                          FileAccess.Read,
+                          FileShare.Read
                           );
                 IFormatter formatter = new BinaryFormatter();
                 try
