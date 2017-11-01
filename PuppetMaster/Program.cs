@@ -5,13 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PuppetMaster
+
 {
     class Program
     {
+
+
         static void Main(string[] args)
         {
+
+            // Handle the ApplicationExit event to know when the application is exiting.
+            ArrayList processes = new ArrayList();
+
             ProcessLaucher processLaucher = new ProcessLaucher();
             Console.WriteLine("Welcome!");
             String text = Console.ReadLine();
@@ -23,32 +32,34 @@ namespace PuppetMaster
                 {
                     Process process = new Process();
                     //Configure the process using the StartInfo properties.
-                    process.StartInfo.FileName = @"..\..\..\pacman\bin\Debug\pacman.exe";
 
-                    /* At end, this does not work
-                     process.StartInfo.FileName = @".."+ Path.PathSeparator + ".."+ Path.PathSeparator 
-                        + ".."+ Path.PathSeparator + "pacman"+ Path.PathSeparator + "bin"+ Path.PathSeparator 
-                        + "Debug"+ Path.PathSeparator + "pacman.exe"; 
-                    */
+                    
+                     process.StartInfo.FileName = @".."+ Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar 
+                        + ".."+ Path.DirectorySeparatorChar + "pacman"+ Path.DirectorySeparatorChar + "bin"+ Path.DirectorySeparatorChar 
+                        + "Debug"+ Path.DirectorySeparatorChar + "pacman.exe"; 
+                    
                     //process.StartInfo.Arguments = "-n";
                     process.StartInfo.WorkingDirectory = path;
                     //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     process.Start();
+                    processes.Add(process.Id);
 
-                    /*
-                    if (text.Split().Length == 6 && text.Split().Length == 7)
-                        processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
-                    else
-                        Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
-                    */
-                }
-                else if (text.Split()[0].Equals("StartServer"))
+                        /*
+                        if (text.Split().Length == 6 && text.Split().Length == 7)
+                            processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
+                        else
+                            Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
+                        */
+                    }
+                    else if (text.Split()[0].Equals("StartServer"))
                 {
                     
                     Process process = new Process();
                     //Configure the process using the StartInfo properties.
-                    process.StartInfo.FileName = @"..\..\..\Server\bin\Debug\Server.exe";
-                    //process.StartInfo.Arguments = "-n";
+
+                    process.StartInfo.FileName = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar
+                       + ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
+                       + "Debug" + Path.DirectorySeparatorChar + "Server.exe";                     //process.StartInfo.Arguments = "-n";
                     process.StartInfo.WorkingDirectory = path;
                     //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     process.Start();
@@ -69,6 +80,7 @@ namespace PuppetMaster
                 }
                 else if (text.Split()[0].Equals("Freeze"))
                 {
+                    // https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
                     Console.WriteLine(text);
                 }
                 else if (text.Split()[0].Equals("Unfreeze"))
@@ -90,6 +102,17 @@ namespace PuppetMaster
                     Console.WriteLine(text);
                 text = Console.ReadLine();
             }
+
+            //AppDomain.CurrentDomain.ProcessExit += (sender, EventArgs) => {
+            //    foreach (int id in processes)
+            //        Console.Write("   {0}", id ); // Process.GetProcessById(id).KILL();
+            //};
+
         }
+
+
+    
+
     }
+
 }
