@@ -242,8 +242,8 @@ namespace pacman {
                     {
                         tbChat.AppendText ("exist: " + entry.Key.nick+" == "+nickname+ "\r\n");
                         if (!entry.Key.nick.Equals(nickname)) {
-                            tbChat.AppendText(nickname + ": "+ tbMsg.Text + " to: "+ entry.Key.nick+ "\r\n");
-                            Thread thread = new Thread(() => entry.Value.send(nickname, tbMsg.Text.ToString()));
+                            string msg = tbMsg.Text;
+                            Thread thread = new Thread(() => entry.Value.send(nickname, msg));
                             thread.Start();
                         }
                     }

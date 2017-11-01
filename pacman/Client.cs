@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -62,9 +63,16 @@ namespace pacman
         }
 
         //I'm new member, and I'm receiving from old members
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void receiveClient(ClientChat cc)
         {
-            
+            foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
+            {
+                if (cc.nick.Equals(entry.Key.nick))
+                {
+                    return;
+                }
+            }
             IClient clientProxy = (IClient)Activator.GetObject(
                     typeof(IClient),
                     cc.url);
@@ -79,13 +87,14 @@ namespace pacman
                 clientServiceName,
                 typeof(RemoteClient)
             );
+            Console.WriteLine("[IF] dictionary added from newclient: " + cc.nick);
             form.clients.Add(cc, clientProxy);
         }
 
         //Receiving new members
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void broadcastClientURL(String clientChat)
         {
-            Console.WriteLine("client add: " + clientChat);
             
             if (!File.Exists(clientChat))
             {
@@ -103,11 +112,13 @@ namespace pacman
                 try
                 {
                     ClientChat client = (ClientChat)formatter.Deserialize(stream);
-
-
-
-                    Console.WriteLine("Adding client to form: " + client.nick + ": " + client.url);
-                    
+                    foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
+                    {
+                        if (client.nick.Equals(entry.Key.nick))
+                        {
+                            throw new Exception("Client already exists!");
+                        }
+                    }
 
                     IClient clientProxy = (IClient)Activator.GetObject(
                     typeof(IClient),
@@ -123,10 +134,11 @@ namespace pacman
                         clientServiceName,
                         typeof(RemoteClient)
                     );
-                    
+                    Console.WriteLine("dictionary added: " + client.nick);
+                    if (!client.Equals(ownClient))
+                        form.clients.Add(client, clientProxy);
+                        
                     clientProxy.receiveClient(ownClient);
-
-                    form.clients.Add(client, clientProxy);
                 }
                 catch (SerializationException es)
                 {
@@ -159,11 +171,12 @@ namespace pacman
             Console.WriteLine("Client sending: "+nick+":"+msg);
             foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
             {
-                Console.WriteLine("Delivering to client: " + entry.Key);
+                Console.WriteLine("Delivering to client: " + entry.Key.nick);
                 if (!entry.Key.nick.Equals(nick))
                 {
                     try
                     {
+                        Console.WriteLine("[IF] Delivering to client: " + entry.Key.nick);
                         entry.Value.broadcast(nick, msg);
                     }
                     catch (Exception e)
