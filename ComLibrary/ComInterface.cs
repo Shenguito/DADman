@@ -17,7 +17,7 @@ namespace ComLibrary
         void receiveClient(ClientChat clientChat);
         void broadcastClientURL(string clientChat);
         void send(string nick, string msg);
-        void broadcast(string nick, string msg);
+        void broadcast(int id, string nick, string msg);
         void movePlayer(int numberPlayer, string movement);
     }
     [Serializable]

@@ -17,24 +17,11 @@ namespace pacman
     public delegate void deluc(string nick, string msg);
     public delegate void delmove(int playernumber, string move);
 
-    class Client
-    {
-        TcpChannel channel;
-        IServer serverProxy;
-        String nick;
-        int port;
-        
-    }
-
-
     class RemoteClient : MarshalByRefObject, IClient
     {
 
-        
-
-
-        TcpChannel channel;
-        IServer server;
+        Dictionary<string, List<int>> msgLog;
+        int clientMessageId=0;
         String nick;
         ClientChat ownClient = new ClientChat();
 
@@ -44,6 +31,7 @@ namespace pacman
 
         public RemoteClient(string nick, ClientForm form)
         {
+            msgLog = new Dictionary<string, List<int>>();
             ownClient.nick = nick;
             ownClient.url = "tcp://localhost:" + form.port + "/ChatClient";
             this.nick = nick;
@@ -57,9 +45,23 @@ namespace pacman
 
         }
 
-        public void broadcast(string nick, string msg)
+        public void broadcast(int id, string nick, string msg)
         {
-            this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+            List<int> lista = new List<int>();
+            if (!(msgLog.ContainsKey(nick))) {
+                lista.Add(id);
+                msgLog.Add(nick, lista);
+                this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+            }else
+            {
+                lista = msgLog[nick];
+                if (!lista.Contains(id))
+                {
+                    lista.Add(id);
+                    msgLog[nick] = lista;
+                    this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+                }
+            }
         }
 
         //I'm new member, and I'm receiving from old members
@@ -169,6 +171,7 @@ namespace pacman
         {
             // alternativa é lançar uma thread
             Console.WriteLine("Client sending: "+nick+":"+msg);
+            clientMessageId++;
             foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
             {
                 Console.WriteLine("Delivering to client: " + entry.Key.nick);
@@ -177,7 +180,7 @@ namespace pacman
                     try
                     {
                         Console.WriteLine("[IF] Delivering to client: " + entry.Key.nick);
-                        entry.Value.broadcast(nick, msg);
+                        entry.Value.broadcast(clientMessageId, nick, msg);
                     }
                     catch (Exception e)
                     {

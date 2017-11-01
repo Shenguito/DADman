@@ -55,7 +55,7 @@ namespace pacman {
 
         public ClientForm() {
 
-
+            
             clients = new Dictionary<ClientChat, IClient>();
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
@@ -108,6 +108,7 @@ namespace pacman {
                     this.ShowInTaskbar = true;
                     this.WindowState = FormWindowState.Normal;
                     InitializeComponent();
+                    this.Text += ": "+ nickname;
                     label2.Visible = false;
                 }
                 catch (Exception e)
@@ -240,11 +241,11 @@ namespace pacman {
                 if (!tbMsg.Text.Trim().Equals("")) {
                     foreach (KeyValuePair<ClientChat, IClient> entry in clients)
                     {
-                        tbChat.AppendText ("exist: " + entry.Key.nick+" == "+nickname+ "\r\n");
                         if (!entry.Key.nick.Equals(nickname)) {
                             string msg = tbMsg.Text;
                             Thread thread = new Thread(() => entry.Value.send(nickname, msg));
                             thread.Start();
+                            tbChat.Text += nick + ": " + msg + "\r\n";
                         }
                     }
                     tbMsg.Clear();
