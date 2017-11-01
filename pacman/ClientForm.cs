@@ -245,7 +245,7 @@ namespace pacman {
                             string msg = tbMsg.Text;
                             Thread thread = new Thread(() => entry.Value.send(nickname, msg));
                             thread.Start();
-                            tbChat.Text += nick + ": " + msg + "\r\n";
+                            tbChat.Text += nickname + ": " + msg + "\r\n";
                         }
                     }
                     tbMsg.Clear();
