@@ -9,6 +9,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using System.Xml.Serialization;
 
 namespace pacman
@@ -63,7 +64,7 @@ namespace pacman
                 }
             }
         }
-
+        /*
         //I'm new member, and I'm receiving from old members
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void receiveClient(ClientChat cc)
@@ -92,62 +93,42 @@ namespace pacman
             Console.WriteLine("[IF] dictionary added from newclient: " + cc.nick);
             form.clients.Add(cc, clientProxy);
         }
-
+        */
         //Receiving new members
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void broadcastClientURL(String clientChat)
+        public void broadcastClientURL(int playerNumber, string nick, int port)
         {
-            
-            if (!File.Exists(clientChat))
-            {
-                Console.WriteLine("client didn't be found" + clientChat);
-            }
             
             try
             {
-                FileStream stream = new FileStream(clientChat,
-                          FileMode.Open,
-                          FileAccess.Read,
-                          FileShare.Read
-                          );
-                IFormatter formatter = new BinaryFormatter();
-                try
+                foreach (KeyValuePair<string, IClient> entry in form.clients)
                 {
-                    ClientChat client = (ClientChat)formatter.Deserialize(stream);
-                    foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
+                    if (nick.Equals(entry.Key))
                     {
-                        if (client.nick.Equals(entry.Key.nick))
-                        {
-                            throw new Exception("Client already exists!");
-                        }
+                        throw new Exception("Client already exists!");
                     }
-
-                    IClient clientProxy = (IClient)Activator.GetObject(
-                    typeof(IClient),
-                    client.url);
-
-                    // Registro do cliente
-                    RemoteClient rmc = new RemoteClient(client.nick, form);
-                    String clientServiceName = "ChatClient";
-
-                    // ## dont know what this does
-                    RemotingServices.Marshal(
-                        rmc,
-                        clientServiceName,
-                        typeof(RemoteClient)
-                    );
-                    Console.WriteLine("dictionary added: " + client.nick);
-                    if (!client.Equals(ownClient))
-                        form.clients.Add(client, clientProxy);
-                        
-                    clientProxy.receiveClient(ownClient);
                 }
-                catch (SerializationException es)
-                {
-                    Console.WriteLine("Failed to deserialize.Reason: " + es.Message);
-                }
-                finally{ stream.Close(); }
-                
+                string url = "tcp://localhost:" + port + "/ChatClient";
+                IClient clientProxy = (IClient)Activator.GetObject(
+                typeof(IClient),
+                url);
+                /*
+                // Registro do cliente
+                RemoteClient rmc = new RemoteClient(nick, form);
+                String clientServiceName = "ChatClient";
+
+                // ## dont know what this does
+                RemotingServices.Marshal(
+                    rmc,
+                    clientServiceName,
+                    typeof(RemoteClient)
+                );
+                */
+
+                Console.WriteLine("dictionary added: " + nick);
+                //if (!nick.Equals(ownClient))
+                form.clients.Add(nick, clientProxy);
+                //clientProxy.receiveClient(ownClient);
             }
             catch (Exception e)
             {
@@ -172,20 +153,25 @@ namespace pacman
             // alternativa é lançar uma thread
             Console.WriteLine("Client sending: "+nick+":"+msg);
             clientMessageId++;
-            foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
+            foreach (KeyValuePair<string, IClient> entry in form.clients)
             {
-                Console.WriteLine("Delivering to client: " + entry.Key.nick);
-                if (!entry.Key.nick.Equals(nick))
+                Console.WriteLine("Delivering to client: " + entry.Key);
+                if (!entry.Key.Equals(nick))
                 {
                     try
                     {
-                        Console.WriteLine("[IF] Delivering to client: " + entry.Key.nick);
+                        Console.WriteLine("[IF] Delivering to client: " + entry.Key);
                         entry.Value.broadcast(clientMessageId, nick, msg);
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Exception on server send");
                     }
+                }
+                else
+                {
+                    Thread thread = new Thread(() => broadcast(clientMessageId, nick, msg));
+                    thread.Start();
                 }
             }
         }

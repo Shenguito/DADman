@@ -23,6 +23,7 @@ namespace Server
         public int playernumber;
         public string url;
         public IClient clientProxy;
+        public int port;
         // defined at end
         public int score;
         internal int playerNumber;
@@ -74,10 +75,11 @@ namespace Server
         }
 
 
-        public void connect(string nick, string url)
+        public void connect(string nick, int port)
         {
             
             Client c = new Client();
+            string url = "tcp://localhost:" + port + "/ChatClient";
             IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),
                 url
@@ -89,61 +91,27 @@ namespace Server
 
             c.nick = nick;
             c.url = url;
+            c.port = port;
             c.clientProxy = clientProxy;
             c.playernumber = numberPlayersConnected;
 
             clientList.Add(c);
-            Console.WriteLine("Connected client " + c.nick + "player:" + c.playernumber);
-
-            //Thread
-            Console.WriteLine("broadcast to:" + c.nick + " => " + url);
-            ClientChat clientChat = new ClientChat();
-            clientChat.nick = c.nick;
-            clientChat.url = c.url;
-            String dir = @"..\..\..\ComLibrary\bin\";
-            String clientInfo = dir + "player" + c.playernumber + ".bin";
-
-            Stream stream = new FileStream(clientInfo,
-                     FileMode.Create,
-                     FileAccess.Write, FileShare.None
-                     );
-            BinaryFormatter formatter = new BinaryFormatter();
-            try
-            {
-                formatter.Serialize(stream, clientChat);
-            }
-            catch (SerializationException es)
-            {
-                Console.WriteLine("Failed to serialize. Reason: " + es.Message);
-            }
-            finally
-            {
-                stream.Close();
-            }
+            
             foreach (Client client in clientList)
             {
                 
                 Console.WriteLine("Client : " + nick+" Client to sent:" + client.nick);
-                
-                try
+                if (!client.nick.Equals(nick))
                 {
-                    Console.WriteLine("Entrei na if: " + client.nick + " : " + clientInfo);
-                    Thread thread = new Thread(() => client.clientProxy.broadcastClientURL(clientInfo));
-                    thread.Start();
-                    Console.WriteLine("broadcastClientURL sent: " + clientInfo);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("IMPORTANTE Exception: didn't send broadcastClientURL");
-                }
-                
-                if (!File.Exists(clientInfo))
-                {
-                    Console.WriteLine("IMPORTANTE Exception: File Doesn't exist: "+ clientInfo);
+                    client.clientProxy.broadcastClientURL(numberPlayersConnected, nick, port);
                 }
                 else
                 {
-                    Console.WriteLine("IMPORTANTE Exception: File exists: "+ clientInfo);
+                    foreach (Client oldClient in clientList)
+                    {
+                        Thread thread = new Thread(() => client.clientProxy.broadcastClientURL(oldClient.playernumber, oldClient.nick, oldClient.port));
+                        thread.Start();
+                    }
                 }
             }
 

@@ -9,13 +9,13 @@ namespace ComLibrary
     public interface IServer
     {
         //void send(String nick, String msg);
-        void connect(string nick, string url);
+        void connect(string nick, int port);
         void sendMove(string nick, string direction);
     }
     public interface IClient
     {
-        void receiveClient(ClientChat clientChat);
-        void broadcastClientURL(string clientChat);
+        //void receiveClient(ClientChat clientChat);
+        void broadcastClientURL(int playerNumber, string nick, int port);
         void send(string nick, string msg);
         void broadcast(int id, string nick, string msg);
         void movePlayer(int numberPlayer, string movement);

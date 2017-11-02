@@ -49,14 +49,12 @@ namespace pacman {
         LoginForm formLogin;
         public TcpChannel channel;
         IServer serverProxy;
-
-        public Dictionary<ClientChat, IClient> clients; 
+        public Dictionary<string, IClient> clients; 
         //public Dictionary<string, IClient> clients { get => clients; set => clients = value; }
 
         public ClientForm() {
-
             
-            clients = new Dictionary<ClientChat, IClient>();
+            clients = new Dictionary<string, IClient>();
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             formLogin = new LoginForm(this);
@@ -99,7 +97,7 @@ namespace pacman {
             {
                 try
                 {
-                    serverProxy.connect(nickname, "tcp://localhost:" + port + "/" + clientServiceName);
+                    serverProxy.connect(nickname, port);
 
                     formLogin.Close();
 
@@ -239,19 +237,23 @@ namespace pacman {
                 }
                 */
                 if (!tbMsg.Text.Trim().Equals("")) {
-                    foreach (KeyValuePair<ClientChat, IClient> entry in clients)
+                    string msg = tbMsg.Text;
+                    IClient myself=null;
+                    foreach (KeyValuePair<string, IClient> entry in clients)
                     {
-                        if (!entry.Key.nick.Equals(nickname)) {
-                            string msg = tbMsg.Text;
-                            Thread thread = new Thread(() => entry.Value.send(nickname, msg));
-                            thread.Start();
-                            tbChat.Text += nickname + ": " + msg + "\r\n";
+                        if (!entry.Key.Equals(nickname)) {
+                            entry.Value.send(nickname, msg);
+                        }else
+                        {
+                            myself = entry.Value;
                         }
                     }
-                    tbMsg.Clear();
-                    tbMsg.Enabled = false;
-                    this.Focus();
+                    if(myself!=null)
+                    myself.send(nickname, msg);
                 }
+                tbMsg.Clear();
+                tbMsg.Enabled = false;
+                this.Focus();
             }
         }
         public void updateChat(string nick, string msg)
