@@ -33,6 +33,7 @@ namespace Server
         public ServerForm()
         {
             InitializeComponent();
+            this.Visible = true;
         }
 
         public PictureBox retrievePicture(int playerNumber)
