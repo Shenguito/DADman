@@ -42,6 +42,7 @@ namespace Server
                 Path.PathSeparator);
             */
             createConnection();
+            
         }
 
         
@@ -185,7 +186,7 @@ namespace Server
                 try
                 {
                     //Console.WriteLine("reach client foreach");
-                    c.clientProxy.movePlayer(c.playernumber, move);
+                    c.clientProxy.movePlayer(playerNumber, move);
                     //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
                 }
                 catch (Exception e)
