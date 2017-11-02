@@ -12,7 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Xml.Serialization;
 
-namespace pacman
+namespace Client
 {
 
     public delegate void deluc(string nick, string msg);

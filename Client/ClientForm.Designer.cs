@@ -1,4 +1,4 @@
-﻿namespace pacman {
+﻿namespace Client {
     partial class ClientForm {
         /// <summary>
         /// Required designer variable.
@@ -207,7 +207,7 @@
             // pictureBoxPlayer1
             // 
             this.pictureBoxPlayer1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer1.Image = global::pacman.Properties.Resources.Left;
+            this.pictureBoxPlayer1.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer1.Location = new System.Drawing.Point(8, 40);
             this.pictureBoxPlayer1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxPlayer1.Name = "pictureBoxPlayer1";
@@ -219,7 +219,7 @@
             // pinkGhost
             // 
             this.pinkGhost.BackColor = System.Drawing.Color.Transparent;
-            this.pinkGhost.Image = global::pacman.Properties.Resources.pink_guy;
+            this.pinkGhost.Image = global::Client.Properties.Resources.pink_guy;
             this.pinkGhost.Location = new System.Drawing.Point(301, 72);
             this.pinkGhost.Name = "pinkGhost";
             this.pinkGhost.Size = new System.Drawing.Size(30, 30);
@@ -231,7 +231,7 @@
             // yellowGhost
             // 
             this.yellowGhost.BackColor = System.Drawing.Color.Transparent;
-            this.yellowGhost.Image = global::pacman.Properties.Resources.yellow_guy;
+            this.yellowGhost.Image = global::Client.Properties.Resources.yellow_guy;
             this.yellowGhost.Location = new System.Drawing.Point(221, 273);
             this.yellowGhost.Name = "yellowGhost";
             this.yellowGhost.Size = new System.Drawing.Size(30, 30);
@@ -243,7 +243,7 @@
             // redGhost
             // 
             this.redGhost.BackColor = System.Drawing.Color.Transparent;
-            this.redGhost.Image = global::pacman.Properties.Resources.red_guy;
+            this.redGhost.Image = global::Client.Properties.Resources.red_guy;
             this.redGhost.Location = new System.Drawing.Point(180, 73);
             this.redGhost.Name = "redGhost";
             this.redGhost.Size = new System.Drawing.Size(30, 30);
@@ -973,7 +973,7 @@
             // pictureBoxPlayer6
             // 
             this.pictureBoxPlayer6.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer6.Image = global::pacman.Properties.Resources.Left;
+            this.pictureBoxPlayer6.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer6.Location = new System.Drawing.Point(8, 240);
             this.pictureBoxPlayer6.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxPlayer6.Name = "pictureBoxPlayer6";
@@ -985,7 +985,7 @@
             // pictureBoxPlayer2
             // 
             this.pictureBoxPlayer2.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer2.Image = global::pacman.Properties.Resources.Left;
+            this.pictureBoxPlayer2.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer2.Location = new System.Drawing.Point(8, 78);
             this.pictureBoxPlayer2.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxPlayer2.Name = "pictureBoxPlayer2";
@@ -997,7 +997,7 @@
             // pictureBoxPlayer5
             // 
             this.pictureBoxPlayer5.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer5.Image = global::pacman.Properties.Resources.Left;
+            this.pictureBoxPlayer5.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer5.Location = new System.Drawing.Point(7, 200);
             this.pictureBoxPlayer5.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxPlayer5.Name = "pictureBoxPlayer5";
@@ -1009,7 +1009,7 @@
             // pictureBoxPlayer3
             // 
             this.pictureBoxPlayer3.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer3.Image = global::pacman.Properties.Resources.Left;
+            this.pictureBoxPlayer3.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer3.Location = new System.Drawing.Point(7, 120);
             this.pictureBoxPlayer3.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxPlayer3.Name = "pictureBoxPlayer3";
@@ -1021,7 +1021,7 @@
             // pictureBoxPlayer4
             // 
             this.pictureBoxPlayer4.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer4.Image = global::pacman.Properties.Resources.Left;
+            this.pictureBoxPlayer4.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer4.Location = new System.Drawing.Point(7, 160);
             this.pictureBoxPlayer4.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxPlayer4.Name = "pictureBoxPlayer4";

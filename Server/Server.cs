@@ -67,13 +67,6 @@ namespace Server
         ArrayList clientList = new ArrayList();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
-        public ServerForm serverForm;
-
-        public RemoteServer()
-        {
-            serverForm = new ServerForm();
-        }
-
 
         public void connect(string nick, int port)
         {
@@ -131,8 +124,7 @@ namespace Server
             Console.WriteLine("player"+ playerNumber + ": " + nick + "receives: " + move);
 
             int pl_number = player_image_hashmap[nick];
-
-            serverForm.processMove(pl_number, move);
+            
 
             foreach (Client c in clientList)
             {

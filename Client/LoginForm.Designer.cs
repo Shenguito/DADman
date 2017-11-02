@@ -1,4 +1,4 @@
-﻿namespace pacman
+﻿namespace Client
 {
     partial class LoginForm
     {

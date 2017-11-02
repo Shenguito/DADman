@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace pacman
+namespace Client
 {
     public partial class LoginForm : Form
     {

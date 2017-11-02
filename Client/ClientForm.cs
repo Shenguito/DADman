@@ -17,7 +17,7 @@ using System.Windows.Forms;
 
 
 
-namespace pacman {
+namespace Client {
     public partial class ClientForm : Form {
 
         string nickname;
