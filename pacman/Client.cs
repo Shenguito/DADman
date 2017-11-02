@@ -24,7 +24,6 @@ namespace pacman
         Dictionary<string, List<int>> msgLog;
         int clientMessageId=0;
         String nick;
-        ClientChat ownClient = new ClientChat();
 
         ClientForm form;
         
@@ -33,8 +32,6 @@ namespace pacman
         public RemoteClient(string nick, ClientForm form)
         {
             msgLog = new Dictionary<string, List<int>>();
-            ownClient.nick = nick;
-            ownClient.url = "tcp://localhost:" + form.port + "/ChatClient";
             this.nick = nick;
             this.form = form;
             //TODO
@@ -48,6 +45,7 @@ namespace pacman
 
         public void broadcast(int id, string nick, string msg)
         {
+            //TODO
             List<int> lista = new List<int>();
             if (!(msgLog.ContainsKey(nick))) {
                 lista.Add(id);
@@ -64,36 +62,7 @@ namespace pacman
                 }
             }
         }
-        /*
-        //I'm new member, and I'm receiving from old members
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void receiveClient(ClientChat cc)
-        {
-            foreach (KeyValuePair<ClientChat, IClient> entry in form.clients)
-            {
-                if (cc.nick.Equals(entry.Key.nick))
-                {
-                    return;
-                }
-            }
-            IClient clientProxy = (IClient)Activator.GetObject(
-                    typeof(IClient),
-                    cc.url);
-
-            // Registro do cliente
-            RemoteClient rmc = new RemoteClient(cc.nick, form);
-            String clientServiceName = "ChatClient";
-
-            // ## dont know what this does
-            RemotingServices.Marshal(
-                rmc,
-                clientServiceName,
-                typeof(RemoteClient)
-            );
-            Console.WriteLine("[IF] dictionary added from newclient: " + cc.nick);
-            form.clients.Add(cc, clientProxy);
-        }
-        */
+        
         //Receiving new members
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void broadcastClientURL(int playerNumber, string nick, int port)
@@ -126,9 +95,8 @@ namespace pacman
                 */
 
                 Console.WriteLine("dictionary added: " + nick);
-                //if (!nick.Equals(ownClient))
+
                 form.clients.Add(nick, clientProxy);
-                //clientProxy.receiveClient(ownClient);
             }
             catch (Exception e)
             {

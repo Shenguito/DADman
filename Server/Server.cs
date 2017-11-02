@@ -120,28 +120,6 @@ namespace Server
             //unnecessary
             assignPlayer(c); 
         }
-        /*
-        public void send(string nick, string msg)
-        {
-            Console.WriteLine("Sending message = " + msg + " ; from nick = " + nick);
-            // alternativa é lançar uma thread
-            foreach (Client c in clientList)
-            {
-                Console.WriteLine("Delivering to client: " + c.nick);
-                if (!c.nick.Equals(nick))
-                {
-                    try
-                    {
-                        c.clientProxy.broadcast(nick, msg);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception on server send");
-                    }
-                }
-            }
-        }
-        */
 
         public void sendMove(string nick, string move)
         {

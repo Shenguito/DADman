@@ -8,36 +8,17 @@ namespace ComLibrary
 {
     public interface IServer
     {
-        //void send(String nick, String msg);
         void connect(string nick, int port);
         void sendMove(string nick, string direction);
     }
     public interface IClient
     {
-        //void receiveClient(ClientChat clientChat);
         void broadcastClientURL(int playerNumber, string nick, int port);
         void send(string nick, string msg);
         void broadcast(int id, string nick, string msg);
         void movePlayer(int numberPlayer, string movement);
     }
-    [Serializable]
-    public class ClientChat
-    {
-        public string nick;
-        public string url;
-        //public IClient clientProxy;
-        public ClientChat()
-        {
 
-        }
-        /*
-        public ClientChat(String nick, string url, IClient clientProxy)
-        {
-            this.nick = nick;
-            this.url = url;
-            this.clientProxy = clientProxy;
-        }*/
-    }
 
     [Serializable]
     public class ClientNotFoundException : ApplicationException
