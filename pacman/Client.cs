@@ -34,7 +34,7 @@ namespace pacman
             msgLog = new Dictionary<string, List<int>>();
             this.nick = nick;
             this.form = form;
-            //TODO
+            
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteClient),
                 "ChatClient",
@@ -45,7 +45,7 @@ namespace pacman
 
         public void broadcast(int id, string nick, string msg)
         {
-            //TODO
+            //TODO Create Vector clocks
             List<int> lista = new List<int>();
             if (!(msgLog.ContainsKey(nick))) {
                 lista.Add(id);

@@ -18,11 +18,6 @@ namespace pacman
     {
         ClientForm form;
 
-        TcpChannel channel;
-        IServer serverProxy;
-        String nick;
-        int port = 8086;
-
 
         public LoginForm(ClientForm form)
         {

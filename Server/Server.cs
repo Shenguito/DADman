@@ -85,8 +85,6 @@ namespace Server
                 url
             );
 
-            Console.WriteLine("Connected client with url = " + url + " ; with nick = " + nick);
-
             numberPlayersConnected++;
 
             c.nick = nick;
@@ -116,8 +114,7 @@ namespace Server
             }
 
             //Creates a correspondence Nick - Player Number i.e. John - Player1
-
-            //unnecessary
+            
             assignPlayer(c); 
         }
 

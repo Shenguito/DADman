@@ -230,12 +230,7 @@ namespace pacman {
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
             {
-                /*//TODO TEST dicrtionary only contains himself
-                foreach(KeyValuePair<ClientChat, IClient> entry in clients)
-                {
-                    tbChat.Text += "PlayerName: " + entry.Key.nick + ":" + entry.Key.url+ "\r\n";
-                }
-                */
+                
                 if (!tbMsg.Text.Trim().Equals("")) {
                     string msg = tbMsg.Text;
                     IClient myself=null;
