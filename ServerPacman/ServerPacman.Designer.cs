@@ -96,8 +96,6 @@
             this.pictureBox62 = new System.Windows.Forms.PictureBox();
             this.pictureBox63 = new System.Windows.Forms.PictureBox();
             this.pictureBox64 = new System.Windows.Forms.PictureBox();
-            this.tbMsg = new System.Windows.Forms.TextBox();
-            this.tbChat = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pacman)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pinkGhost)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowGhost)).BeginInit();
@@ -942,31 +940,11 @@
             this.pictureBox64.TabStop = false;
             this.pictureBox64.Tag = "coin";
             // 
-            // tbMsg
-            // 
-            this.tbMsg.Enabled = false;
-            this.tbMsg.Location = new System.Drawing.Point(367, 315);
-            this.tbMsg.Name = "tbMsg";
-            this.tbMsg.Size = new System.Drawing.Size(100, 20);
-            this.tbMsg.TabIndex = 143;
-            this.tbMsg.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbMsg_KeyDown);
-            // 
-            // tbChat
-            // 
-            this.tbChat.Enabled = false;
-            this.tbChat.Location = new System.Drawing.Point(367, 40);
-            this.tbChat.Multiline = true;
-            this.tbChat.Name = "tbChat";
-            this.tbChat.Size = new System.Drawing.Size(100, 255);
-            this.tbChat.TabIndex = 144;
-            // 
-            // Form1
+            // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(479, 344);
-            this.Controls.Add(this.tbChat);
-            this.Controls.Add(this.tbMsg);
+            this.ClientSize = new System.Drawing.Size(356, 343);
             this.Controls.Add(this.pictureBox56);
             this.Controls.Add(this.pictureBox57);
             this.Controls.Add(this.pictureBox58);
@@ -1037,7 +1015,7 @@
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.pictureBox1);
-            this.Name = "Form1";
+            this.Name = "ServerForm";
             this.Text = "DADman";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyisdown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.keyisup);
@@ -1187,8 +1165,6 @@
         private System.Windows.Forms.PictureBox pictureBox62;
         private System.Windows.Forms.PictureBox pictureBox63;
         private System.Windows.Forms.PictureBox pictureBox64;
-        private System.Windows.Forms.TextBox tbMsg;
-        private System.Windows.Forms.TextBox tbChat;
     }
 }
 
