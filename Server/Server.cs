@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace Server
@@ -35,7 +36,7 @@ namespace Server
         private int MSECROUND = 10; //game speed [communication refresh time]
         const int PORT = 8000;
         static TcpChannel channel = new TcpChannel(PORT);
-        
+       
 
         public Server()
         {
@@ -44,10 +45,12 @@ namespace Server
                 Path.PathSeparator);
             */
 
-
+            
+            
             createConnection();
             
         }
+
 
         
         private void createConnection()
@@ -67,6 +70,22 @@ namespace Server
         ArrayList clientList = new ArrayList();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
+
+        //TODO NUNES THIS IS FOR YOU
+        public ServerForm serverForm;
+        public RemoteServer()
+        {
+            Thread thread = new Thread(() => createServerForm());
+            thread.Start();
+        }
+
+
+        private void createServerForm()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(serverForm = new ServerForm());
+        }
 
         public void connect(string nick, int port)
         {
