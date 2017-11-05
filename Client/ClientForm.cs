@@ -230,25 +230,31 @@ namespace Client {
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
             {
-                
-                if (!tbMsg.Text.Trim().Equals("")) {
-                    string msg = tbMsg.Text;
-                    IClient myself=null;
-                    foreach (KeyValuePair<string, IClient> entry in clients)
-                    {
-                        if (!entry.Key.Equals(nickname)) {
-                            entry.Value.send(nickname, msg);
-                        }else
+                try {
+                    if (!tbMsg.Text.Trim().Equals("")) {
+                        string msg = tbMsg.Text;
+                        IClient myself=null;
+                        foreach (KeyValuePair<string, IClient> entry in clients)
                         {
-                            myself = entry.Value;
+                            if (!entry.Key.Equals(nickname)) {
+                                entry.Value.send(nickname, msg);
+                            }else
+                            {
+                                myself = entry.Value;
+                            }
                         }
+                        if(myself!=null)
+                        myself.send(nickname, msg);
                     }
-                    if(myself!=null)
-                    myself.send(nickname, msg);
+                    tbMsg.Clear();
+                    tbMsg.Enabled = false;
+                    this.Focus();
                 }
-                tbMsg.Clear();
-                tbMsg.Enabled = false;
-                this.Focus();
+                catch (Exception exception)
+                {
+                    //TODO exception
+                    throw new ThereIsNoCommunication(exception.Message);
+                }
             }
         }
         public void updateChat(string nick, string msg)

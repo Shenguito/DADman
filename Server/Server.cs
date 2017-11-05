@@ -44,11 +44,8 @@ namespace Server
             Console.WriteLine("Path.PathSeparator={0}", 
                 Path.PathSeparator);
             */
-
-            
             
             createConnection();
-            
         }
 
 

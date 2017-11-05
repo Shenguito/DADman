@@ -81,8 +81,9 @@ namespace Client
                 IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),
                 url);
+
                 /*
-                // Registro do cliente
+                // Registro do cliente TODO to understand this code
                 RemoteClient rmc = new RemoteClient(nick, form);
                 String clientServiceName = "ChatClient";
 
@@ -100,8 +101,8 @@ namespace Client
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception Started:\r\n "+e.ToString()+"\r\nException ending");
-                //throw new ClientNotFoundException(e.Message);
+                //TODO exception
+                throw new ThereIsNoCommunication(e.Message);
             }
             
         }
@@ -133,7 +134,8 @@ namespace Client
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception on server send");
+                        //TODO exception
+                        throw new ClientIsDown(e.Message);
                     }
                 }
                 else
