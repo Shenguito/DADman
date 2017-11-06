@@ -25,9 +25,8 @@ namespace Server
         public string url;
         public IClient clientProxy;
         public int port;
-        // defined at end
+        // TODO defined at end
         public int score;
-        internal int playerNumber;
        
     }
 
@@ -40,11 +39,10 @@ namespace Server
 
         public Server()
         {
-            /*
+            /* TODO FOR LINUX / WINDOWS
             Console.WriteLine("Path.PathSeparator={0}", 
                 Path.PathSeparator);
             */
-            
             createConnection();
         }
 
@@ -64,15 +62,16 @@ namespace Server
     }
     public class RemoteServer : MarshalByRefObject, IServer
     {
-        ArrayList clientList = new ArrayList();
+        internal List<Client> clientList = new List<Client>();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
         public delegate void delProcess(int playerNumber, string move);
 
 
-        //TODO NUNES THIS IS FOR YOU
         public ServerForm serverForm;
         private ArrayList deadPlayers = new ArrayList();
+
+        //TODO 
         public RemoteServer()
         {
             Thread thread = new Thread(() => createServerForm());
@@ -132,6 +131,7 @@ namespace Server
 
         public void sendMove(string nick, string move)
         {
+            /*
             int playerNumber=0;
             
             foreach(Client c in clientList)
@@ -140,29 +140,23 @@ namespace Server
                     playerNumber = c.playernumber;
             }
             
-            Console.WriteLine("player"+ playerNumber + ": " + nick + "receives: " + move);
-
+            Console.WriteLine("player"+ playerNumber + ": " + nick + "\t receives: " + move);
+            */
             int pl_number = player_image_hashmap[nick];
 
-
-            this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
-            //serverForm.processMove(pl_number, move);
-
-
-            foreach (Client c in clientList)
+            try
             {
-                try
-                {
-                    //Console.WriteLine("reach client foreach");
-                    c.clientProxy.movePlayer(playerNumber, move);
-                    //Console.WriteLine("player:" + c.playernumber + " suposely receives: " + move);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception on server sendMove");
-                }
-                
+                this.serverForm.listMove.Add(pl_number, move);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("Client already sent a move in this round...\r\n");
+            }
+
+            //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
+
+
+            
         }
 
        

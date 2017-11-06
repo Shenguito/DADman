@@ -29,8 +29,6 @@ namespace Client
 
         ClientForm form;
         
-
-
         public RemoteClient(string nick, ClientForm form)
         {
             msgLog = new Dictionary<string, List<int>>();
