@@ -70,6 +70,7 @@ namespace Server
 
         //TODO NUNES THIS IS FOR YOU
         public ServerForm serverForm;
+        private ArrayList deadPlayers = new ArrayList();
         public RemoteServer()
         {
             Thread thread = new Thread(() => createServerForm());

@@ -48,19 +48,19 @@ namespace Server {
         {
             if (playerNumber == 1)
             {
-                return pictureBoxPlayer1;
+                return pictureBox1;
             }
             if (playerNumber == 2)
             {
-                return pictureBoxPlayer2;
+                return pictureBox2;
             }
             if (playerNumber == 3)
             {
-                return pictureBoxPlayer3;
+                return pictureBox3;
             }
             else
             {
-                return pictureBoxPlayer4;
+                return pictureBox4;
             }
 
         }
