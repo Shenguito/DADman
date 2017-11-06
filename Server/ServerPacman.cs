@@ -68,31 +68,37 @@ namespace Server {
         public void processMove(int playerNumber, string move)
         {
             PictureBox pb = retrievePicture(playerNumber);
-
-            updatePlayerPosition(pb, move);
-
-            foreach (Control x in this.Controls)
+            try
             {
-                // checking if the player hits the wall or the ghost, then game is over
-                if (x is PictureBox && x.Tag == "wall" || x.Tag == "ghost")
-                {
-                    if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
-                    {
-                        pb.Left = 0;
-                        pb.Top = 25;
-                        sendPlayerDead(playerNumber);
+                updatePlayerPosition(pb, move);
 
-                    }
-                }
-                if (x is PictureBox && x.Tag == "coin")
+                foreach (Control x in this.Controls)
                 {
-                    if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
+                    // checking if the player hits the wall or the ghost, then game is over
+                    if (x is PictureBox && x.Tag == "wall" || x.Tag == "ghost")
                     {
-                        Controls.Remove(x);
-                        sendCoinEaten(playerNumber, x.Name);
+                        if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
+                        {
+                            pb.Left = 0;
+                            pb.Top = 25;
+                            sendPlayerDead(playerNumber);
+
+                        }
+                    }
+                    if (x is PictureBox && x.Tag == "coin")
+                    {
+                        if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
+                        {
+                            Controls.Remove(x);
+                            sendCoinEaten(playerNumber, x.Name);
+                        }
                     }
                 }
+            }catch(Exception e)
+            {
+                Console.WriteLine("Start: \r\n" + e.ToString() + "\r\nEnd");
             }
+            
         }
 
 

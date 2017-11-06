@@ -141,7 +141,9 @@ namespace Server
             Console.WriteLine("player"+ playerNumber + ": " + nick + "receives: " + move);
 
             int pl_number = player_image_hashmap[nick];
-            
+
+            serverForm.processMove(pl_number, move);
+
 
             foreach (Client c in clientList)
             {
