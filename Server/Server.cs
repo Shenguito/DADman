@@ -67,6 +67,8 @@ namespace Server
         ArrayList clientList = new ArrayList();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
         public int numberPlayersConnected = 0;
+        public delegate void delProcess(int playerNumber, string move);
+
 
         //TODO NUNES THIS IS FOR YOU
         public ServerForm serverForm;
@@ -142,7 +144,9 @@ namespace Server
 
             int pl_number = player_image_hashmap[nick];
 
-            serverForm.processMove(pl_number, move);
+
+            this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
+            //serverForm.processMove(pl_number, move);
 
 
             foreach (Client c in clientList)

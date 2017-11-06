@@ -1072,6 +1072,11 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBoxPlayer1);
+            this.Controls.Add(this.pictureBoxPlayer2);
+            this.Controls.Add(this.pictureBoxPlayer3);
+            this.Controls.Add(this.pictureBoxPlayer4);
+            this.Controls.Add(this.pictureBoxPlayer5);
+            this.Controls.Add(this.pictureBoxPlayer6);
             this.Controls.Add(this.pinkGhost);
             this.Controls.Add(this.yellowGhost);
             this.Controls.Add(this.redGhost);
@@ -1082,6 +1087,11 @@
             this.Name = "ServerForm";
             this.Text = "DADman";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pinkGhost)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowGhost)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.redGhost)).EndInit();

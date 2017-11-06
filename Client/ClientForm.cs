@@ -327,7 +327,6 @@ namespace Client {
         {
             foreach (Control x in this.Controls)
             {
-                tbChat.Text += "Comi coin!";
                 if (x is PictureBox && x.Tag == "coin" && x.Name.Equals(coinName))
                 {
                     Controls.Remove(x);
