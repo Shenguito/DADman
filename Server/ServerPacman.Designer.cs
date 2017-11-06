@@ -186,12 +186,6 @@
             this.label2.TabIndex = 72;
             this.label2.Text = "label2";
             // 
-            // timer1
-            // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 20;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
             // pacman
             // 
             this.pacman.BackColor = System.Drawing.Color.Transparent;
@@ -1017,8 +1011,6 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "ServerForm";
             this.Text = "DADman";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyisdown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.keyisup);
             ((System.ComponentModel.ISupportInitialize)(this.pacman)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pinkGhost)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowGhost)).EndInit();

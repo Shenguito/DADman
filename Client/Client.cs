@@ -17,6 +17,8 @@ namespace Client
 
     public delegate void deluc(string nick, string msg);
     public delegate void delmove(int playernumber, string move);
+    public delegate void delDead(int playerNumber);
+    public delegate void delCoin(int playerNumber, string coinName);
 
     class RemoteClient : MarshalByRefObject, IClient
     {
@@ -144,6 +146,14 @@ namespace Client
                     thread.Start();
                 }
             }
+        }
+        public void coinEaten(int playerNumber, string coinName)
+        {
+            this.form.Invoke(new delCoin(form.updateCoin), new object[] { playerNumber, coinName });
+        }
+        public void playerDead(int playerNumber)
+        {
+            this.form.Invoke(new delDead(form.updateDead), new object[] { playerNumber });
         }
     }
 }

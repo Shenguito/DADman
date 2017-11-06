@@ -10,6 +10,8 @@ namespace ComLibrary
     {
         void connect(string nick, int port);
         void sendMove(string nick, string direction);
+        void sendCoinEaten(int playerNumber, string coinName);
+        void sendPlayerDead(int playerNumber);
     }
     public interface IClient
     {
@@ -17,27 +19,7 @@ namespace ComLibrary
         void send(string nick, string msg);
         void broadcast(int id, string nick, string msg);
         void movePlayer(int numberPlayer, string movement);
-    }
-
-
-    [Serializable]
-    public class ClientNotFoundException : ApplicationException
-    {
-
-        public ClientNotFoundException() { }
-
-        public ClientNotFoundException(string msg)
-            : base(msg)
-        {
-        }
-        public ClientNotFoundException(System.Runtime.Serialization.SerializationInfo info,
-        System.Runtime.Serialization.StreamingContext context)
-        : base(info, context)
-        {
-        }
-        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-        }
+        void coinEaten(int playerNumber, string coinName);
+        void playerDead(int playerNumber);
     }
 }

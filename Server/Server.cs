@@ -62,7 +62,7 @@ namespace Server
 
         
     }
-    class RemoteServer : MarshalByRefObject, IServer
+    public class RemoteServer : MarshalByRefObject, IServer
     {
         ArrayList clientList = new ArrayList();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
@@ -81,7 +81,7 @@ namespace Server
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(serverForm = new ServerForm());
+            Application.Run(serverForm = new ServerForm(this));
         }
 
         public void connect(string nick, int port)
@@ -169,6 +169,40 @@ namespace Server
             }
 
         }
-        
+
+        public void sendPlayerDead(int playerNumber)
+        {
+            deadPlayers.Add(playerNumber);
+
+            foreach (Client c in clientList)
+            {
+                try
+                {
+                    c.clientProxy.playerDead(playerNumber);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception on server sendPlayerDead()");
+                }
+
+            }
+        }
+
+        public void sendCoinEaten(int playerNumber, string coinName)
+        {
+            foreach (Client c in clientList)
+            {
+                try
+                {
+                    c.clientProxy.coinEaten(playerNumber, coinName);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception on server sendCoinEaten()");
+                }
+
+            }
+        }
+
     }
 }

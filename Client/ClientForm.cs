@@ -67,8 +67,6 @@ namespace Client {
         public void Init(string nickname, int port)
         {
             
-
-
             this.nickname = nickname;
             this.port = port;
             // Iniciar canal
@@ -315,6 +313,28 @@ namespace Client {
                     pb.Image = Properties.Resources.down;
                 }
             }
+        }
+
+        internal void updateDead(int playerNumber)
+        {
+            PictureBox pb = retrievePicture(playerNumber);
+
+            pb.Left = 0;
+            pb.Top = 25;
+        }
+
+        internal void updateCoin(int playerNumber, string coinName)
+        {
+            foreach (Control x in this.Controls)
+            {
+
+                if (x is PictureBox && x.Tag == "coin" && x.Name.Equals(coinName))
+                {
+                    Controls.Remove(x);
+                }
+            }
+
+
         }
     }
 }

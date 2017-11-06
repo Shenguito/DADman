@@ -34,139 +34,115 @@ namespace Server {
         
         //x and y directions for the bi-direccional pink ghost
         int ghost3x = 5;
-        int ghost3y = 5;            
+        int ghost3y = 5;
 
-        public ServerForm() {
+        private RemoteServer server;
+
+        public ServerForm(RemoteServer remoteServer) {
             InitializeComponent();
             label2.Visible = false;
+            this.server = remoteServer;
         }
 
-        //TODO
-        private void processMove(string nick, string move)
+        public PictureBox retrievePicture(int playerNumber)
         {
+            if (playerNumber == 1)
+            {
+                return pictureBoxPlayer1;
+            }
+            if (playerNumber == 2)
+            {
+                return pictureBoxPlayer2;
+            }
+            if (playerNumber == 3)
+            {
+                return pictureBoxPlayer3;
+            }
+            else
+            {
+                return pictureBoxPlayer4;
+            }
 
-
-            //TODO
-            sendCoinEaten("1");
         }
-        //TODO
-        private void sendCoinEaten(string coin)
+
+        public void processMove(int playerNumber, string move)
         {
+            PictureBox pb = retrievePicture(playerNumber);
 
-        }
+            updatePlayerPosition(pb, move);
 
-        private void keyisdown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Left) {
-                goleft = true;
-                pacman.Image = Properties.Resources.Left;
-            }
-            if (e.KeyCode == Keys.Right) {
-                goright = true;
-                pacman.Image = Properties.Resources.Right;
-            }
-            if (e.KeyCode == Keys.Up) {
-                goup = true;
-                pacman.Image = Properties.Resources.Up;
-            }
-            if (e.KeyCode == Keys.Down) {
-                godown = true;
-                pacman.Image = Properties.Resources.down;
-            }
-        }
-
-        private void keyisup(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Left) {
-                goleft = false;
-            }
-            if (e.KeyCode == Keys.Right) {
-                goright = false;
-            }
-            if (e.KeyCode == Keys.Up) {
-                goup = false;
-            }
-            if (e.KeyCode == Keys.Down) {
-                godown = false;
-            }
-        }
-
-        private void timer1_Tick(object sender, EventArgs e) {
-            label1.Text = "Score: " + score;
-
-            //move player
-            if (goleft) {
-                if (pacman.Left > (boardLeft))
-                    pacman.Left -= speed;
-            }
-            if (goright) {
-                if (pacman.Left < (boardRight))
-                pacman.Left += speed;
-            }
-            if (goup) {
-                if (pacman.Top > (boardTop))
-                    pacman.Top -= speed;
-            }
-            if (godown) {
-                if (pacman.Top < (boardBottom))
-                    pacman.Top += speed;
-            }
-            //move ghosts
-            redGhost.Left += ghost1;
-            yellowGhost.Left += ghost2;
-
-            // if the red ghost hits the picture box 4 then wereverse the speed
-            if (redGhost.Bounds.IntersectsWith(pictureBox1.Bounds))
-                ghost1 = -ghost1;
-            // if the red ghost hits the picture box 3 we reverse the speed
-            else if (redGhost.Bounds.IntersectsWith(pictureBox2.Bounds))
-                ghost1 = -ghost1;
-            // if the yellow ghost hits the picture box 1 then wereverse the speed
-            if (yellowGhost.Bounds.IntersectsWith(pictureBox3.Bounds))
-                ghost2 = -ghost2;
-            // if the yellow chost hits the picture box 2 then wereverse the speed
-            else if (yellowGhost.Bounds.IntersectsWith(pictureBox4.Bounds))
-                ghost2 = -ghost2;
-            //moving ghosts and bumping with the walls end
-            //for loop to check walls, ghosts and points
-            foreach (Control x in this.Controls) {
+            foreach (Control x in this.Controls)
+            {
                 // checking if the player hits the wall or the ghost, then game is over
-                if (x is PictureBox && x.Tag == "wall" || x.Tag == "ghost") {
-                    if (((PictureBox)x).Bounds.IntersectsWith(pacman.Bounds)) {
-                        pacman.Left = 0;
-                        pacman.Top = 25;
-                        label2.Text = "GAME OVER";
-                        label2.Visible = true;
-                        timer1.Stop();
-                    }
-                }
-                if (x is PictureBox && x.Tag == "coin") {
-                    if (((PictureBox)x).Bounds.IntersectsWith(pacman.Bounds)) {
-                        this.Controls.Remove(x);
-                        score++;
-                        //TODO check if all coins where "eaten"
-                        if (score == total_coins) {
-                            //pacman.Left = 0;
-                            //pacman.Top = 25;
-                            label2.Text = "GAME WON!";
-                            label2.Visible = true;
-                            timer1.Stop();
-                            }
-                    }
-                }
-            }
-            pinkGhost.Left += ghost3x;
-            pinkGhost.Top += ghost3y;
+                if (x is PictureBox && x.Tag == "wall" || x.Tag == "ghost")
+                {
+                    if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
+                    {
+                        pb.Left = 0;
+                        pb.Top = 25;
+                        sendPlayerDead(playerNumber);
 
-            if (pinkGhost.Left < boardLeft ||
-                pinkGhost.Left > boardRight ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox1.Bounds)) ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox2.Bounds)) ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox3.Bounds)) ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox4.Bounds))) {
-                ghost3x = -ghost3x;
-            }
-            if (pinkGhost.Top < boardTop || pinkGhost.Top + pinkGhost.Height > boardBottom - 2) {
-                ghost3y = -ghost3y;
+                    }
+                }
+                if (x is PictureBox && x.Tag == "coin")
+                {
+                    if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
+                    {
+                        Controls.Remove(x);
+                        sendCoinEaten(playerNumber, x.Name);
+                    }
+                }
             }
         }
+
+
+
+        public void sendPlayerDead(int playerNumber)
+        {
+            server.sendPlayerDead(playerNumber);
+        }
+
+        public void sendCoinEaten(int playerNumber, string coinName)
+        {
+            server.sendCoinEaten(playerNumber, coinName);
+        }
+        private void updatePlayerPosition(PictureBox pb, string move)
+        {
+            if (move.Equals("left"))
+            {
+                if (pb.Left > (boardLeft))
+                {
+                    pb.Left -= speed;
+                    pb.Image = Properties.Resources.Left;
+                }
+            }
+            if (move.Equals("right"))
+            {
+                if (pb.Left < (boardRight))
+                {
+                    pb.Left += speed;
+                    pb.Image = Properties.Resources.Right;
+                }
+            }
+            if (move.Equals("up"))
+            {
+                if (pb.Top > (boardTop))
+                {
+                    pb.Top -= speed;
+                    pb.Image = Properties.Resources.Up;
+                }
+            }
+            if (move.Equals("down"))
+            {
+                if (pb.Top < (boardBottom))
+                {
+                    pb.Top += speed;
+                    pb.Image = Properties.Resources.down;
+                }
+            }
+        }
+
+
+
     }
 }
