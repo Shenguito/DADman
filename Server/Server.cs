@@ -71,7 +71,7 @@ namespace Server
         public ServerForm serverForm;
         private ArrayList deadPlayers = new ArrayList();
 
-        //TODO 
+        //TODO PROBLEM WITH MS INPUT
         public RemoteServer()
         {
             Thread thread = new Thread(() => createServerForm());

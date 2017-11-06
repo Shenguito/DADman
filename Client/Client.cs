@@ -109,17 +109,13 @@ namespace Client
 
         public void movePlayer(int playernumber, string move)
         {
-            //TODO function crash
             Console.WriteLine(nick + " received info that player " + playernumber + " moved " + move);
-            //this.form.updateMove(playernumber, move);
-            //this.form.Invoke(new deluc(form.updateChat), new object[] { "sheng", move });
             this.form.Invoke(new delmove(form.updateMove), new object[] { playernumber, move });
 
         }
 
         public void send(string nick, string msg)
         {
-            // alternativa é lançar uma thread
             Console.WriteLine("Client sending: "+nick+":"+msg);
             clientMessageId++;
             foreach (KeyValuePair<string, IClient> entry in form.clients)
