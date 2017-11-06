@@ -28,7 +28,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.pacman = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPlayer1 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPlayer2 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPlayer3 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPlayer4 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPlayer5 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPlayer6 = new System.Windows.Forms.PictureBox();
             this.pinkGhost = new System.Windows.Forms.PictureBox();
             this.yellowGhost = new System.Windows.Forms.PictureBox();
             this.redGhost = new System.Windows.Forms.PictureBox();
@@ -96,7 +101,12 @@
             this.pictureBox62 = new System.Windows.Forms.PictureBox();
             this.pictureBox63 = new System.Windows.Forms.PictureBox();
             this.pictureBox64 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pacman)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pinkGhost)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowGhost)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.redGhost)).BeginInit();
@@ -188,15 +198,75 @@
             // 
             // pacman
             // 
-            this.pacman.BackColor = System.Drawing.Color.Transparent;
-            this.pacman.Image = global::Server.Properties.Resources.Left;
-            this.pacman.Location = new System.Drawing.Point(8, 40);
-            this.pacman.Margin = new System.Windows.Forms.Padding(0);
-            this.pacman.Name = "pacman";
-            this.pacman.Size = new System.Drawing.Size(25, 25);
-            this.pacman.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pacman.TabIndex = 4;
-            this.pacman.TabStop = false;
+            this.pictureBoxPlayer1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer1.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer1.Location = new System.Drawing.Point(8, 40);
+            this.pictureBoxPlayer1.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer1.Name = "pacman";
+            this.pictureBoxPlayer1.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer1.TabIndex = 4;
+            this.pictureBoxPlayer1.TabStop = false;
+            // 
+            // pictureBoxPlayer6
+            // 
+            this.pictureBoxPlayer6.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer6.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer6.Location = new System.Drawing.Point(8, 240);
+            this.pictureBoxPlayer6.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer6.Name = "pictureBoxPlayer6";
+            this.pictureBoxPlayer6.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer6.TabIndex = 145;
+            this.pictureBoxPlayer6.TabStop = false;
+            // 
+            // pictureBoxPlayer2
+            // 
+            this.pictureBoxPlayer2.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer2.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer2.Location = new System.Drawing.Point(8, 78);
+            this.pictureBoxPlayer2.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer2.Name = "pictureBoxPlayer2";
+            this.pictureBoxPlayer2.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer2.TabIndex = 146;
+            this.pictureBoxPlayer2.TabStop = false;
+            // 
+            // pictureBoxPlayer5
+            // 
+            this.pictureBoxPlayer5.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer5.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer5.Location = new System.Drawing.Point(7, 200);
+            this.pictureBoxPlayer5.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer5.Name = "pictureBoxPlayer5";
+            this.pictureBoxPlayer5.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer5.TabIndex = 147;
+            this.pictureBoxPlayer5.TabStop = false;
+            // 
+            // pictureBoxPlayer3
+            // 
+            this.pictureBoxPlayer3.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer3.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer3.Location = new System.Drawing.Point(7, 120);
+            this.pictureBoxPlayer3.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer3.Name = "pictureBoxPlayer3";
+            this.pictureBoxPlayer3.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer3.TabIndex = 148;
+            this.pictureBoxPlayer3.TabStop = false;
+            // 
+            // pictureBoxPlayer4
+            // 
+            this.pictureBoxPlayer4.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer4.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer4.Location = new System.Drawing.Point(7, 160);
+            this.pictureBoxPlayer4.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer4.Name = "pictureBoxPlayer4";
+            this.pictureBoxPlayer4.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer4.TabIndex = 149;
+            this.pictureBoxPlayer4.TabStop = false;
             // 
             // pinkGhost
             // 
@@ -1001,7 +1071,7 @@
             this.Controls.Add(this.pictureBox5);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.pacman);
+            this.Controls.Add(this.pictureBoxPlayer1);
             this.Controls.Add(this.pinkGhost);
             this.Controls.Add(this.yellowGhost);
             this.Controls.Add(this.redGhost);
@@ -1011,7 +1081,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "ServerForm";
             this.Text = "DADman";
-            ((System.ComponentModel.ISupportInitialize)(this.pacman)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pinkGhost)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowGhost)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.redGhost)).EndInit();
@@ -1093,7 +1163,12 @@
         private System.Windows.Forms.PictureBox redGhost;
         private System.Windows.Forms.PictureBox yellowGhost;
         private System.Windows.Forms.PictureBox pinkGhost;
-        private System.Windows.Forms.PictureBox pacman;
+        private System.Windows.Forms.PictureBox pictureBoxPlayer1;
+        private System.Windows.Forms.PictureBox pictureBoxPlayer2;
+        private System.Windows.Forms.PictureBox pictureBoxPlayer3;
+        private System.Windows.Forms.PictureBox pictureBoxPlayer4;
+        private System.Windows.Forms.PictureBox pictureBoxPlayer5;
+        private System.Windows.Forms.PictureBox pictureBoxPlayer6;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Timer timer1;
