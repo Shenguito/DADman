@@ -369,6 +369,14 @@ namespace Client {
             }
         }
 
+        public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
+        {
+            redGhost.Left = g1;
+            yellowGhost.Left = g2;
+            pinkGhost.Left = g3x;
+            pinkGhost.Top = g3y;
+        }
+
         internal void updateDead(int playerNumber)
         {
             Console.WriteLine(myNumber + playerNumber);

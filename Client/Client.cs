@@ -19,6 +19,7 @@ namespace Client
 
     public delegate void deluc(string nick, string msg);
     public delegate void delmove(int playernumber, string move);
+    public delegate void delmoveGhost(int g1, int g2, int g3x, int g3y);
     public delegate void delDead(int playerNumber);
     public delegate void delCoin(int playerNumber, string coinName);
     public delegate void delStart();
@@ -136,6 +137,12 @@ namespace Client
             Console.WriteLine(nick + " received info that player " + playernumber + " moved " + move);
             this.form.Invoke(new delmove(form.updateMove), new object[] { playernumber, move });
 
+        }
+
+        public void moveGhost(List<int> ghostMove)
+        {
+
+            this.form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { ghostMove[0], ghostMove[1], ghostMove[2], ghostMove[3] });
         }
 
         public void send(string nick, string msg)

@@ -80,9 +80,7 @@ namespace Server {
                     {
                         if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
                         {
-                            
                             sendPlayerDead(playerNumber);
-
                         }
                     }
                     if (x is PictureBox && x.Tag == "coin")
@@ -94,15 +92,16 @@ namespace Server {
                         }
                     }
                 }
-                //TODO Remove Disconnected Client #1
-                List<Client> tmpClient = new List<Client>();
                 
 
+                //TODO Remove Disconnected Client #1
+                List<Client> tmpClient = new List<Client>();
                 foreach (Client c in server.clientList)
                 {
                     try
                     {
                         c.clientProxy.movePlayer(playerNumber, move);
+                        
                     }
                     catch (SocketException exception)
                     {
@@ -144,6 +143,62 @@ namespace Server {
         {
             server.sendCoinEaten(playerNumber, coinName);
         }
+
+        private void updateGhostsPosition()
+        {
+
+            List<int> moveGhost = new List<int>();
+            //move ghosts
+            redGhost.Left += ghost1;
+            yellowGhost.Left += ghost2;
+
+            // if the red ghost hits the picture box 4 then wereverse the speed
+            if (redGhost.Bounds.IntersectsWith(pictureBox1.Bounds))
+                ghost1 = -ghost1;
+            // if the red ghost hits the picture box 3 we reverse the speed
+            else if (redGhost.Bounds.IntersectsWith(pictureBox2.Bounds))
+                ghost1 = -ghost1;
+            // if the yellow ghost hits the picture box 1 then wereverse the speed
+            if (yellowGhost.Bounds.IntersectsWith(pictureBox3.Bounds))
+                ghost2 = -ghost2;
+            // if the yellow chost hits the picture box 2 then wereverse the speed
+            else if (yellowGhost.Bounds.IntersectsWith(pictureBox4.Bounds))
+                ghost2 = -ghost2;
+
+            pinkGhost.Left += ghost3x;
+            pinkGhost.Top += ghost3y;
+
+            if (pinkGhost.Left < boardLeft ||
+               pinkGhost.Left > boardRight ||
+                (pinkGhost.Bounds.IntersectsWith(pictureBox1.Bounds)) ||
+                (pinkGhost.Bounds.IntersectsWith(pictureBox2.Bounds)) ||
+                (pinkGhost.Bounds.IntersectsWith(pictureBox3.Bounds)) ||
+                (pinkGhost.Bounds.IntersectsWith(pictureBox4.Bounds)))
+            {
+                ghost3x = -ghost3x;
+            }
+            if (pinkGhost.Top < boardTop || pinkGhost.Top + pinkGhost.Height > boardBottom - 2)
+            {
+                ghost3y = -ghost3y;
+            }
+            moveGhost.Add(redGhost.Left);
+            moveGhost.Add(yellowGhost.Left);
+            moveGhost.Add(pinkGhost.Left);
+            moveGhost.Add(pinkGhost.Top);
+
+            foreach (Client c in server.clientList)
+            {
+                try
+                {
+                    c.clientProxy.moveGhost(moveGhost);
+                }
+                catch (SocketException exception)
+                {
+                    Console.WriteLine(exception.ToString());
+                }
+            }
+        }
+
         private void updatePlayerPosition(PictureBox pb, string move)
         {
             if (move.Equals("left"))
@@ -187,40 +242,7 @@ namespace Server {
                 processMove(entry.Key, entry.Value);
             }
             listMove = new Dictionary<int, string>();
-
-            //move ghosts
-            redGhost.Left += ghost1;
-            yellowGhost.Left += ghost2;
-
-            // if the red ghost hits the picture box 4 then wereverse the speed
-            if (redGhost.Bounds.IntersectsWith(pictureBox1.Bounds))
-                ghost1 = -ghost1;
-            // if the red ghost hits the picture box 3 we reverse the speed
-            else if (redGhost.Bounds.IntersectsWith(pictureBox2.Bounds))
-                ghost1 = -ghost1;
-            // if the yellow ghost hits the picture box 1 then wereverse the speed
-            if (yellowGhost.Bounds.IntersectsWith(pictureBox3.Bounds))
-                ghost2 = -ghost2;
-            // if the yellow chost hits the picture box 2 then wereverse the speed
-            else if (yellowGhost.Bounds.IntersectsWith(pictureBox4.Bounds))
-                ghost2 = -ghost2;
-
-            pinkGhost.Left += ghost3x;
-            pinkGhost.Top += ghost3y;
-
-            if (pinkGhost.Left < boardLeft ||
-               pinkGhost.Left > boardRight ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox1.Bounds)) ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox2.Bounds)) ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox3.Bounds)) ||
-                (pinkGhost.Bounds.IntersectsWith(pictureBox4.Bounds)))
-            {
-                ghost3x = -ghost3x;
-            }
-            if (pinkGhost.Top < boardTop || pinkGhost.Top + pinkGhost.Height > boardBottom - 2)
-            {
-                ghost3y = -ghost3y;
-            }
+            updateGhostsPosition();
         }
 
     }
