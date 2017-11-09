@@ -34,20 +34,19 @@ namespace PuppetMaster
                 {
                     Process process = new Process();
                     //Configure the process using the StartInfo properties.
-
                     
                     process.StartInfo.FileName = @".."+ Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar 
                         + ".."+ Path.DirectorySeparatorChar + "pacman"+ Path.DirectorySeparatorChar + "bin"+ Path.DirectorySeparatorChar 
-                        + "Debug"+ Path.DirectorySeparatorChar + "pacman.exe"; 
-                    
-                    //process.StartInfo.Arguments = "-n";
+                        + "Debug"+ Path.DirectorySeparatorChar + "pacman.exe";
+
+                    //process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
                     process.StartInfo.WorkingDirectory = path;
-                    //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+
                     process.Start();
                     processes.Add(text.Split(' ')[1],process.Id);
 
                         /*
-                        if (text.Split().Length == 6 && text.Split().Length == 7)
+                        if (text.Split().Length == 6)
                             processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
                         else
                             Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
@@ -63,55 +62,103 @@ namespace PuppetMaster
                        + ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
                        + "Debug" + Path.DirectorySeparatorChar + "Server.exe";                     //process.StartInfo.Arguments = "-n";
                     process.StartInfo.WorkingDirectory = path;
-                    //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                    //process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
                     process.Start();
                     processes.Add(text.Split(' ')[1], process.Id);
 
-                    if (text.Split(' ').Length == 6)
+                   /* if (text.Split(' ').Length == 6)
                         processLaucher.startServer(text.Split(' ')[1], text.Split(' ')[2], text.Split(' ')[3], text.Split(' ')[4], text.Split(' ')[5]);
                     else
                         Console.WriteLine("StartServer PID PCS_URL SERVER_URL MSEC_PER_ROUND NUM_PLAYERS");
+                     */
                 }
                 else if (text.Split(' ')[0].Equals("GlobalStatus"))
                 {
+                    //foreach (int id in processes)
+                    //{
+                    //    Process p = Process.GetProcessById(id);
+                    //    foreach (ProcessThread pT in p.Threads)
+                    //    {
+                    //        if ((pT.ThreadState & System.Diagnostics.ThreadState.Running) == System.Diagnostics.ThreadState.Running)
+                    //        {
+                    //            Console.WriteLine("present?");
+                    //        }
+                    //    }
+                    //}
                     Console.WriteLine(text);
                 }
                 else if (text.Split(' ')[0].Equals("Crash"))
                 {
+                   /* int pid = Int32.Parse(text.Split()[1]);
+                    if (processes.ContainsValue(pid))
+                    {
+                        
+                        Process.GetProcessById(id).Kill();
+                        var item = processes.First(kvp => kvp.Value == id);
+
+                        processes.Remove(item.Key);
+                    }*/
                     Console.WriteLine(text);
                 }
                 else if (text.Split(' ')[0].Equals("Freeze"))
                 {
                     // https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
-                    try
+                    int pid = Int32.Parse(text.Split(' ')[1]);
+                    if (processes.ContainsValue(pid))
                     {
-                        int pid = Int32.Parse(text.Split(' ')[1]);
-                        Process process2freeze = Process.GetProcessById(pid);
-                        Console.WriteLine("1-Process has "+process2freeze.Threads.Count+" threads");
-                        foreach (ProcessThread t in process2freeze.Threads)
+                        try
                         {
-                            Console.WriteLine("Thread pool? " + t.ToString()+"\r\n");
-                            Console.WriteLine("Thread pool? " + t.ThreadState + "\r\n");
-                            Console.WriteLine("Thread pool? " + t.WaitReason + "\r\n");
-                        }
+                            Process process2freeze = Process.GetProcessById(pid);
+                            Console.WriteLine("1-Process has " + process2freeze.Threads.Count + " threads");
+                            foreach (ProcessThread t in process2freeze.Threads)
+                            {
+                                Console.WriteLine("Thread pool? " + t.ToString() + "\r\n");
+                                Console.WriteLine("Thread pool? " + t.ThreadState + "\r\n");
+                                Console.WriteLine("Thread pool? " + t.WaitReason + "\r\n");
+                            }
 
-                    }
-                    catch (Exception e) {
-                        Console.WriteLine(text);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(text);
+                        }
                     }
                 }
                 else if (text.Split(' ')[0].Equals("Unfreeze"))
                 {
-                    Console.WriteLine(text);
+                    int pid = Int32.Parse(text.Split(' ')[1]);
+                    if (processes.ContainsValue(pid))
+                    {
+                        Console.WriteLine(text);
+                    }
                 }
                 else if (text.Split(' ')[0].Equals("InjectDelay"))
                 {
+                    //injectDelay(text.Split()[1], text.Split()[2]);
                     Console.WriteLine(text);
                 }
                 else if (text.Split(' ')[0].Equals("LocalState"))
                 {
+                    /* string[] lines = File.ReadAllLines(path + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar
+                        + ".." + Path.DirectorySeparatorChar + "pacman" + Path.DirectorySeparatorChar + "logs" + text.Split(' ')[1] + "-" + text.Split(' ')[2]);
+                    foreach (string line in lines)
+                    {
+                        // Use a tab to indent each line of the file.
+                        Console.WriteLine("\t" + line);
+                    }
+
+                    File.Create(path + "LocalState-" + text.Split(' ')[1] + "-" + text.Split(' ')[2]);
+                    File.WriteAllLines(path + "LocalState-" + text.Split(' ')[1] + "-" + text.Split(' ')[2], lines);
+                    Console.WriteLine(text);
+                    */
+                }
+
+                else if (text.Split()[0].Equals("Wait"))
+                {
+                    System.Threading.Thread.Sleep(Int32.Parse(text.Split()[1]));
                     Console.WriteLine(text);
                 }
+
                 else if (text.Split(' ')[0].Equals("Check"))
                 {
                     Console.WriteLine("Process: "+processes.Count+" created");
@@ -128,10 +175,10 @@ namespace PuppetMaster
                 text = Console.ReadLine();
             }
 
-            //AppDomain.CurrentDomain.ProcessExit += (sender, EventArgs) => {
-            //    foreach (int id in processes)
-            //        Console.Write("   {0}", id ); // Process.GetProcessById(id).KILL();
-            //};
+            foreach (KeyValuePair<string, int> entry in processes)
+            {
+                Process.GetProcessById(entry.Value).Kill();
+            }
 
         }
 
