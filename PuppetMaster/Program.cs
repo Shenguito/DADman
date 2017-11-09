@@ -177,7 +177,14 @@ namespace PuppetMaster
 
             foreach (KeyValuePair<string, int> entry in processes)
             {
-                Process.GetProcessById(entry.Value).Kill();
+                try
+                {
+                    Process.GetProcessById(entry.Value).Kill();
+                }catch(Exception e)
+                {
+
+                }
+
             }
 
         }
