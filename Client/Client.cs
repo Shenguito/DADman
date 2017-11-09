@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -42,7 +43,7 @@ namespace Client
             );
 
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void broadcast(int id, string nick, string msg)
         {
             //TODO Create Vector clocks
@@ -118,6 +119,9 @@ namespace Client
         {
             Console.WriteLine("Client sending: "+nick+":"+msg);
             clientMessageId++;
+
+            //TODO Remove Disconnected Client #1
+            List<String> tmpClient = new List<String>();
             foreach (KeyValuePair<string, IClient> entry in form.clients)
             {
                 Console.WriteLine("Delivering to client: " + entry.Key);
@@ -128,16 +132,30 @@ namespace Client
                         Console.WriteLine("[IF] Delivering to client: " + entry.Key);
                         entry.Value.broadcast(clientMessageId, nick, msg);
                     }
-                    catch (Exception e)
+                    catch (SocketException e)
                     {
-                        //TODO exception
-                        throw new ClientIsDown(e.Message);
+                        //TODO Remove Disconnected Client #2
+                        tmpClient.Add(entry.Key);
+                        Console.WriteLine("Debug: " + e.ToString());
+                    }catch(Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
                     }
                 }
                 else
                 {
                     Thread thread = new Thread(() => broadcast(clientMessageId, nick, msg));
                     thread.Start();
+                }
+            }
+
+            //TODO Remove Disconnected Client #3
+            if (tmpClient.Count!=0)
+            {
+                foreach (String c in tmpClient)
+                {
+                    if (form.clients.ContainsKey(c))
+                        form.clients.Remove(c);
                 }
             }
         }

@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -49,6 +50,8 @@ namespace Client {
         LoginForm formLogin;
         public TcpChannel channel;
         IServer serverProxy;
+
+        //TODO change below dictionary to List<Client>
         public Dictionary<string, IClient> clients; 
         //public Dictionary<string, IClient> clients { get => clients; set => clients = value; }
 
@@ -232,18 +235,44 @@ namespace Client {
             {
                 try {
                     if (!tbMsg.Text.Trim().Equals("")) {
+
+                        //TODO Remove Disconnected Client #1
+                        List<String> tmpClient = new List<String>();
+
                         string msg = tbMsg.Text;
                         IClient myself=null;
                         foreach (KeyValuePair<string, IClient> entry in clients)
                         {
-                            if (!entry.Key.Equals(nickname)) {
-                                entry.Value.send(nickname, msg);
-                            }else
+                            try
                             {
-                                myself = entry.Value;
+                                if (!entry.Key.Equals(nickname))
+                                {
+                                    entry.Value.send(nickname, msg);
+                                }
+                                else
+                                {
+                                    myself = entry.Value;
+                                }
+                            }
+                            catch (SocketException exception)
+                            {
+                                //TODO Remove Disconnected Client #2
+                                tmpClient.Add(entry.Key);
+
+                                Console.WriteLine("Debug: " + exception.ToString());
+                                
                             }
                         }
-                        if(myself!=null)
+                        //TODO Remove Disconnected Client #3
+                        if (tmpClient.Count != 0)
+                        {
+                            foreach (String c in tmpClient)
+                            {
+                                if (clients.ContainsKey(c))
+                                    clients.Remove(c);
+                            }
+                        }
+                        if (myself!=null)
                         myself.send(nickname, msg);
                     }
                     tbMsg.Clear();
@@ -253,8 +282,10 @@ namespace Client {
                 catch (Exception exception)
                 {
                     //TODO exception
-                    throw new ThereIsNoCommunication(exception.Message);
+                    //throw new ThereIsNoCommunication(exception.Message);
+                    Console.WriteLine("Debug: " + exception.ToString());
                 }
+
             }
         }
         public void updateChat(string nick, string msg)

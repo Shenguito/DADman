@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections;
 using static System.Net.Mime.MediaTypeNames;
+using System.Threading;
 
 namespace PuppetMaster
 
@@ -14,7 +15,7 @@ namespace PuppetMaster
     class Program
     {
 
-
+        private bool freezed=false;
         static void Main(string[] args)
         {
 
@@ -28,13 +29,13 @@ namespace PuppetMaster
             string path = Directory.GetCurrentDirectory();
             while (!text.Equals("exit"))
             {
-                if (text.Split()[0].Equals("StartClient"))
+                if (text.Split(' ')[0].Equals("StartClient"))
                 {
                     Process process = new Process();
                     //Configure the process using the StartInfo properties.
 
                     
-                     process.StartInfo.FileName = @".."+ Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar 
+                    process.StartInfo.FileName = @".."+ Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar 
                         + ".."+ Path.DirectorySeparatorChar + "pacman"+ Path.DirectorySeparatorChar + "bin"+ Path.DirectorySeparatorChar 
                         + "Debug"+ Path.DirectorySeparatorChar + "pacman.exe"; 
                     
@@ -51,7 +52,7 @@ namespace PuppetMaster
                             Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
                         */
                     }
-                    else if (text.Split()[0].Equals("StartServer"))
+                    else if (text.Split(' ')[0].Equals("StartServer"))
                 {
                     
                     Process process = new Process();
@@ -63,43 +64,66 @@ namespace PuppetMaster
                     process.StartInfo.WorkingDirectory = path;
                     //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     process.Start();
+                    processes.Add(process.Id);
 
-
-                    if (text.Split().Length == 6)
-                        processLaucher.startServer(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5]);
+                    if (text.Split(' ').Length == 6)
+                        processLaucher.startServer(text.Split(' ')[1], text.Split(' ')[2], text.Split(' ')[3], text.Split(' ')[4], text.Split(' ')[5]);
                     else
                         Console.WriteLine("StartServer PID PCS_URL SERVER_URL MSEC_PER_ROUND NUM_PLAYERS");
                 }
-                else if (text.Split()[0].Equals("GlobalStatus"))
+                else if (text.Split(' ')[0].Equals("GlobalStatus"))
                 {
                     Console.WriteLine(text);
                 }
-                else if (text.Split()[0].Equals("Crash"))
+                else if (text.Split(' ')[0].Equals("Crash"))
                 {
                     Console.WriteLine(text);
                 }
-                else if (text.Split()[0].Equals("Freeze"))
+                else if (text.Split(' ')[0].Equals("Freeze"))
                 {
                     // https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
-                    Console.WriteLine(text);
+                    try
+                    {
+                        int pid = Int32.Parse(text.Split(' ')[1]);
+                        Process process2freeze = Process.GetProcessById(pid);
+                        Console.WriteLine("1-Process has "+process2freeze.Threads.Count+" threads");
+                        foreach (ProcessThread t in process2freeze.Threads)
+                        {
+                            Console.WriteLine("Thread pool? " + t.ToString()+"\r\n");
+                            Console.WriteLine("Thread pool? " + t.ThreadState + "\r\n");
+                            Console.WriteLine("Thread pool? " + t.WaitReason + "\r\n");
+                        }
+
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(text);
+                    }
                 }
-                else if (text.Split()[0].Equals("Unfreeze"))
+                else if (text.Split(' ')[0].Equals("Unfreeze"))
                 {
                     Console.WriteLine(text);
                 }
-                else if (text.Split()[0].Equals("InjectDelay"))
+                else if (text.Split(' ')[0].Equals("InjectDelay"))
                 {
                     Console.WriteLine(text);
                 }
-                else if (text.Split()[0].Equals("LocalState"))
+                else if (text.Split(' ')[0].Equals("LocalState"))
                 {
                     Console.WriteLine(text);
+                }
+                else if (text.Split(' ')[0].Equals("Check"))
+                {
+                    Console.WriteLine("Process: "+processes.Count+" created");
+                    foreach (int pid in processes)
+                    {
+                        Console.WriteLine(pid);
+                    }
                 }
 
 
 
 
-                    Console.WriteLine(text);
+                Console.WriteLine(text);
                 text = Console.ReadLine();
             }
 
@@ -110,8 +134,23 @@ namespace PuppetMaster
 
         }
 
+        //TODO
+        public void freeze(ProcessThread processThread)
+        {
+            lock (processThread)
+            {
+                Monitor.Wait(processThread);
+            }
 
-    
+        }
+        //TODO
+        public void unfreeze(ProcessThread processThread)
+        {
+            lock (processThread)
+            {
+                Monitor.Pulse(processThread);
+            }
+        }
 
     }
 

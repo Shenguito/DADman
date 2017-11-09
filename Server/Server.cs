@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -26,6 +28,7 @@ namespace Server
         public IClient clientProxy;
         public int port;
         // TODO defined at end
+        public bool connected;
         public int score;
        
     }
@@ -86,6 +89,7 @@ namespace Server
             Application.Run(serverForm = new ServerForm(this));
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void connect(string nick, int port)
         {
             
@@ -128,7 +132,7 @@ namespace Server
             
             assignPlayer(c); 
         }
-
+        
         public void sendMove(string nick, string move)
         {
             /*
@@ -147,6 +151,10 @@ namespace Server
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("Debug: " + e.ToString());
             }
             catch (Exception e)
             {
@@ -170,25 +178,40 @@ namespace Server
             }
 
         }
-
+        
         public void sendPlayerDead(int playerNumber)
         {
             deadPlayers.Add(playerNumber);
-
+            //TODO Remove Disconnected Client #1
+            List<Client> tmpClient = new List<Client>();
             foreach (Client c in clientList)
             {
                 try
                 {
                     c.clientProxy.playerDead(playerNumber);
                 }
+                catch (SocketException e)
+                {
+                    //TODO Remove Disconnected Client #2
+                    tmpClient.Add(c);
+                    Console.WriteLine("Debug: " + e.ToString());
+                }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception on server sendPlayerDead()");
                 }
-
+            }
+            //TODO Remove Disconnected Client #3
+            if (tmpClient.Count != 0)
+            {
+                foreach (Client c in tmpClient)
+                {
+                    if(clientList.Contains(c))
+                        clientList.Remove(c);
+                }
             }
         }
-
+        
         public void sendCoinEaten(int playerNumber, string coinName)
         {
             foreach (Client c in clientList)
@@ -196,6 +219,10 @@ namespace Server
                 try
                 {
                     c.clientProxy.coinEaten(playerNumber, coinName);
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("Debug: " + e.ToString());
                 }
                 catch (Exception e)
                 {

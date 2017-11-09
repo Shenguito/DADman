@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -94,17 +95,34 @@ namespace Server {
                         }
                     }
                 }
+                //TODO Remove Disconnected Client #1
+                List<Client> tmpClient = new List<Client>();
+                
+
                 foreach (Client c in server.clientList)
                 {
                     try
                     {
                         c.clientProxy.movePlayer(playerNumber, move);
                     }
-                    catch (Exception e)
+                    catch (SocketException exception)
                     {
-                        Console.WriteLine("Exception on server sendMove");
-                    }
+                        //TODO Remove Disconnected Client #2
+                        tmpClient.Add(c);
 
+                        Console.WriteLine("Debug: " + exception.ToString());
+                    }
+                }
+
+
+                //TODO Remove Disconnected Client #3
+                if (tmpClient.Count!=0)
+                {
+                    foreach (Client c in tmpClient)
+                    {
+                        if (server.clientList.Contains(c))
+                            server.clientList.Remove(c);
+                    }
                 }
             }
             catch(Exception e)
