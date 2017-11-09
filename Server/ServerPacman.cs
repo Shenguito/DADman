@@ -42,7 +42,7 @@ namespace Server {
             listMove=new Dictionary<int, string>();
             
             this.server = remoteServer;
-            this.timer1.Interval = 2000;
+            this.timer1.Interval = 100;
         }
 
         public PictureBox retrievePicture(int playerNumber)
@@ -80,8 +80,7 @@ namespace Server {
                     {
                         if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
                         {
-                            pb.Left = 0;
-                            pb.Top = 25;
+                            
                             sendPlayerDead(playerNumber);
 
                         }

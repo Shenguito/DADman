@@ -21,8 +21,11 @@ namespace Client
     public delegate void delmove(int playernumber, string move);
     public delegate void delDead(int playerNumber);
     public delegate void delCoin(int playerNumber, string coinName);
+    public delegate void delStart();
 
-    class Client{
+
+    class Client
+    {
         public Client()
         {
             Thread thread = new Thread(() => createClientForm());
@@ -92,6 +95,10 @@ namespace Client
                     if (nick.Equals(entry.Key))
                     {
                         throw new Exception("Client already exists!");
+                    }
+                    if (this.nick.Equals(nick))
+                    {
+                        form.myNumber = playerNumber;
                     }
                 }
                 string url = "tcp://localhost:" + port + "/ChatClient";
@@ -182,6 +189,12 @@ namespace Client
         public void playerDead(int playerNumber)
         {
             this.form.Invoke(new delDead(form.updateDead), new object[] { playerNumber });
+        }
+
+        public void startGame()
+        {
+            Console.WriteLine("Recebi start Game");
+            form.startGame();
         }
     }
 }

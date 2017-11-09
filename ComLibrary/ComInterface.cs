@@ -12,6 +12,7 @@ namespace ComLibrary
         void sendMove(string nick, string direction);
         void sendCoinEaten(int playerNumber, string coinName);
         void sendPlayerDead(int playerNumber);
+        
     }
     public interface IClient
     {
@@ -21,5 +22,6 @@ namespace ComLibrary
         void movePlayer(int numberPlayer, string movement);
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
+        void startGame();
     }
 }
