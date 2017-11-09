@@ -21,8 +21,12 @@ using System.Windows.Forms;
 namespace Client {
     public partial class ClientForm : Form {
 
+        public int myNumber = 1;
+
         string nickname;
         public int port;
+        bool started = false;
+        bool dead = false;
 
         // direction player is moving in. Only one will be true
         bool goup;
@@ -69,7 +73,7 @@ namespace Client {
 
         public void Init(string nickname, int port)
         {
-            
+
             this.nickname = nickname;
             this.port = port;
             // Iniciar canal
@@ -96,7 +100,8 @@ namespace Client {
             //try catch missed
             if (serverProxy != null)
             {
-                try
+                
+                    try
                 {
                     serverProxy.connect(nickname, port);
 
@@ -107,42 +112,58 @@ namespace Client {
                     this.ShowInTaskbar = true;
                     this.WindowState = FormWindowState.Normal;
                     InitializeComponent();
-                    this.Text += ": "+ nickname;
+                    this.Text += ": " + nickname;
                     label2.Visible = false;
                 }
                 catch (Exception e)
                 {
                     formLogin.LoginError();
                 }
+
             }
             else
             {
                 //connection error problem
             }
+            
         }
 
         //TODO move pacman
         private void keyisdown(object sender, KeyEventArgs e) {
 
             
-            if (e.KeyCode == Keys.Left) {
-                Thread thread = new Thread(() => serverProxy.sendMove(nickname,"left"));
-                thread.Start();
-               
+            lock (this)
+            {
+                while (!started)
+                {
+                    Monitor.Wait(this);
+                }
             }
-            if (e.KeyCode == Keys.Right) {
-                Thread thread = new Thread(() => serverProxy.sendMove(nickname, "right"));
-                thread.Start();
-               
-            }
-            if (e.KeyCode == Keys.Up) {
-                Thread thread = new Thread(() => serverProxy.sendMove(nickname, "up"));
-                thread.Start();
-               
-            }
-            if (e.KeyCode == Keys.Down) {
-                Thread thread = new Thread(() => serverProxy.sendMove(nickname, "down"));
-                thread.Start();
+            if (!dead)
+            {
+                if (e.KeyCode == Keys.Left)
+                {
+                    Thread thread = new Thread(() => serverProxy.sendMove(nickname, "left"));
+                    thread.Start();
+
+                }
+                if (e.KeyCode == Keys.Right)
+                {
+                    Thread thread = new Thread(() => serverProxy.sendMove(nickname, "right"));
+                    thread.Start();
+
+                }
+                if (e.KeyCode == Keys.Up)
+                {
+                    Thread thread = new Thread(() => serverProxy.sendMove(nickname, "up"));
+                    thread.Start();
+
+                }
+                if (e.KeyCode == Keys.Down)
+                {
+                    Thread thread = new Thread(() => serverProxy.sendMove(nickname, "down"));
+                    thread.Start();
+                }
             }
             if (e.KeyCode == Keys.Enter) {
                     tbMsg.Enabled = true; tbMsg.Focus();
@@ -166,7 +187,7 @@ namespace Client {
 
 
         //TODO dont know if necessary
-        private void timer1_Tick(object sender, EventArgs e) {
+       /* private void timer1_Tick(object sender, EventArgs e) {
             label1.Text = "Score: " + score;
 
             
@@ -228,7 +249,7 @@ namespace Client {
                 if (pinkGhost.Top < boardTop || pinkGhost.Top + pinkGhost.Height > boardBottom - 2) {
                     ghost3y = -ghost3y;
                 }
-        }
+        }*/
 
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
@@ -350,10 +371,16 @@ namespace Client {
 
         internal void updateDead(int playerNumber)
         {
-            PictureBox pb = retrievePicture(playerNumber);
+            Console.WriteLine(myNumber + playerNumber);
+            if (myNumber == playerNumber)
+            {
+                Console.WriteLine("updated dead");
+                dead = true;
+            }
+          /*  PictureBox pb = retrievePicture(playerNumber);
 
             pb.Left = 0;
-            pb.Top = 25;
+            pb.Top = 25; */
         }
 
         internal void updateCoin(int playerNumber, string coinName)
@@ -367,6 +394,16 @@ namespace Client {
             }
 
 
+        }
+
+        internal void startGame()
+        {
+            lock (this) {
+                started = true;
+                Console.WriteLine("vou pulsar");
+                Monitor.Pulse(this);
+            }
+            
         }
     }
 }

@@ -92,7 +92,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void connect(string nick, int port)
         {
-            
+
             Client c = new Client();
             string url = "tcp://localhost:" + port + "/ChatClient";
             IClient clientProxy = (IClient)Activator.GetObject(
@@ -109,11 +109,11 @@ namespace Server
             c.playernumber = numberPlayersConnected;
 
             clientList.Add(c);
-            
+
             foreach (Client client in clientList)
             {
-                
-                Console.WriteLine("Client : " + nick+" Client to sent:" + client.nick);
+
+                Console.WriteLine("Client : " + nick + " Client to sent:" + client.nick);
                 if (!client.nick.Equals(nick))
                 {
                     client.clientProxy.broadcastClientURL(numberPlayersConnected, nick, port);
@@ -129,10 +129,11 @@ namespace Server
             }
 
             //Creates a correspondence Nick - Player Number i.e. John - Player1
-            
-            assignPlayer(c); 
+
+            assignPlayer(c);
+            sendStartGame();
         }
-        
+
         public void sendMove(string nick, string move)
         {
             /*
@@ -164,13 +165,13 @@ namespace Server
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
 
 
-            
+
         }
 
-       
+
         private void assignPlayer(Client c)
         {
-            player_image_hashmap.Add(c.nick,c.playernumber);
+            player_image_hashmap.Add(c.nick, c.playernumber);
 
             foreach (KeyValuePair<string, int> entry in player_image_hashmap)
             {
@@ -178,7 +179,7 @@ namespace Server
             }
 
         }
-        
+
         public void sendPlayerDead(int playerNumber)
         {
             deadPlayers.Add(playerNumber);
@@ -188,6 +189,7 @@ namespace Server
             {
                 try
                 {
+                    Console.WriteLine("Debug: "+c.nick);
                     c.clientProxy.playerDead(playerNumber);
                 }
                 catch (SocketException e)
@@ -206,12 +208,12 @@ namespace Server
             {
                 foreach (Client c in tmpClient)
                 {
-                    if(clientList.Contains(c))
+                    if (clientList.Contains(c))
                         clientList.Remove(c);
                 }
             }
         }
-        
+
         public void sendCoinEaten(int playerNumber, string coinName)
         {
             foreach (Client c in clientList)
@@ -232,5 +234,28 @@ namespace Server
             }
         }
 
+        public void sendStartGame()
+        {
+            Console.WriteLine("PLAYERS: " + numberPlayersConnected);
+            int i = 0;
+            //TODO sheng
+            if (numberPlayersConnected == 1) { 
+                foreach (Client c in clientList)
+                {
+                    Console.WriteLine("debug: " + i + " -" + c.nick + " -" +  c.clientProxy);
+                    try
+                    {
+                        c.clientProxy.startGame();
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+
+                    }
+                    i++;
+                }
+            }
+
+        }
     }
 }
