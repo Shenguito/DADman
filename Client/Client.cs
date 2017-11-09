@@ -11,6 +11,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace Client
@@ -20,6 +21,21 @@ namespace Client
     public delegate void delmove(int playernumber, string move);
     public delegate void delDead(int playerNumber);
     public delegate void delCoin(int playerNumber, string coinName);
+
+    class Client{
+        public Client()
+        {
+            Thread thread = new Thread(() => createClientForm());
+            thread.Start();
+        }
+        private void createClientForm()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new ClientForm());
+        }
+
+    }
 
     class RemoteClient : MarshalByRefObject, IClient
     {

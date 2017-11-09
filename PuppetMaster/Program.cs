@@ -20,7 +20,8 @@ namespace PuppetMaster
         {
 
             // Handle the ApplicationExit event to know when the application is exiting.
-            ArrayList processes = new ArrayList();
+            //ArrayList processes = new ArrayList();
+            Dictionary<string, int> processes = new Dictionary<string, int>();
 
             ProcessLaucher processLaucher = new ProcessLaucher();
             Console.WriteLine("Welcome!");
@@ -43,7 +44,7 @@ namespace PuppetMaster
                     process.StartInfo.WorkingDirectory = path;
                     //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     process.Start();
-                    processes.Add(process.Id);
+                    processes.Add(text.Split(' ')[1],process.Id);
 
                         /*
                         if (text.Split().Length == 6 && text.Split().Length == 7)
@@ -64,7 +65,7 @@ namespace PuppetMaster
                     process.StartInfo.WorkingDirectory = path;
                     //process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     process.Start();
-                    processes.Add(process.Id);
+                    processes.Add(text.Split(' ')[1], process.Id);
 
                     if (text.Split(' ').Length == 6)
                         processLaucher.startServer(text.Split(' ')[1], text.Split(' ')[2], text.Split(' ')[3], text.Split(' ')[4], text.Split(' ')[5]);
@@ -114,9 +115,9 @@ namespace PuppetMaster
                 else if (text.Split(' ')[0].Equals("Check"))
                 {
                     Console.WriteLine("Process: "+processes.Count+" created");
-                    foreach (int pid in processes)
+                    foreach (KeyValuePair<string, int> entry in processes)
                     {
-                        Console.WriteLine(pid);
+                        Console.WriteLine(entry.Key+":"+entry.Value+"\r\n");
                     }
                 }
 
