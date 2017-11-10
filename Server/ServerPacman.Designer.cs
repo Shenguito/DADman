@@ -207,23 +207,12 @@
             this.pictureBoxPlayer1.Image = global::Server.Properties.Resources.Left;
             this.pictureBoxPlayer1.Location = new System.Drawing.Point(8, 40);
             this.pictureBoxPlayer1.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxPlayer1.Name = "pacman";
+            this.pictureBoxPlayer1.Name = "pictureBoxPlayer1";
             this.pictureBoxPlayer1.Size = new System.Drawing.Size(25, 25);
             this.pictureBoxPlayer1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer1.TabIndex = 4;
             this.pictureBoxPlayer1.TabStop = false;
-            // 
-            // pictureBoxPlayer6
-            // 
-            this.pictureBoxPlayer6.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer6.Image = global::Server.Properties.Resources.Left;
-            this.pictureBoxPlayer6.Location = new System.Drawing.Point(8, 240);
-            this.pictureBoxPlayer6.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxPlayer6.Name = "pictureBoxPlayer6";
-            this.pictureBoxPlayer6.Size = new System.Drawing.Size(25, 25);
-            this.pictureBoxPlayer6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBoxPlayer6.TabIndex = 145;
-            this.pictureBoxPlayer6.TabStop = false;
+            this.pictureBoxPlayer1.Visible = false;
             // 
             // pictureBoxPlayer2
             // 
@@ -236,18 +225,7 @@
             this.pictureBoxPlayer2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer2.TabIndex = 146;
             this.pictureBoxPlayer2.TabStop = false;
-            // 
-            // pictureBoxPlayer5
-            // 
-            this.pictureBoxPlayer5.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxPlayer5.Image = global::Server.Properties.Resources.Left;
-            this.pictureBoxPlayer5.Location = new System.Drawing.Point(7, 200);
-            this.pictureBoxPlayer5.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxPlayer5.Name = "pictureBoxPlayer5";
-            this.pictureBoxPlayer5.Size = new System.Drawing.Size(25, 25);
-            this.pictureBoxPlayer5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBoxPlayer5.TabIndex = 147;
-            this.pictureBoxPlayer5.TabStop = false;
+            this.pictureBoxPlayer2.Visible = false;
             // 
             // pictureBoxPlayer3
             // 
@@ -260,6 +238,7 @@
             this.pictureBoxPlayer3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer3.TabIndex = 148;
             this.pictureBoxPlayer3.TabStop = false;
+            this.pictureBoxPlayer3.Visible = false;
             // 
             // pictureBoxPlayer4
             // 
@@ -272,6 +251,33 @@
             this.pictureBoxPlayer4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer4.TabIndex = 149;
             this.pictureBoxPlayer4.TabStop = false;
+            this.pictureBoxPlayer4.Visible = false;
+            // 
+            // pictureBoxPlayer5
+            // 
+            this.pictureBoxPlayer5.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer5.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer5.Location = new System.Drawing.Point(7, 200);
+            this.pictureBoxPlayer5.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer5.Name = "pictureBoxPlayer5";
+            this.pictureBoxPlayer5.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer5.TabIndex = 147;
+            this.pictureBoxPlayer5.TabStop = false;
+            this.pictureBoxPlayer5.Visible = false;
+            // 
+            // pictureBoxPlayer6
+            // 
+            this.pictureBoxPlayer6.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxPlayer6.Image = global::Server.Properties.Resources.Left;
+            this.pictureBoxPlayer6.Location = new System.Drawing.Point(8, 240);
+            this.pictureBoxPlayer6.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxPlayer6.Name = "pictureBoxPlayer6";
+            this.pictureBoxPlayer6.Size = new System.Drawing.Size(25, 25);
+            this.pictureBoxPlayer6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxPlayer6.TabIndex = 145;
+            this.pictureBoxPlayer6.TabStop = false;
+            this.pictureBoxPlayer6.Visible = false;
             // 
             // pinkGhost
             // 

@@ -36,12 +36,14 @@ namespace PuppetMaster
                     //Configure the process using the StartInfo properties.
                     
                     process.StartInfo.FileName = @".."+ Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar 
-                        + ".."+ Path.DirectorySeparatorChar + "pacman"+ Path.DirectorySeparatorChar + "bin"+ Path.DirectorySeparatorChar 
-                        + "Debug"+ Path.DirectorySeparatorChar + "pacman.exe";
-
-                    //process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
+                        + ".."+ Path.DirectorySeparatorChar + "Client"+ Path.DirectorySeparatorChar + "bin"+ Path.DirectorySeparatorChar 
+                        + "Debug"+ Path.DirectorySeparatorChar + "Client.exe";
+                    if (text.Split(' ').Length > 4)
+                        process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
+                    else
+                        process.StartInfo.Arguments = text.Split()[2] + " " + text.Split()[3];
+                    Console.WriteLine("Path: " + path);
                     process.StartInfo.WorkingDirectory = path;
-
                     process.Start();
                     processes.Add(text.Split(' ')[1],process.Id);
 
@@ -62,7 +64,10 @@ namespace PuppetMaster
                        + ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
                        + "Debug" + Path.DirectorySeparatorChar + "Server.exe";                     //process.StartInfo.Arguments = "-n";
                     process.StartInfo.WorkingDirectory = path;
-                    //process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
+                    if (text.Split(' ').Length > 4)
+                        process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
+                    else
+                        process.StartInfo.Arguments = text.Split()[2] + " " + text.Split()[3];
                     process.Start();
                     processes.Add(text.Split(' ')[1], process.Id);
 

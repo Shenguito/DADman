@@ -22,7 +22,7 @@ namespace Client
     public delegate void delmoveGhost(int g1, int g2, int g3x, int g3y);
     public delegate void delDead(int playerNumber);
     public delegate void delCoin(int playerNumber, string coinName);
-    public delegate void delStart();
+    public delegate void delImageVisible(int playerNumber);
 
 
     class Client
@@ -83,12 +83,12 @@ namespace Client
                 }
             }
         }
-        
+
         //Receiving new members
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void broadcastClientURL(int playerNumber, string nick, int port)
         {
-            
+            Console.WriteLine("Recebi1");
             try
             {
                 foreach (KeyValuePair<string, IClient> entry in form.clients)
@@ -97,10 +97,11 @@ namespace Client
                     {
                         throw new Exception("Client already exists!");
                     }
-                    if (this.nick.Equals(nick))
-                    {
-                        form.myNumber = playerNumber;
-                    }
+                }
+                if (this.nick.Equals(nick))
+                {
+                    Console.WriteLine("Recebi2");
+                    form.myNumber = playerNumber;
                 }
                 string url = "tcp://localhost:" + port + "/ChatClient";
                 IClient clientProxy = (IClient)Activator.GetObject(
@@ -121,13 +122,13 @@ namespace Client
                 */
 
                 Console.WriteLine("dictionary added: " + nick);
-
+                Console.WriteLine("Recebi3");
                 form.clients.Add(nick, clientProxy);
             }
             catch (Exception e)
             {
                 //TODO exception
-                throw new ThereIsNoCommunication(e.Message);
+                //throw new ThereIsNoCommunication(e.Message);
             }
             
         }
@@ -169,7 +170,7 @@ namespace Client
                         Console.WriteLine("Debug: " + e.ToString());
                     }catch(Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Console.WriteLine("Debug: "+e.ToString());
                     }
                 }
                 else
@@ -198,10 +199,9 @@ namespace Client
             this.form.Invoke(new delDead(form.updateDead), new object[] { playerNumber });
         }
 
-        public void startGame()
+        public void startGame(int playerNumbers)
         {
-            Console.WriteLine("Recebi start Game");
-            form.startGame();
+            this.form.Invoke(new delImageVisible(form.startGame), new object[] { playerNumbers });
         }
     }
 }

@@ -24,6 +24,6 @@ namespace ComLibrary
         void moveGhost(List<int> ghostsMove);
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
-        void startGame();
+        void startGame(int playerNumbers);
     }
 }

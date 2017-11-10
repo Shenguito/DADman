@@ -19,6 +19,7 @@ using System.Xml.Serialization;
 
 namespace Server
 {
+    public delegate void delImageVisible(int playerNumber);
     //client in server
     class Client
     {
@@ -35,10 +36,11 @@ namespace Server
 
     class Server
     {
-        private int MSECROUND = 10; //game speed [communication refresh time]
+        private int MSECROUND = Program.MSSEC; //game speed [communication refresh time]
         const int PORT = 8000;
         static TcpChannel channel = new TcpChannel(PORT);
-       
+        
+
 
         public Server()
         {
@@ -236,23 +238,23 @@ namespace Server
 
         public void sendStartGame()
         {
-            Console.WriteLine("PLAYERS: " + numberPlayersConnected);
-            int i = 0;
-            //TODO sheng
-            if (numberPlayersConnected == 1) { 
+            
+            Console.WriteLine("Debug: "+ Program.PLAYERNUMBER+"=="+ numberPlayersConnected);
+            if (numberPlayersConnected == Program.PLAYERNUMBER) {
+
+                this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 foreach (Client c in clientList)
                 {
-                    Console.WriteLine("debug: " + i + " -" + c.nick + " -" +  c.clientProxy);
                     try
                     {
-                        c.clientProxy.startGame();
+                        Console.WriteLine("Debug: " + c.nick + ":" + c.playernumber);
+                        c.clientProxy.startGame(numberPlayersConnected);
                     }
                     catch(Exception e)
                     {
                         Console.WriteLine(e.ToString());
 
                     }
-                    i++;
                 }
             }
 

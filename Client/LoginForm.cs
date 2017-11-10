@@ -34,7 +34,7 @@ namespace Client
                 && !textPort.Text.Trim().Equals("") 
                 && textPort.Text.Trim().All(char.IsDigit))
             {
-                
+                Console.WriteLine("Teste init");
                 form.Init(textNick.Text.Trim(), Int32.Parse(textPort.Text.Trim()));
             }
             else

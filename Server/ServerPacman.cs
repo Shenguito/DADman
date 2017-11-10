@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,6 +17,7 @@ namespace Server {
     public partial class ServerForm : Form
     {
         public Dictionary<int, string> listMove;
+        public bool started = false;
 
         int boardRight = 320;
         int boardBottom = 320;
@@ -43,32 +45,13 @@ namespace Server {
             
             this.server = remoteServer;
             this.timer1.Interval = 100;
+            if (Program.MSSEC!=0)
+            this.timer1.Interval = Program.MSSEC;
         }
-
-        public PictureBox retrievePicture(int playerNumber)
-        {
-            if (playerNumber == 1)
-            {
-                return pictureBoxPlayer1;
-            }
-            if (playerNumber == 2)
-            {
-                return pictureBoxPlayer2;
-            }
-            if (playerNumber == 3)
-            {
-                return pictureBoxPlayer3;
-            }
-            else
-            {
-                return pictureBoxPlayer4;
-            }
-
-        }
-
+        
         public void processMove(int playerNumber, string move)
         {
-            PictureBox pb = retrievePicture(playerNumber);
+            PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playerNumber);
             try
             {
                 updatePlayerPosition(pb, move);
@@ -143,7 +126,7 @@ namespace Server {
         {
             server.sendCoinEaten(playerNumber, coinName);
         }
-
+        
         private void updateGhostsPosition()
         {
 
@@ -196,6 +179,10 @@ namespace Server {
                 {
                     Console.WriteLine(exception.ToString());
                 }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception.ToString());
+                }
             }
         }
 
@@ -242,7 +229,26 @@ namespace Server {
                 processMove(entry.Key, entry.Value);
             }
             listMove = new Dictionary<int, string>();
+            
             updateGhostsPosition();
+        }
+
+        public void startGame(int playerNumbers)
+        {
+            for (int i = 1; i <= playerNumbers; i++)
+                getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
+        }
+
+        //Get Picture by String
+        private PictureBox getPictureBoxByName(string name)
+        {
+            foreach (object p in this.Controls)
+            {
+                if (p.GetType() == typeof(PictureBox))
+                    if (((PictureBox)p).Name == name)
+                        return (PictureBox)p;
+            }
+            return new PictureBox(); //OR return null;
         }
 
     }

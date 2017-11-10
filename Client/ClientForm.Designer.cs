@@ -198,12 +198,6 @@
             this.label2.TabIndex = 72;
             this.label2.Text = "label2";
             // 
-            // timer1
-            // 
-           /* this.timer1.Enabled = true;
-            this.timer1.Interval = 20;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);*/
-            // 
             // pictureBoxPlayer1
             // 
             this.pictureBoxPlayer1.BackColor = System.Drawing.Color.Transparent;
@@ -981,6 +975,7 @@
             this.pictureBoxPlayer6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer6.TabIndex = 145;
             this.pictureBoxPlayer6.TabStop = false;
+            this.pictureBoxPlayer6.Visible = false;
             // 
             // pictureBoxPlayer2
             // 
@@ -993,6 +988,7 @@
             this.pictureBoxPlayer2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer2.TabIndex = 146;
             this.pictureBoxPlayer2.TabStop = false;
+            this.pictureBoxPlayer2.Visible = false;
             // 
             // pictureBoxPlayer5
             // 
@@ -1005,6 +1001,7 @@
             this.pictureBoxPlayer5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer5.TabIndex = 147;
             this.pictureBoxPlayer5.TabStop = false;
+            this.pictureBoxPlayer5.Visible = false;
             // 
             // pictureBoxPlayer3
             // 
@@ -1017,6 +1014,7 @@
             this.pictureBoxPlayer3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer3.TabIndex = 148;
             this.pictureBoxPlayer3.TabStop = false;
+            this.pictureBoxPlayer3.Visible = false;
             // 
             // pictureBoxPlayer4
             // 
@@ -1029,6 +1027,7 @@
             this.pictureBoxPlayer4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxPlayer4.TabIndex = 149;
             this.pictureBoxPlayer4.TabStop = false;
+            this.pictureBoxPlayer4.Visible = false;
             // 
             // ClientForm
             // 
