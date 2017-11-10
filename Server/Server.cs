@@ -39,8 +39,10 @@ namespace Server
         private int MSECROUND = Program.MSSEC; //game speed [communication refresh time]
         const int PORT = 8000;
         static TcpChannel channel = new TcpChannel(PORT);
-        
 
+        public static string PATH = @".."+ Path.DirectorySeparatorChar+".."+ Path.DirectorySeparatorChar+
+            ".."+ Path.DirectorySeparatorChar+"ComLibrary"+ Path.DirectorySeparatorChar+
+            "bin"+ Path.DirectorySeparatorChar+"Log.txt";
 
         public Server()
         {
@@ -49,6 +51,16 @@ namespace Server
                 Path.PathSeparator);
             */
             createConnection();
+
+            
+            // Create a file to write to.
+            using (StreamWriter sw = File.CreateText(PATH))
+            {
+                
+                sw.WriteLine("Server Started!");
+            }
+            
+
         }
 
 
@@ -94,7 +106,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void connect(string nick, int port)
         {
-
+            
             Client c = new Client();
             string url = "tcp://localhost:" + port + "/ChatClient";
             IClient clientProxy = (IClient)Activator.GetObject(
@@ -111,6 +123,11 @@ namespace Server
             c.playernumber = numberPlayersConnected;
 
             clientList.Add(c);
+            
+            using (StreamWriter sw = File.AppendText(Server.PATH))
+            {
+                sw.WriteLine("Conneted: " + nick + " at port: " + port);
+            }
 
             foreach (Client client in clientList)
             {
@@ -164,6 +181,11 @@ namespace Server
                 Console.WriteLine("Client already sent a move in this round...\r\n");
             }
 
+            using (StreamWriter sw = File.AppendText(Server.PATH))
+            {
+                sw.WriteLine(nick+ "[Player" + +pl_number+"]" + " move: " + move+".");
+            }
+
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
 
 
@@ -214,6 +236,11 @@ namespace Server
                         clientList.Remove(c);
                 }
             }
+            string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
+            using (StreamWriter sw = File.AppendText(Server.PATH))
+            {
+                sw.WriteLine(nick + "[Player" + +playerNumber + "]" + " dead.");
+            }
         }
 
         public void sendCoinEaten(int playerNumber, string coinName)
@@ -234,6 +261,11 @@ namespace Server
                 }
 
             }
+            string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
+            using (StreamWriter sw = File.AppendText(Server.PATH))
+            {
+                sw.WriteLine(nick + "[Player" + +playerNumber + "]" + " ate a coin.");
+            }
         }
 
         public void sendStartGame()
@@ -241,7 +273,6 @@ namespace Server
             
             Console.WriteLine("Debug: "+ Program.PLAYERNUMBER+"=="+ numberPlayersConnected);
             if (numberPlayersConnected == Program.PLAYERNUMBER) {
-
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 foreach (Client c in clientList)
                 {
@@ -253,10 +284,15 @@ namespace Server
                     catch(Exception e)
                     {
                         Console.WriteLine(e.ToString());
-
                     }
                 }
+                using (StreamWriter sw = File.AppendText(Server.PATH))
+                {
+                    sw.WriteLine("Game started!");
+                }
             }
+            
+            
 
         }
     }

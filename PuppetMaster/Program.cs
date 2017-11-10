@@ -18,7 +18,9 @@ namespace PuppetMaster
         private bool freezed=false;
         static void Main(string[] args)
         {
-
+            string pathLog = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
+            ".." + Path.DirectorySeparatorChar + "ComLibrary" + Path.DirectorySeparatorChar +
+            "bin" + Path.DirectorySeparatorChar + "Log.txt";
             // Handle the ApplicationExit event to know when the application is exiting.
             //ArrayList processes = new ArrayList();
             Dictionary<string, int> processes = new Dictionary<string, int>();
@@ -32,50 +34,60 @@ namespace PuppetMaster
             {
                 if (text.Split(' ')[0].Equals("StartClient"))
                 {
-                    Process process = new Process();
-                    //Configure the process using the StartInfo properties.
-                    
-                    process.StartInfo.FileName = @".."+ Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar 
-                        + ".."+ Path.DirectorySeparatorChar + "Client"+ Path.DirectorySeparatorChar + "bin"+ Path.DirectorySeparatorChar 
-                        + "Debug"+ Path.DirectorySeparatorChar + "Client.exe";
-                    if (text.Split(' ').Length > 4)
-                        process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
-                    else
-                        process.StartInfo.Arguments = text.Split()[2] + " " + text.Split()[3];
-                    Console.WriteLine("Path: " + path);
-                    process.StartInfo.WorkingDirectory = path;
-                    process.Start();
-                    processes.Add(text.Split(' ')[1],process.Id);
-
-                        /*
-                        if (text.Split().Length == 6)
-                            processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
-                        else
-                            Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
-                        */
-                    }
-                    else if (text.Split(' ')[0].Equals("StartServer"))
-                {
-                    
-                    Process process = new Process();
+                    if (!processes.ContainsKey(text.Split(' ')[1]))
+                    {
+                        Process process = new Process();
                     //Configure the process using the StartInfo properties.
 
                     process.StartInfo.FileName = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar
-                       + ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
-                       + "Debug" + Path.DirectorySeparatorChar + "Server.exe";                     //process.StartInfo.Arguments = "-n";
-                    process.StartInfo.WorkingDirectory = path;
+                        + ".." + Path.DirectorySeparatorChar + "Client" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
+                        + "Debug" + Path.DirectorySeparatorChar + "Client.exe";
                     if (text.Split(' ').Length > 4)
                         process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
                     else
                         process.StartInfo.Arguments = text.Split()[2] + " " + text.Split()[3];
+                    //Console.WriteLine("Path: " + path);
+                    process.StartInfo.WorkingDirectory = path;
                     process.Start();
                     processes.Add(text.Split(' ')[1], process.Id);
-
-                   /* if (text.Split(' ').Length == 6)
-                        processLaucher.startServer(text.Split(' ')[1], text.Split(' ')[2], text.Split(' ')[3], text.Split(' ')[4], text.Split(' ')[5]);
+                    }
                     else
-                        Console.WriteLine("StartServer PID PCS_URL SERVER_URL MSEC_PER_ROUND NUM_PLAYERS");
-                     */
+                    {
+                        Console.WriteLine("Try another PID");
+                    }
+
+                    /*
+                    if (text.Split().Length == 6)
+                        processLaucher.startClient(text.Split()[1], text.Split()[2], text.Split()[3], text.Split()[4], text.Split()[5], text.Split()[6]);
+                    else
+                        Console.WriteLine("StartClient PID PCS_URL CLIENT_URL MSEC_PER_ROUND NUM_PLAYERS [filename]");
+                    */
+                }
+                else if (text.Split(' ')[0].Equals("StartServer"))
+                {
+                    if(!processes.ContainsKey(text.Split(' ')[1])) {
+                        Process process = new Process();
+                        //Configure the process using the StartInfo properties.
+                        process.StartInfo.FileName = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar
+                           + ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar
+                           + "Debug" + Path.DirectorySeparatorChar + "Server.exe";                     //process.StartInfo.Arguments = "-n";
+                        process.StartInfo.WorkingDirectory = path;
+                        if (text.Split(' ').Length > 4)
+                            process.StartInfo.Arguments = text.Split()[1] + " " + text.Split()[2] + " " + text.Split()[3] + " " + text.Split()[4] + " " + text.Split()[5] + " " + text.Split()[6];
+                        else
+                            process.StartInfo.Arguments = text.Split()[2] + " " + text.Split()[3];
+                        process.Start();
+                        processes.Add(text.Split(' ')[1], process.Id);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Try another PID");
+                    }
+                    /* if (text.Split(' ').Length == 6)
+                         processLaucher.startServer(text.Split(' ')[1], text.Split(' ')[2], text.Split(' ')[3], text.Split(' ')[4], text.Split(' ')[5]);
+                     else
+                         Console.WriteLine("StartServer PID PCS_URL SERVER_URL MSEC_PER_ROUND NUM_PLAYERS");
+                      */
                 }
                 else if (text.Split(' ')[0].Equals("GlobalStatus"))
                 {
@@ -94,15 +106,15 @@ namespace PuppetMaster
                 }
                 else if (text.Split(' ')[0].Equals("Crash"))
                 {
-                   /* int pid = Int32.Parse(text.Split()[1]);
-                    if (processes.ContainsValue(pid))
-                    {
-                        
-                        Process.GetProcessById(id).Kill();
-                        var item = processes.First(kvp => kvp.Value == id);
+                    /* int pid = Int32.Parse(text.Split()[1]);
+                     if (processes.ContainsValue(pid))
+                     {
 
-                        processes.Remove(item.Key);
-                    }*/
+                         Process.GetProcessById(id).Kill();
+                         var item = processes.First(kvp => kvp.Value == id);
+
+                         processes.Remove(item.Key);
+                     }*/
                     Console.WriteLine(text);
                 }
                 else if (text.Split(' ')[0].Equals("Freeze"))
@@ -166,17 +178,34 @@ namespace PuppetMaster
 
                 else if (text.Split(' ')[0].Equals("Check"))
                 {
-                    Console.WriteLine("Process: "+processes.Count+" created");
+                    Console.WriteLine("Process: " + processes.Count + " created");
                     foreach (KeyValuePair<string, int> entry in processes)
                     {
-                        Console.WriteLine(entry.Key+":"+entry.Value+"\r\n");
+                        Console.WriteLine(entry.Key + ":" + entry.Value + "\r\n");
+                    }
+                }
+                else if(text.Split(' ')[0].Equals("ServerLog"))
+                {
+                    if (File.Exists(pathLog))
+                    {
+                        // Open the file to read from.
+                        
+                        using (StreamReader sr = File.OpenText(pathLog))
+                        {
+
+                            string s = "";
+                            while ((s = sr.ReadLine()) != null)
+                            {
+                                Console.WriteLine(s);
+                            }
+                        }
                     }
                 }
 
 
 
 
-                Console.WriteLine(text);
+                //Console.WriteLine(text);
                 text = Console.ReadLine();
             }
 
