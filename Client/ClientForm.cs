@@ -299,6 +299,7 @@ namespace Client {
                 dead = true;
                 label2.Text = "GAME OVER";
                 label2.Visible = true;
+                getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.Black;
             }
           /*  PictureBox pb = retrievePicture(playerNumber);
 
@@ -315,7 +316,12 @@ namespace Client {
                     Controls.Remove(x);
                 }
             }
-
+            //TODO coin
+            if (myNumber==playerNumber)
+            {
+                score++;
+                label1.Text = "Score: " + score;
+            }
 
         }
 
@@ -324,6 +330,8 @@ namespace Client {
             for (int i = 2; i <= playerNumbers; i++)
                 getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
             started = true;
+
+            getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
         }
 
 

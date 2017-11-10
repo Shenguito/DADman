@@ -184,9 +184,9 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(3, 3);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(57, 20);
+            this.label1.Size = new System.Drawing.Size(76, 20);
             this.label1.TabIndex = 71;
-            this.label1.Text = "label1";
+            this.label1.Text = "Score: 0";
             // 
             // label2
             // 
@@ -200,6 +200,8 @@
             // 
             // pictureBoxPlayer1
             // 
+            this.pictureBoxPlayer1.AccessibleDescription = "";
+            this.pictureBoxPlayer1.AccessibleName = "";
             this.pictureBoxPlayer1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxPlayer1.Image = global::Client.Properties.Resources.Left;
             this.pictureBoxPlayer1.Location = new System.Drawing.Point(8, 40);
