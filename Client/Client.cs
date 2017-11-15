@@ -27,16 +27,17 @@ namespace Client
 
     class Client
     {
-        public Client()
-        {
-            Thread thread = new Thread(() => createClientForm());
-            thread.Start();
-        }
-        private void createClientForm()
+        public Client(string playername, int port)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ClientForm());
+            Application.Run(new ClientForm(playername, port));
+        }
+        public Client(string playername, int port, string filename)
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new ClientForm(playername, port, filename));
         }
 
     }
@@ -120,10 +121,11 @@ namespace Client
                     typeof(RemoteClient)
                 );
                 */
-
-                Console.WriteLine("dictionary added: " + nick);
-                Console.WriteLine("Recebi3");
+                
                 form.clients.Add(nick, clientProxy);
+
+                
+                form.sendMoveByFile();
             }
             catch (Exception e)
             {
@@ -137,7 +139,6 @@ namespace Client
         {
             Console.WriteLine(nick + " received info that player " + playernumber + " moved " + move);
             this.form.Invoke(new delmove(form.updateMove), new object[] { playernumber, move });
-
         }
 
         public void moveGhost(List<int> ghostMove)

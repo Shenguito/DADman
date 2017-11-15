@@ -25,6 +25,7 @@ namespace Client {
 
         string nickname;
         public int port;
+        string filename;
         bool started = false;
         bool dead = false;
 
@@ -59,13 +60,19 @@ namespace Client {
         public Dictionary<string, IClient> clients; 
         //public Dictionary<string, IClient> clients { get => clients; set => clients = value; }
 
-        public ClientForm() {
+        public ClientForm(string nickname, int port) {
             
             clients = new Dictionary<string, IClient>();
-            this.WindowState = FormWindowState.Minimized;
-            this.ShowInTaskbar = false;
-            formLogin = new LoginForm(this);
-            formLogin.Show();
+            Init(nickname, port);
+            //InitializeComponent();
+            //label2.Visible = false;
+
+        }
+        public ClientForm(string nickname, int port, string filename)
+        {
+            this.filename = filename;
+            clients = new Dictionary<string, IClient>();
+            Init(nickname, port);
             //InitializeComponent();
             //label2.Visible = false;
 
@@ -73,7 +80,6 @@ namespace Client {
 
         public void Init(string nickname, int port)
         {
-            Console.WriteLine("Teste1 init");
             this.nickname = nickname;
             this.port = port;
             // Iniciar canal
@@ -85,7 +91,6 @@ namespace Client {
                 typeof(IServer),
                 "tcp://localhost:8000/ChatServer" //lacking null verification
             );
-            Console.WriteLine("Teste2 init");
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(nickname, this);
             String clientServiceName = "ChatClient";
@@ -96,23 +101,15 @@ namespace Client {
                 clientServiceName,
                 typeof(RemoteClient)
             );
-            Console.WriteLine("Teste3 init");
             //try catch missed
             if (serverProxy != null)
             {
                 
                 try
                 {
-                    Console.WriteLine("Teste4 init:"+nickname+":"+port);
                     Thread thread = new Thread(() => serverProxy.connect(nickname, port));
                     thread.Start();
-                    Console.WriteLine("Teste5 init");
-                    formLogin.Close();
-
-                    //TODO loading for players
-
-                    this.ShowInTaskbar = true;
-                    this.WindowState = FormWindowState.Normal;
+                    
                     InitializeComponent();
                     this.Text += ": " + nickname;
                     label2.Visible = false;
@@ -127,7 +124,10 @@ namespace Client {
             {
                 Console.WriteLine("Teste init error");
             }
-            Console.WriteLine("Teste init end");
+
+
+            
+
         }
 
         //TODO move pacman
@@ -141,25 +141,25 @@ namespace Client {
                 {
                     if (e.KeyCode == Keys.Left)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "left"));
+                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "LEFT"));
                         thread.Start();
 
                     }
                     if (e.KeyCode == Keys.Right)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "right"));
+                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "RIGHT"));
                         thread.Start();
 
                     }
                     if (e.KeyCode == Keys.Up)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "up"));
+                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "UP"));
                         thread.Start();
 
                     }
                     if (e.KeyCode == Keys.Down)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "down"));
+                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "DOWN"));
                         thread.Start();
                     }
                 }
@@ -247,35 +247,34 @@ namespace Client {
         {
             tbChat.Text += nick + ": " + msg + "\r\n";
         }
-
-
+        
         public void updateMove(int playernumber, string move)
         {
             goleft = goright = goup = godown = false;
             PictureBox pb = getPictureBoxByName("pictureBoxPlayer"+playernumber);
 
-            if (move.Equals("left"))
+            if (move.Equals("LEFT"))
             {
                 if (pb.Left > (boardLeft)){
                     pb.Left -= speed;
                     pb.Image = Properties.Resources.Left;
                 }
             }
-            if (move.Equals("right"))
+            if (move.Equals("RIGHT"))
             {
                 if (pb.Left < (boardRight)) { 
                     pb.Left += speed;
                     pb.Image = Properties.Resources.Right;
                 }
             }
-            if (move.Equals("up"))
+            if (move.Equals("UP"))
             {
                 if (pb.Top > (boardTop)) { 
                     pb.Top -= speed;
                     pb.Image = Properties.Resources.Up;
                 }
             }
-            if (move.Equals("down")) {
+            if (move.Equals("DOWN")) {
                 if (pb.Top < (boardBottom)){
                     pb.Top += speed;
                     pb.Image = Properties.Resources.down;
@@ -345,6 +344,23 @@ namespace Client {
                         return (PictureBox)p;
             }
             return new PictureBox(); //OR return null;
+        }
+
+        public void sendMoveByFile()
+        {
+            string clientInput =@".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
+            ".." + Path.DirectorySeparatorChar + "PuppetMaster" + Path.DirectorySeparatorChar +
+            "file" + Path.DirectorySeparatorChar +filename;
+            using (StreamReader sr = File.OpenText(clientInput))
+            {
+                string s = "";
+                while ((s = sr.ReadLine()) != null)
+                {
+                    Thread thread = new Thread(() => serverProxy.sendMove(nickname, s.Split(',')[1]));
+                    thread.Start();
+                }
+            }
+
         }
     }
 }

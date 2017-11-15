@@ -41,7 +41,7 @@ namespace Server
         static TcpChannel channel = new TcpChannel(PORT);
 
         public static string PATH = @".."+ Path.DirectorySeparatorChar+".."+ Path.DirectorySeparatorChar+
-            ".."+ Path.DirectorySeparatorChar+"ComLibrary"+ Path.DirectorySeparatorChar+
+            ".."+ Path.DirectorySeparatorChar+"Server"+ Path.DirectorySeparatorChar+
             "bin"+ Path.DirectorySeparatorChar+"Log.txt";
 
         public Server()
@@ -50,13 +50,14 @@ namespace Server
             Console.WriteLine("Path.PathSeparator={0}", 
                 Path.PathSeparator);
             */
+
+            
             createConnection();
 
             
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(PATH))
             {
-                
                 sw.WriteLine("Server Started!");
             }
             
@@ -171,24 +172,22 @@ namespace Server
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
+                using (StreamWriter sw = File.AppendText(Server.PATH))
+                {
+                    sw.WriteLine(nick + "[Player" + +pl_number + "]" + " move: " + move + ".");
+                }
             }
             catch (SocketException e)
             {
-                Console.WriteLine("Debug: " + e.ToString());
+                Console.WriteLine("Send a Move Bug: " + e.ToString());
             }
             catch (Exception e)
             {
                 Console.WriteLine("Client already sent a move in this round...\r\n");
             }
 
-            using (StreamWriter sw = File.AppendText(Server.PATH))
-            {
-                sw.WriteLine(nick+ "[Player" + +pl_number+"]" + " move: " + move+".");
-            }
-
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
-
-
+            
 
         }
 
@@ -255,7 +254,7 @@ namespace Server
                 {
                     Console.WriteLine("Debug: " + e.ToString());
                 }
-                catch (Exception e)
+                catch
                 {
                     Console.WriteLine("Exception on server sendCoinEaten()");
                 }
@@ -271,14 +270,12 @@ namespace Server
         public void sendStartGame()
         {
             
-            Console.WriteLine("Debug: "+ Program.PLAYERNUMBER+"=="+ numberPlayersConnected);
             if (numberPlayersConnected == Program.PLAYERNUMBER) {
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 foreach (Client c in clientList)
                 {
                     try
                     {
-                        Console.WriteLine("Debug: " + c.nick + ":" + c.playernumber);
                         c.clientProxy.startGame(numberPlayersConnected);
                     }
                     catch(Exception e)
@@ -290,6 +287,7 @@ namespace Server
                 {
                     sw.WriteLine("Game started!");
                 }
+                Console.WriteLine("Game started!");
             }
             
             

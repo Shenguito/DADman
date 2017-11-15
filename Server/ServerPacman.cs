@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
@@ -16,8 +17,15 @@ using System.Windows.Forms;
 namespace Server {
     public partial class ServerForm : Form
     {
+        public static string PATH = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
+            ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar +
+            "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar;
+
         public Dictionary<int, string> listMove;
+        public List<int> deadPlayer;
         public bool started = false;
+
+        int roundID = 0;
 
         int boardRight = 320;
         int boardBottom = 320;
@@ -39,10 +47,16 @@ namespace Server {
         private RemoteServer server;
 
         public ServerForm(RemoteServer remoteServer) {
+
+            
+
             InitializeComponent();
             label2.Visible = false;
             listMove=new Dictionary<int, string>();
-            
+            deadPlayer = new List<int>();
+            string pathString = System.IO.Path.Combine(PATH, "log");
+            Directory.CreateDirectory(pathString);
+
             this.server = remoteServer;
             this.timer1.Interval = 100;
             if (Program.MSSEC!=0)
@@ -110,16 +124,13 @@ namespace Server {
             {
                 Console.WriteLine("Start: \r\n" + e.ToString() + "\r\nEnd");
             }
-
-            
             
         }
-
-
-
+        
         public void sendPlayerDead(int playerNumber)
         {
             server.sendPlayerDead(playerNumber);
+            deadPlayer.Add(playerNumber);
         }
 
         public void sendCoinEaten(int playerNumber, string coinName)
@@ -184,11 +195,70 @@ namespace Server {
                     Console.WriteLine(exception.ToString());
                 }
             }
+
+            roundID++;
+            using (StreamWriter sw = File.CreateText(PATH+ Path.DirectorySeparatorChar + "log"+ Path.DirectorySeparatorChar + roundID))
+            {
+                foreach (Control x in this.Controls)
+                {
+                    if(x is PictureBox && x.Tag == "ghost")
+                    {
+                        sw.WriteLine("M, " +x.Location.X+ ", "+x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "coin")
+                    {
+                        sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player1")
+                    {
+                        if(deadPlayer.Contains(1))
+                            sw.WriteLine("P1, L, " + x.Location.X + ", " + x.Location.Y);
+                        else
+                            sw.WriteLine("P1, P, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player2")
+                    {
+                        if (deadPlayer.Contains(2))
+                            sw.WriteLine("P2, L, " + x.Location.X + ", " + x.Location.Y);
+                        else
+                            sw.WriteLine("P2, P, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player3")
+                    {
+                        if (deadPlayer.Contains(3))
+                            sw.WriteLine("P3, L, " + x.Location.X + ", " + x.Location.Y);
+                        else
+                            sw.WriteLine("P3, P, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player4")
+                    {
+                        if (deadPlayer.Contains(4))
+                            sw.WriteLine("P4, L, " + x.Location.X + ", " + x.Location.Y);
+                        else
+                            sw.WriteLine("P4, P, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player5")
+                    {
+                        if (deadPlayer.Contains(5))
+                            sw.WriteLine("P5, L, " + x.Location.X + ", " + x.Location.Y);
+                        else
+                            sw.WriteLine("P5, P, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player6")
+                    {
+                        if (deadPlayer.Contains(6))
+                            sw.WriteLine("P6, L, " + x.Location.X + ", " + x.Location.Y);
+                        else
+                            sw.WriteLine("P6, P, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                }
+            }
+
         }
 
         private void updatePlayerPosition(PictureBox pb, string move)
         {
-            if (move.Equals("left"))
+            if (move.Equals("LEFT"))
             {
                 if (pb.Left > (boardLeft))
                 {
@@ -196,7 +266,7 @@ namespace Server {
                     pb.Image = Properties.Resources.Left;
                 }
             }
-            if (move.Equals("right"))
+            if (move.Equals("RIGHT"))
             {
                 if (pb.Left < (boardRight))
                 {
@@ -204,7 +274,7 @@ namespace Server {
                     pb.Image = Properties.Resources.Right;
                 }
             }
-            if (move.Equals("up"))
+            if (move.Equals("UP"))
             {
                 if (pb.Top > (boardTop))
                 {
@@ -212,7 +282,7 @@ namespace Server {
                     pb.Image = Properties.Resources.Up;
                 }
             }
-            if (move.Equals("down"))
+            if (move.Equals("DOWN"))
             {
                 if (pb.Top < (boardBottom))
                 {
