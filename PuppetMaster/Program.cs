@@ -58,7 +58,7 @@ namespace PuppetMaster
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine("File was not found...\r\n"+e.ToString());
+                    Console.WriteLine("Init Error...\r\n"+e.ToString());
                 }
                 
                 
@@ -262,10 +262,17 @@ namespace PuppetMaster
         {
             foreach (KeyValuePair<string, int> entry in processes)
             {
-                if(Process.GetProcessById(entry.Value).Responding)
-                    Console.WriteLine(entry.Key + " is alive\r\n");
-                else
+                try
+                {
+                    if (Process.GetProcessById(entry.Value).Responding)
+                        Console.WriteLine(entry.Key + " is alive\r\n");
+                    else
+                        Console.WriteLine(entry.Key + " is not responding\r\n");
+                }
+                catch
+                {
                     Console.WriteLine(entry.Key + " is not responding\r\n");
+                }
             }
         }
 

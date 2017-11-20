@@ -51,8 +51,7 @@ namespace Client {
         //x and y directions for the bi-direccional pink ghost
         int ghost3x = 5;
         int ghost3y = 5;
-
-        LoginForm formLogin;
+        
         public TcpChannel channel;
         IServer serverProxy;
 
@@ -114,9 +113,9 @@ namespace Client {
                     this.Text += ": " + nickname;
                     label2.Visible = false;
                 }
-                catch (Exception e)
+                catch
                 {
-                    formLogin.LoginError();
+                    
                 }
 
             }
@@ -129,14 +128,11 @@ namespace Client {
             
 
         }
-
-        //TODO move pacman
+        
         private void keyisdown(object sender, KeyEventArgs e) {
-
-            Console.WriteLine("teste1");
+            
             if (started)
             {
-                Console.WriteLine("teste3");
                 if (!dead)
                 {
                     if (e.KeyCode == Keys.Left)
