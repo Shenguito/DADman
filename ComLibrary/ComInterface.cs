@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,5 +27,23 @@ namespace ComLibrary
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
         void startGame(int playerNumbers);
+    }
+
+    //not applied yet
+    public interface IremotingException
+    {
+        void MyException(SerializationInfo info, StreamingContext context);
+    }
+
+    public interface IGeneralControlServices
+    {
+        [OneWay]
+        void Freeze();
+        void Unfreeze();
+    }
+    
+    public interface IPuppetMasterLauncher
+    {
+        void LaunchProcess(string name, string args);
     }
 }
