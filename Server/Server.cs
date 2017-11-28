@@ -213,10 +213,9 @@ namespace Server
                     }
                 }
                 Console.WriteLine("Game started!");
+                //TODO this delegate seems like does not work too
+                this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
             }
-            //TODO this delegate seems like does not work too
-            this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
-
         }
     }
 }

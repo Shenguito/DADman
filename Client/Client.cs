@@ -192,9 +192,8 @@ namespace Client
                 {
                 
                 }
-                this.form.Invoke(new delImageVisible(form.startGame), new object[] { i });
             }
-            
+            this.form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
         }
     }
 }
