@@ -127,7 +127,6 @@ namespace Client
                     {
                         //Client Disconnected
                         connectedClient.connected = false;
-                        Console.WriteLine("Debug: " + e.ToString());
                     }
                     catch(Exception e)
                     {
@@ -152,8 +151,9 @@ namespace Client
 
         public void startGame(int numberPlayersConnected, string arg)
         {
-            // Remember: in the server we sent arg string as:
+            // Remember: in the server we sent arg as:
             // "-" +c.nick+":"+ c.playernumber + ":" + c.url
+            // in for nick=c[0] playernumber=c[1] url=c[2]
             string[] rawClient = arg.Split('-');
             for(int i=1; i< rawClient.Length; i++) {
                 try
@@ -178,7 +178,7 @@ namespace Client
                         clientServiceName,
                         typeof(RemoteClient)
                     );
-                    //string nick, int playernumber, string url, IClient clientProxy)
+                    
                     form.clients.Add(new ConnectedClient(c[0], form.myNumber, c[2], clientProxy));
 
 

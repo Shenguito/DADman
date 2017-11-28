@@ -38,18 +38,12 @@ namespace Client {
         int boardBottom = 320;
         int boardLeft = 0;
         int boardTop = 40;
+
         //player speed
         int speed = 5;
-
-        int score = 0; int total_coins = 61;
-
-        //ghost speed for the one direction ghosts
-        int ghost1 = 5;
-        int ghost2 = 5;
-        
-        //x and y directions for the bi-direccional pink ghost
-        int ghost3x = 5;
-        int ghost3y = 5;
+        int score = 0;
+        //TODO to define when game is over
+        int total_coins = 61;
         
         private  TcpChannel channel;
         IServer serverProxy;
@@ -62,8 +56,6 @@ namespace Client {
             InitializeComponent();
             this.Text += ": " + nickname;
             label2.Visible = false;
-            
-            tbChat.Text += nickname + ":" + port + ".\r\n" + Program.SERVERURL.Split(':')[2].Split('/')[1].Trim();
             
             Init(nickname, port);
 
@@ -102,20 +94,19 @@ namespace Client {
                 }
                 catch
                 {
-                    Console.WriteLine("Connect error");
+                    tbChat.Text += "Didn't connected to server";
                 }
 
             }
             else
             {
-                tbChat.Text += "Teste init error";
+                tbChat.Text += "Didn't connected to server";
             }
             
-
-            
-
         }
         
+
+        //Todo, sending only if he can
         private void keyisdown(object sender, KeyEventArgs e) {
             
             if (started)

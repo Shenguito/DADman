@@ -72,8 +72,6 @@ namespace Server
         public int numberPlayersConnected = 0;
         public delegate void delProcess(int playerNumber, string move);
 
-        private string arg;
-
         public ServerForm serverForm;
         
         public RemoteServer()
@@ -103,6 +101,7 @@ namespace Server
 
             numberPlayersConnected++;
 
+            //Create a connected client with below parameters:
             c.nick = nick;
             c.url = url;
             c.clientProxy = clientProxy;
@@ -112,44 +111,28 @@ namespace Server
             c.score = 0;
 
             clientList.Add(c);
-            
-            //Creates a correspondence Nick - Player Number i.e. John - Player1
 
             assignPlayer(c);
             sendStartGame();
         }
 
+        
         public void sendMove(string nick, string move)
         {
-            /*
-            int playerNumber=0;
             
-            foreach(Client c in clientList)
-            {
-                if (c.nick.Equals(nick))
-                    playerNumber = c.playernumber;
-            }
-            
-            Console.WriteLine("player"+ playerNumber + ": " + nick + "\t receives: " + move);
-            */
             int pl_number = player_image_hashmap[nick];
 
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
             }
-            catch (SocketException e)
+            catch
             {
-                Console.WriteLine("Send a Move Bug: " + e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Client already sent a move in this round...\r\n");
+                Console.WriteLine("Client sent a move exception (Server sendMove(...))");
             }
 
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
             
-
         }
 
 
@@ -166,8 +149,6 @@ namespace Server
 
         public void sendPlayerDead(int playerNumber)
         {
-            
-            
             foreach (Client c in clientList)
             {
                 if (c.playernumber == playerNumber)
@@ -178,17 +159,13 @@ namespace Server
                 {
                     c.clientProxy.playerDead(playerNumber);
                 }
-                catch (SocketException e)
+                catch
                 {
                     c.connected = false;
-                }
-                catch (Exception e)
-                {
                     Console.WriteLine("Exception on server sendPlayerDead()");
                 }
             }
             string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
-            
         }
 
         public void sendCoinEaten(int playerNumber, string coinName)
@@ -199,12 +176,9 @@ namespace Server
                 {
                     c.clientProxy.coinEaten(playerNumber, coinName);
                 }
-                catch (SocketException e)
-                {
-                    Console.WriteLine("Debug: " + e.ToString());
-                }
                 catch
                 {
+                    c.connected = false;
                     Console.WriteLine("Exception on server sendCoinEaten()");
                 }
 
@@ -213,37 +187,34 @@ namespace Server
             
         }
 
-        //TODO problem here
+        
         public void sendStartGame()
         {
             if (numberPlayersConnected == Program.PLAYERNUMBER) {
-                arg = " ";
-                Console.WriteLine("INTO IF - Client list number:"+ clientList.Count());
+                string arg = " ";
                 foreach (Client c in clientList)
                 {
                     arg += "-" +c.nick+":"+ c.playernumber + ":" + c.url;
-                    
                 }
                 foreach (Client c in clientList)
                 {
                     try
                     {
                         Console.WriteLine("foreach connecting: " + arg);
+                        //TODO problem here, sending client list as arg to each client
+                        //each client as: "-" +c.nick+":"+ c.playernumber + ":" + c.url
                         c.clientProxy.startGame(numberPlayersConnected, arg);
                         Console.WriteLine("foreach connected: " + arg);
                     }
-                    catch (SocketException e)
+                    catch
                     {
-                        Console.WriteLine("Socket Exception: " + e.ToString());
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception: "+e.ToString());
+                        c.connected = false;
+                        Console.WriteLine("Exception on server sendStartGame()");
                     }
                 }
-                
                 Console.WriteLine("Game started!");
             }
+            //TODO this delegate seems like does not work too
             this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
 
         }

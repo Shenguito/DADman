@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-
 namespace Server {
     public partial class ServerForm : Form
     {
@@ -34,6 +33,7 @@ namespace Server {
         //player speed
         int speed = 5;
         
+        //TO define when the game is over
         int total_coins = 61;
 
         //ghost speed for the one direction ghosts
@@ -47,9 +47,7 @@ namespace Server {
         private RemoteServer server;
 
         public ServerForm(RemoteServer remoteServer) {
-
             
-
             InitializeComponent();
             label2.Visible = false;
             listMove=new Dictionary<int, string>();
@@ -58,9 +56,12 @@ namespace Server {
             Directory.CreateDirectory(pathString);
 
             this.server = remoteServer;
-            this.timer1.Interval = 100;
+
+            
             if (Program.MSSEC!=0)
-            this.timer1.Interval = Program.MSSEC;
+                this.timer1.Interval = Program.MSSEC;
+            else
+                this.timer1.Interval = 1000;
         }
         
         public void processMove(int playerNumber, string move)
@@ -69,7 +70,6 @@ namespace Server {
             try
             {
                 updatePlayerPosition(pb, move);
-
                 foreach (Control x in this.Controls)
                 {
                     // checking if the player hits the wall or the ghost, then game is over
@@ -89,34 +89,20 @@ namespace Server {
                         }
                     }
                 }
-                
-
-                //TODO Remove Disconnected Client #1
-                List<Client> tmpClient = new List<Client>();
                 foreach (Client c in server.clientList)
                 {
-                    try
+                    if (c.connected)
                     {
-                        c.clientProxy.movePlayer(playerNumber, move);
-                        
-                    }
-                    catch (SocketException exception)
-                    {
-                        //TODO Remove Disconnected Client #2
-                        tmpClient.Add(c);
+                        try
+                        {
+                            c.clientProxy.movePlayer(playerNumber, move);
 
-                        Console.WriteLine("Debug: " + exception.ToString());
-                    }
-                }
-
-
-                //TODO Remove Disconnected Client #3
-                if (tmpClient.Count!=0)
-                {
-                    foreach (Client c in tmpClient)
-                    {
-                        if (server.clientList.Contains(c))
-                            server.clientList.Remove(c);
+                        }
+                        catch (SocketException exception)
+                        {
+                            c.connected = false;
+                            Console.WriteLine("Debug: " + exception.ToString());
+                        }
                     }
                 }
             }
@@ -198,6 +184,8 @@ namespace Server {
             }
             */
 
+
+            //TODO, writing the server localstate to a file, must be flexible with number of players
             roundID++;
             using (StreamWriter sw = File.CreateText(PATH+ Path.DirectorySeparatorChar + "log"+ Path.DirectorySeparatorChar + roundID))
             {
@@ -255,7 +243,6 @@ namespace Server {
                     }
                 }
             }
-
         }
 
         private void updatePlayerPosition(PictureBox pb, string move)
