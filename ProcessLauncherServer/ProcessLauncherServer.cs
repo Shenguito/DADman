@@ -12,6 +12,8 @@ namespace ProcessLauncherServer
     {
         public void LaunchProcess(string name, string args)
         {
+            Console.WriteLine("Lauching....");
+
             if (args == null || name == null)
                 return;
             if (Util.IsLinux)

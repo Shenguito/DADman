@@ -180,6 +180,7 @@ namespace Server {
             moveGhost.Add(pinkGhost.Left);
             moveGhost.Add(pinkGhost.Top);
 
+            /*
             foreach (Client c in server.clientList)
             {
                 try
@@ -195,6 +196,7 @@ namespace Server {
                     Console.WriteLine(exception.ToString());
                 }
             }
+            */
 
             roundID++;
             using (StreamWriter sw = File.CreateText(PATH+ Path.DirectorySeparatorChar + "log"+ Path.DirectorySeparatorChar + roundID))

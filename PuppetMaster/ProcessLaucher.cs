@@ -23,7 +23,7 @@ namespace PuppetMaster
         * 
         */
         private Dictionary<string, int> processes;
-
+        private string serverURL;
         public ProcessLaucher()
         {
             processes = new Dictionary<string, int>();
@@ -31,18 +31,10 @@ namespace PuppetMaster
 
         public void exec(string className, string ip, string port, string args)
         {
-            /*
-            Process process = new Process();
-
-
-            process.StartInfo.Arguments = args;
-            process.StartInfo.WorkingDirectory = Util.PROJECT_ROOT + className +
-                        Util.EXE_PATH + className + ".exe";
-            process.Start();
-            */
-            //processes.Add(input[1], process.Id);
-
-            if (ip.Equals("localhost") || ip.Equals("127.0.0.1"))
+            Console.WriteLine("DEBUG: " + Util.GetLocalIPAddress());
+            Console.WriteLine("DEBUG: " + ip);
+            Console.WriteLine("DEBUG: " + port);
+            if (ip.Equals("localhost") || ip.Equals("127.0.0.1") || ip.Equals(Util.GetLocalIPAddress()))
             {
                 if (Util.IsLinux)
                 {
@@ -52,9 +44,10 @@ namespace PuppetMaster
                 }
                 else
                 {
+                    Console.WriteLine("Localhost Launching Process... "+ Util.PROJECT_ROOT + className +
+                        Util.EXE_PATH + className+"\r\n"+args);
                     Process.Start(Util.PROJECT_ROOT + className +
                         Util.EXE_PATH + className, args);
-                    Console.WriteLine("Process started with: " + args);
                 }
             }
             else
@@ -64,6 +57,7 @@ namespace PuppetMaster
                 IPuppetMasterLauncher launcher = Activator.GetObject(
                     typeof(IPuppetMasterLauncher), url)
                     as IPuppetMasterLauncher;
+                Console.WriteLine("Launching Process on other PC...");
                 launcher.LaunchProcess(className, args);
             }
         }
@@ -72,27 +66,23 @@ namespace PuppetMaster
         {
             Console.WriteLine("StartServer");
             string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
-            /*
-            processLaucher.AddNode(input[1], Util.ExtractIPFromURL(input[2]),
-                Util.ExtractPortFromURL(input[2]));
-
-            processLaucher.AddNode(input[1], Util.ExtractIPFromURL(input[3]),
-                Util.ExtractPortFromURL(input[3]));
-            */
-            //Console.WriteLine("Path: " + path);
+            
+            serverURL = input[3].Trim();
             try
             {
-                exec("ProcessLauncherServer", Util.ExtractIPFromURL(input[2]), Util.ExtractPortFromURL(input[2]), " ");
-                Console.WriteLine("Server step1 passed");
+                if (Util.ExtractIPFromURL(input[3]).Equals("localhost")||
+                    Util.ExtractIPFromURL(input[3]).Equals("127.0.0.1"))
+                {
+                    exec("Server", Util.GetLocalIPAddress(), Util.ExtractPortFromURL(input[3]), argv);
+
+                }else
                 exec("Server", Util.ExtractIPFromURL(input[3]), Util.ExtractPortFromURL(input[3]), argv);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Create PCS or Server error-> " + e.ToString());
             }
-
-
-
+            
         }
         public void startClient(string[] input)
         {
@@ -100,12 +90,23 @@ namespace PuppetMaster
             Console.WriteLine("StartClient");
             string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
 
+            if (serverURL != null)
+            {
+                if(Util.ExtractIPFromURL(serverURL).Equals("localhost") ||
+                    Util.ExtractIPFromURL(serverURL).Equals("127.0.0.1")){
+                    argv += " " + "tcp://"+Util.GetLocalIPAddress()+":"+ Util.ExtractPortFromURL(serverURL) + "/Server";
+                }else
+                argv += " " + serverURL;
+            }
             if (input.Length > 6)
                 argv += " " + input[6];
             try
             {
-                exec("ProcessLauncherServer", Util.ExtractIPFromURL(input[2]), Util.ExtractPortFromURL(input[2]), " ");
-                Console.WriteLine("Client step1 passed");
+                if (Util.ExtractIPFromURL(input[3]).Equals("localhost") ||
+                    Util.ExtractIPFromURL(input[3]).Equals("127.0.0.1"))
+                {
+                    exec("Client", Util.GetLocalIPAddress(), Util.ExtractPortFromURL(input[3]), argv);
+                }else
                 exec("Client", Util.ExtractIPFromURL(input[3]), Util.ExtractPortFromURL(input[3]), argv);
             }
             catch (Exception e)

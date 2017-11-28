@@ -33,16 +33,26 @@ namespace Client
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ClientForm(playername, port));
         }
-        public Client(string playername, int port, string filename)
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ClientForm(playername, port, filename));
-        }
 
     }
+    public class ConnectedClient
+    {
+        public string nick;
+        public int playernumber;
+        public string url;
+        public IClient clientProxy;
+        public bool connected;
+        public ConnectedClient(string nick, int playernumber, string url, IClient clientProxy)
+        {
+            this.nick = nick;
+            this.playernumber = playernumber;
+            this.url = url;
+            this.clientProxy = clientProxy;
+            connected = true;
+        }
+    }
 
-    class RemoteClient : MarshalByRefObject, IClient
+    public class RemoteClient : MarshalByRefObject, IClient
     {
 
         Dictionary<string, List<int>> msgLog;
@@ -59,15 +69,15 @@ namespace Client
             
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteClient),
-                "ChatClient",
+                "Client",
                 WellKnownObjectMode.Singleton
             );
 
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
+        //TODO CHAT, shows up the message to chat according to fault tolerance
         public void broadcast(int id, string nick, string msg)
         {
-            //TODO Create Vector clocks
             List<int> lista = new List<int>();
             if (!(msgLog.ContainsKey(nick))) {
                 lista.Add(id);
@@ -85,56 +95,6 @@ namespace Client
             }
         }
 
-        //Receiving new members
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void broadcastClientURL(int playerNumber, string nick, int port)
-        {
-            Console.WriteLine("Recebi1");
-            try
-            {
-                foreach (KeyValuePair<string, IClient> entry in form.clients)
-                {
-                    if (nick.Equals(entry.Key))
-                    {
-                        throw new Exception("Client already exists!");
-                    }
-                }
-                if (this.nick.Equals(nick))
-                {
-                    Console.WriteLine("Recebi2");
-                    form.myNumber = playerNumber;
-                }
-                string url = "tcp://localhost:" + port + "/ChatClient";
-                IClient clientProxy = (IClient)Activator.GetObject(
-                typeof(IClient),
-                url);
-
-                /*
-                // Registro do cliente TODO to understand this code
-                RemoteClient rmc = new RemoteClient(nick, form);
-                String clientServiceName = "ChatClient";
-
-                // ## dont know what this does
-                RemotingServices.Marshal(
-                    rmc,
-                    clientServiceName,
-                    typeof(RemoteClient)
-                );
-                */
-                
-                form.clients.Add(nick, clientProxy);
-
-                
-                form.sendMoveByFile();
-            }
-            catch (Exception e)
-            {
-                //TODO exception
-                //throw new ThereIsNoCommunication(e.Message);
-            }
-            
-        }
-
         public void movePlayer(int playernumber, string move)
         {
             Console.WriteLine(nick + " received info that player " + playernumber + " moved " + move);
@@ -147,29 +107,29 @@ namespace Client
             this.form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { ghostMove[0], ghostMove[1], ghostMove[2], ghostMove[3] });
         }
 
+        //TODO CHAT, every connected client receive the message, and then decide which message show broadcast
         public void send(string nick, string msg)
         {
             Console.WriteLine("Client sending: "+nick+":"+msg);
             clientMessageId++;
-
-            //TODO Remove Disconnected Client #1
-            List<String> tmpClient = new List<String>();
-            foreach (KeyValuePair<string, IClient> entry in form.clients)
+            
+            foreach (ConnectedClient connectedClient in form.clients)
             {
-                Console.WriteLine("Delivering to client: " + entry.Key);
-                if (!entry.Key.Equals(nick))
+                Console.WriteLine("Delivering to client: " + connectedClient.nick);
+                if (!connectedClient.nick.Equals(nick))
                 {
                     try
                     {
-                        Console.WriteLine("[IF] Delivering to client: " + entry.Key);
-                        entry.Value.broadcast(clientMessageId, nick, msg);
+                        Console.WriteLine("[IF] Delivering to client: " + connectedClient.nick);
+                        connectedClient.clientProxy.broadcast(clientMessageId, nick, msg);
                     }
                     catch (SocketException e)
                     {
-                        //TODO Remove Disconnected Client #2
-                        tmpClient.Add(entry.Key);
+                        //Client Disconnected
+                        connectedClient.connected = false;
                         Console.WriteLine("Debug: " + e.ToString());
-                    }catch(Exception e)
+                    }
+                    catch(Exception e)
                     {
                         Console.WriteLine("Debug: "+e.ToString());
                     }
@@ -178,16 +138,6 @@ namespace Client
                 {
                     Thread thread = new Thread(() => broadcast(clientMessageId, nick, msg));
                     thread.Start();
-                }
-            }
-
-            //TODO Remove Disconnected Client #3
-            if (tmpClient.Count!=0)
-            {
-                foreach (String c in tmpClient)
-                {
-                    if (form.clients.ContainsKey(c))
-                        form.clients.Remove(c);
                 }
             }
         }
@@ -200,9 +150,51 @@ namespace Client
             this.form.Invoke(new delDead(form.updateDead), new object[] { playerNumber });
         }
 
-        public void startGame(int playerNumbers)
+        public void startGame(int numberPlayersConnected, string arg)
         {
-            this.form.Invoke(new delImageVisible(form.startGame), new object[] { playerNumbers });
+            // Remember: in the server we sent arg string as:
+            // "-" +c.nick+":"+ c.playernumber + ":" + c.url
+            string[] rawClient = arg.Split('-');
+            for(int i=1; i< rawClient.Length; i++) {
+                try
+                {
+                    string[] c = rawClient[1].Split(':');
+
+
+                    if (this.nick.Equals(c[0]))
+                    {
+                        form.myNumber = Int32.Parse(c[1]);
+                    }
+                    IClient clientProxy = (IClient)Activator.GetObject(
+                    typeof(IClient),
+                    c[2]);
+
+                    RemoteClient rmc = new RemoteClient(nick, form);
+                    string clientServiceName = "Client";
+
+                    // ## dont know what this does
+                    RemotingServices.Marshal(
+                        rmc,
+                        clientServiceName,
+                        typeof(RemoteClient)
+                    );
+                    //string nick, int playernumber, string url, IClient clientProxy)
+                    form.clients.Add(new ConnectedClient(c[0], form.myNumber, c[2], clientProxy));
+
+
+                    //TODO client move by file
+                    if (Program.FILENAME != null)
+                    {
+                        form.sendMoveByFile(Program.FILENAME);
+                    }
+                }
+                catch
+                {
+                
+                }
+                this.form.Invoke(new delImageVisible(form.startGame), new object[] { i });
+            }
+            
         }
     }
 }

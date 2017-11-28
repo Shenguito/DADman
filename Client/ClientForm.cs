@@ -25,7 +25,6 @@ namespace Client {
 
         string nickname;
         public int port;
-        string filename;
         bool started = false;
         bool dead = false;
 
@@ -52,47 +51,40 @@ namespace Client {
         int ghost3x = 5;
         int ghost3y = 5;
         
-        public TcpChannel channel;
+        private  TcpChannel channel;
         IServer serverProxy;
 
-        //TODO change below dictionary to List<Client>
-        public Dictionary<string, IClient> clients; 
-        //public Dictionary<string, IClient> clients { get => clients; set => clients = value; }
+        public List<ConnectedClient> clients;
 
         public ClientForm(string nickname, int port) {
             
-            clients = new Dictionary<string, IClient>();
+            clients = new List<ConnectedClient>();
+            InitializeComponent();
+            this.Text += ": " + nickname;
+            label2.Visible = false;
+            
+            tbChat.Text += nickname + ":" + port + ".\r\n" + Program.SERVERURL.Split(':')[2].Split('/')[1].Trim();
+            
             Init(nickname, port);
-            //InitializeComponent();
-            //label2.Visible = false;
-
-        }
-        public ClientForm(string nickname, int port, string filename)
-        {
-            this.filename = filename;
-            clients = new Dictionary<string, IClient>();
-            Init(nickname, port);
-            //InitializeComponent();
-            //label2.Visible = false;
 
         }
 
         public void Init(string nickname, int port)
         {
+
             this.nickname = nickname;
             this.port = port;
-            // Iniciar canal
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
-
-            // Registro do Servidor
+            
             serverProxy = (IServer)Activator.GetObject(
                 typeof(IServer),
-                "tcp://localhost:8000/ChatServer" //lacking null verification
+                Program.SERVERURL
             );
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(nickname, this);
-            String clientServiceName = "ChatClient";
+            
+            string clientServiceName = Program.SERVERURL.Split(':')[2].Split('/')[1].Trim();
 
             // ## dont know what this does
             RemotingServices.Marshal(
@@ -100,30 +92,25 @@ namespace Client {
                 clientServiceName,
                 typeof(RemoteClient)
             );
+            
             //try catch missed
             if (serverProxy != null)
             {
-                
                 try
                 {
-                    Thread thread = new Thread(() => serverProxy.connect(nickname, port));
-                    thread.Start();
-                    
-                    InitializeComponent();
-                    this.Text += ": " + nickname;
-                    label2.Visible = false;
+                    serverProxy.connect(nickname, "tcp://"+ Util.GetLocalIPAddress()+":"+ port+"/Client");
                 }
                 catch
                 {
-                    
+                    Console.WriteLine("Connect error");
                 }
 
             }
             else
             {
-                Console.WriteLine("Teste init error");
+                tbChat.Text += "Teste init error";
             }
-
+            
 
             
 
@@ -186,41 +173,28 @@ namespace Client {
             {
                 try {
                     if (!tbMsg.Text.Trim().Equals("")) {
-
-                        //TODO Remove Disconnected Client #1
-                        List<String> tmpClient = new List<String>();
-
+                        
                         string msg = tbMsg.Text;
                         IClient myself=null;
-                        foreach (KeyValuePair<string, IClient> entry in clients)
+                        foreach (ConnectedClient connectedClient in clients)
                         {
                             try
                             {
-                                if (!entry.Key.Equals(nickname))
+                                if (!connectedClient.nick.Equals(nickname)&& connectedClient.connected)
                                 {
-                                    entry.Value.send(nickname, msg);
+                                    connectedClient.clientProxy.send(nickname, msg);
                                 }
-                                else
+                                else if(connectedClient.nick.Equals(nickname))
                                 {
-                                    myself = entry.Value;
+                                    myself = connectedClient.clientProxy;
                                 }
                             }
                             catch (SocketException exception)
                             {
-                                //TODO Remove Disconnected Client #2
-                                tmpClient.Add(entry.Key);
-
+                                //Client Disconnected
+                                connectedClient.connected = false;
                                 Console.WriteLine("Debug: " + exception.ToString());
                                 
-                            }
-                        }
-                        //TODO Remove Disconnected Client #3
-                        if (tmpClient.Count != 0)
-                        {
-                            foreach (String c in tmpClient)
-                            {
-                                if (clients.ContainsKey(c))
-                                    clients.Remove(c);
                             }
                         }
                         if (myself!=null)
@@ -311,7 +285,6 @@ namespace Client {
                     Controls.Remove(x);
                 }
             }
-            //TODO coin
             if (myNumber==playerNumber)
             {
                 score++;
@@ -342,7 +315,7 @@ namespace Client {
             return new PictureBox(); //OR return null;
         }
 
-        public void sendMoveByFile()
+        public void sendMoveByFile(string filename)
         {
             string clientInput =@".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
             ".." + Path.DirectorySeparatorChar + "PuppetMaster" + Path.DirectorySeparatorChar +

@@ -10,7 +10,7 @@ namespace ComLibrary
 {
     public interface IServer
     {
-        void connect(string nick, int port);
+        void connect(string nick, string url);
         void sendMove(string nick, string direction);
         void sendCoinEaten(int playerNumber, string coinName);
         void sendPlayerDead(int playerNumber);
@@ -18,30 +18,28 @@ namespace ComLibrary
     }
     public interface IClient
     {
-        void broadcastClientURL(int playerNumber, string nick, int port);
         void send(string nick, string msg);
         void broadcast(int id, string nick, string msg);
         void movePlayer(int numberPlayer, string movement);
-        //TODO interception exception
         void moveGhost(List<int> ghostsMove);
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
-        void startGame(int playerNumbers);
+        void startGame(int playerNumber, string arg);
     }
 
-    //not applied yet
+    //TODO not applied yet
     public interface IremotingException
     {
         void MyException(SerializationInfo info, StreamingContext context);
     }
-
+    //TODO not applied yet
     public interface IGeneralControlServices
     {
         [OneWay]
         void Freeze();
         void Unfreeze();
     }
-    
+    //TODO not applied yet
     public interface IPuppetMasterLauncher
     {
         void LaunchProcess(string name, string args);

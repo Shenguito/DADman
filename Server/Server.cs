@@ -27,18 +27,18 @@ namespace Server
         public int playernumber;
         public string url;
         public IClient clientProxy;
-        public int port;
         // TODO defined at end
+        public bool dead;
         public bool connected;
         public int score;
        
     }
 
-    class Server
+    public class Server
     {
         private int MSECROUND = Program.MSSEC; //game speed [communication refresh time]
-        const int PORT = 8000;
-        static TcpChannel channel = new TcpChannel(PORT);
+
+        static TcpChannel channel = new TcpChannel(Program.PORT);
 
         public static string PATH = @".."+ Path.DirectorySeparatorChar+".."+ Path.DirectorySeparatorChar+
             ".."+ Path.DirectorySeparatorChar+"Server"+ Path.DirectorySeparatorChar+
@@ -46,22 +46,9 @@ namespace Server
 
         public Server()
         {
-            /* TODO FOR LINUX / WINDOWS
-            Console.WriteLine("Path.PathSeparator={0}", 
-                Path.PathSeparator);
-            */
-
             
             createConnection();
-
             
-            // Create a file to write to.
-            using (StreamWriter sw = File.CreateText(PATH))
-            {
-                sw.WriteLine("Server Started!");
-            }
-            
-
         }
 
 
@@ -71,7 +58,7 @@ namespace Server
             ChannelServices.RegisterChannel(channel, false);
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteServer),
-                "ChatServer",
+                "Server",
                 WellKnownObjectMode.Singleton
             );
         }
@@ -85,11 +72,10 @@ namespace Server
         public int numberPlayersConnected = 0;
         public delegate void delProcess(int playerNumber, string move);
 
+        private string arg;
 
         public ServerForm serverForm;
-        private ArrayList deadPlayers = new ArrayList();
-
-        //TODO PROBLEM WITH MS INPUT
+        
         public RemoteServer()
         {
             Thread thread = new Thread(() => createServerForm());
@@ -105,11 +91,11 @@ namespace Server
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void connect(string nick, int port)
+        public void connect(string nick, string url)
         {
-            
             Client c = new Client();
-            string url = "tcp://localhost:" + port + "/ChatClient";
+            
+            Console.WriteLine("URL: "+url);
             IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),
                 url
@@ -119,35 +105,14 @@ namespace Server
 
             c.nick = nick;
             c.url = url;
-            c.port = port;
             c.clientProxy = clientProxy;
             c.playernumber = numberPlayersConnected;
+            c.dead = false;
+            c.connected = true;
+            c.score = 0;
 
             clientList.Add(c);
             
-            using (StreamWriter sw = File.AppendText(Server.PATH))
-            {
-                sw.WriteLine("Conneted: " + nick + " at port: " + port);
-            }
-
-            foreach (Client client in clientList)
-            {
-
-                Console.WriteLine("Client : " + nick + " Client to sent:" + client.nick);
-                if (!client.nick.Equals(nick))
-                {
-                    client.clientProxy.broadcastClientURL(numberPlayersConnected, nick, port);
-                }
-                else
-                {
-                    foreach (Client oldClient in clientList)
-                    {
-                        Thread thread = new Thread(() => client.clientProxy.broadcastClientURL(oldClient.playernumber, oldClient.nick, oldClient.port));
-                        thread.Start();
-                    }
-                }
-            }
-
             //Creates a correspondence Nick - Player Number i.e. John - Player1
 
             assignPlayer(c);
@@ -172,10 +137,6 @@ namespace Server
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
-                using (StreamWriter sw = File.AppendText(Server.PATH))
-                {
-                    sw.WriteLine(nick + "[Player" + +pl_number + "]" + " move: " + move + ".");
-                }
             }
             catch (SocketException e)
             {
@@ -205,41 +166,29 @@ namespace Server
 
         public void sendPlayerDead(int playerNumber)
         {
-            deadPlayers.Add(playerNumber);
-            //TODO Remove Disconnected Client #1
-            List<Client> tmpClient = new List<Client>();
+            
+            
             foreach (Client c in clientList)
             {
+                if (c.playernumber == playerNumber)
+                {
+                    c.dead = true;
+                }
                 try
                 {
-                    Console.WriteLine("Debug: "+c.nick);
                     c.clientProxy.playerDead(playerNumber);
                 }
                 catch (SocketException e)
                 {
-                    //TODO Remove Disconnected Client #2
-                    tmpClient.Add(c);
-                    Console.WriteLine("Debug: " + e.ToString());
+                    c.connected = false;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception on server sendPlayerDead()");
                 }
             }
-            //TODO Remove Disconnected Client #3
-            if (tmpClient.Count != 0)
-            {
-                foreach (Client c in tmpClient)
-                {
-                    if (clientList.Contains(c))
-                        clientList.Remove(c);
-                }
-            }
             string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
-            using (StreamWriter sw = File.AppendText(Server.PATH))
-            {
-                sw.WriteLine(nick + "[Player" + +playerNumber + "]" + " dead.");
-            }
+            
         }
 
         public void sendCoinEaten(int playerNumber, string coinName)
@@ -261,36 +210,41 @@ namespace Server
 
             }
             string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
-            using (StreamWriter sw = File.AppendText(Server.PATH))
-            {
-                sw.WriteLine(nick + "[Player" + +playerNumber + "]" + " ate a coin.");
-            }
+            
         }
 
+        //TODO problem here
         public void sendStartGame()
         {
-            
             if (numberPlayersConnected == Program.PLAYERNUMBER) {
-                this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
+                arg = " ";
+                Console.WriteLine("INTO IF - Client list number:"+ clientList.Count());
+                foreach (Client c in clientList)
+                {
+                    arg += "-" +c.nick+":"+ c.playernumber + ":" + c.url;
+                    
+                }
                 foreach (Client c in clientList)
                 {
                     try
                     {
-                        c.clientProxy.startGame(numberPlayersConnected);
+                        Console.WriteLine("foreach connecting: " + arg);
+                        c.clientProxy.startGame(numberPlayersConnected, arg);
+                        Console.WriteLine("foreach connected: " + arg);
                     }
-                    catch(Exception e)
+                    catch (SocketException e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Console.WriteLine("Socket Exception: " + e.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception: "+e.ToString());
                     }
                 }
-                using (StreamWriter sw = File.AppendText(Server.PATH))
-                {
-                    sw.WriteLine("Game started!");
-                }
+                
                 Console.WriteLine("Game started!");
             }
-            
-            
+            this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
 
         }
     }
