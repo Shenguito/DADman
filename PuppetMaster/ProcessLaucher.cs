@@ -31,9 +31,11 @@ namespace PuppetMaster
 
         public void exec(string className, string ip, string port, string args)
         {
+            /* Debug effect
             Console.WriteLine("DEBUG: " + Util.GetLocalIPAddress());
             Console.WriteLine("DEBUG: " + ip);
             Console.WriteLine("DEBUG: " + port);
+            */
             if (ip.Equals("localhost") || ip.Equals("127.0.0.1") || ip.Equals(Util.GetLocalIPAddress()))
             {
                 if (Util.IsLinux)

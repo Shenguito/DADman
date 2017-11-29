@@ -94,13 +94,13 @@ namespace Client {
                 }
                 catch
                 {
-                    tbChat.Text += "Didn't connected to server";
+                    tbChat.Text += "Catch: Didn't connected to server";
                 }
 
             }
             else
             {
-                tbChat.Text += "Didn't connected to server";
+                tbChat.Text += "Else: Didn't connected to server";
             }
             
         }
@@ -320,7 +320,11 @@ namespace Client {
                     thread.Start();
                 }
             }
+        }
 
+        public void debugFunction(string text)
+        {
+            tbChat.AppendText("Debug: " + text);
         }
     }
 }

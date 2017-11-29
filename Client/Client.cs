@@ -154,43 +154,49 @@ namespace Client
             // Remember: in the server we sent arg as:
             // "-" +c.nick+":"+ c.playernumber + ":" + c.url
             // in for nick=c[0] playernumber=c[1] url=c[2]
-            string[] rawClient = arg.Split('-');
-            for(int i=1; i< rawClient.Length; i++) {
-                try
+            if (arg!=null)
+            {
+                form.debugFunction(arg);
+                string[] rawClient = arg.Split('-');
+                for (int i = 1; i < rawClient.Length; i++)
                 {
-                    string[] c = rawClient[1].Split(':');
-
-
-                    if (this.nick.Equals(c[0]))
+                    try
                     {
-                        form.myNumber = Int32.Parse(c[1]);
+                        string[] c = rawClient[1].Split(':');
+
+
+                        if (this.nick.Equals(c[0]))
+                        {
+                            form.myNumber = Int32.Parse(c[1]);
+                        }
+
+
+                        RemoteClient rmc = new RemoteClient(nick, form);
+                        string clientServiceName = "Client";
+
+                        RemotingServices.Marshal(
+                            rmc,
+                            clientServiceName,
+                            typeof(RemoteClient)
+                        );
+
+                        IClient clientProxy = (IClient)Activator.GetObject(
+                        typeof(IClient),
+                        c[2]);
+
+                        form.clients.Add(new ConnectedClient(c[0], form.myNumber, c[2], clientProxy));
+
+
+                        //TODO client move by file
+                        if (Program.FILENAME != null)
+                        {
+                            form.sendMoveByFile(Program.FILENAME);
+                        }
                     }
-                    IClient clientProxy = (IClient)Activator.GetObject(
-                    typeof(IClient),
-                    c[2]);
-
-                    RemoteClient rmc = new RemoteClient(nick, form);
-                    string clientServiceName = "Client";
-
-                    // ## dont know what this does
-                    RemotingServices.Marshal(
-                        rmc,
-                        clientServiceName,
-                        typeof(RemoteClient)
-                    );
-                    
-                    form.clients.Add(new ConnectedClient(c[0], form.myNumber, c[2], clientProxy));
-
-
-                    //TODO client move by file
-                    if (Program.FILENAME != null)
+                    catch
                     {
-                        form.sendMoveByFile(Program.FILENAME);
+
                     }
-                }
-                catch
-                {
-                
                 }
             }
             this.form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
