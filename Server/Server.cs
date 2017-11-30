@@ -119,7 +119,12 @@ namespace Server
             clientList.Add(c);
 
             assignPlayer(c);
-            sendStartGame();
+            if (numberPlayersConnected == Program.PLAYERNUMBER)
+            {
+                Thread thread = new Thread(() => sendStartGame());
+                thread.Start();
+            }
+
         }
 
         
@@ -196,7 +201,7 @@ namespace Server
         
         public void sendStartGame()
         {
-            if (numberPlayersConnected == Program.PLAYERNUMBER) {
+            
                 string arg = " ";
                 foreach (Client c in clientList)
                 {
@@ -204,7 +209,7 @@ namespace Server
                 }
                 foreach (Client c in clientList)
                 {
-                        Console.WriteLine("SERVER: startGame para o player" + c.playernumber);
+                    Console.WriteLine("SERVER: startGame:"+ arg);
                     try
                     {
                         c.clientProxy.startGame(numberPlayersConnected, arg);
@@ -219,11 +224,7 @@ namespace Server
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 
                 Console.WriteLine("Game started!");
-            }
-            else
-            {
-                Console.WriteLine("SERVER: Not enough players......");
-            }
+            
         }
     }
 }

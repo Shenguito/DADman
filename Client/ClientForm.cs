@@ -52,16 +52,15 @@ namespace Client {
         public List<ConnectedClient> clients;
 
         public ClientForm() {
+            
             nickname = Program.PLAYERNAME;
             clients = new List<ConnectedClient>();
-            System.Diagnostics.Debug.WriteLine("DEBUG---------------------" + nickname);
             InitializeComponent();
-            //tbChat.AppendText("DEBUG-" + nickname);
             this.Text += ": " + nickname;
             label2.Visible = false;
             
             Init();
-
+            
         }
 
         public void Init()
@@ -76,23 +75,16 @@ namespace Client {
                 typeof(IServer),
                 Program.SERVERURL
             );
+
             // Registro do cliente
-            RemoteClient rmc = new RemoteClient();
-            
-            tbChat.Text += "---" + rmc.form.ToString() + "---";
-
-
-            string clientServiceName = Program.SERVERURL.Split(':')[2].Split('/')[1].Trim();
-
+            RemoteClient rmc = new RemoteClient(this);
+            string clientServiceName = "Client";
             // ## dont know what this does
             RemotingServices.Marshal(
                 rmc,
                 clientServiceName,
                 typeof(RemoteClient)
             );
-            rmc.form = this;
-
-            //tbChat.Text+="CLIENTE: " + serverProxy.ToString();
 
             //try catch missed
             if (serverProxy != null)

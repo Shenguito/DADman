@@ -36,21 +36,9 @@ namespace Client
        
         public Client()
         {
-
-           
-             createClientForm();
-           
-
-
-        }
-
-        public void createClientForm()
-        {
-            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ClientForm());
-
         }
 
     }
@@ -83,17 +71,16 @@ namespace Client
 
         
         
-        public RemoteClient()
+        public RemoteClient(ClientForm form)
         {
             msgLog = new Dictionary<string, List<int>>();
-     
+            this.form = form;
             nick = Program.PLAYERNAME;
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteClient),
                 "Client",
                 WellKnownObjectMode.Singleton
             );
-
         }
 
         public void setForm(ClientForm f)
@@ -200,8 +187,8 @@ namespace Client
                             form.myNumber = Int32.Parse(c[1]);
                         }
 
-
-                        RemoteClient rmc = new RemoteClient();
+                        /*
+                        RemoteClient rmc = new RemoteClient(form);
                         string clientServiceName = "Client";
 
                         RemotingServices.Marshal(
@@ -209,7 +196,7 @@ namespace Client
                             clientServiceName,
                             typeof(RemoteClient)
                         );
-
+                        */
                         IClient clientProxy = (IClient)Activator.GetObject(
                         typeof(IClient),
                         c[2]);
@@ -228,8 +215,8 @@ namespace Client
 
                     }
                 }
+                form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
             }
-            //form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
         }
     }
 }
