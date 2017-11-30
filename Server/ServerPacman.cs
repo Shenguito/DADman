@@ -140,8 +140,8 @@ namespace Server {
         
         private void updateGhostsPosition()
         {
-            
-            List<int> moveGhost = new List<int>();
+
+            string arg = "-";
             //move ghosts
             redGhost.Left += ghost1;
             yellowGhost.Left += ghost2;
@@ -175,10 +175,7 @@ namespace Server {
             {
                 ghost3y = -ghost3y;
             }
-            moveGhost.Add(redGhost.Left);
-            moveGhost.Add(yellowGhost.Left);
-            moveGhost.Add(pinkGhost.Left);
-            moveGhost.Add(pinkGhost.Top);
+            
 
             /*
             foreach (Client c in server.clientList)
@@ -206,57 +203,119 @@ namespace Server {
             {
                 foreach (Control x in this.Controls)
                 {
-                    if(x is PictureBox && x.Tag == "ghost")
+                    if (x is PictureBox && x.Tag == "ghost")
                     {
-                        sw.WriteLine("M, " +x.Location.X+ ", "+x.Location.Y);
+                        sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
+                        arg += "M, " + x.Location.X + ", " + x.Location.Y + "-";
+
+
                     }
                     else if (x is PictureBox && x.Tag == "coin")
                     {
                         sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
+                        arg += "C, " + x.Location.X + ", " + x.Location.Y + "-";
                     }
                     else if (x is PictureBox && x.Tag == "player1")
                     {
-                        if(deadPlayer.Contains(1))
+                        if (deadPlayer.Contains(1))
+                        {
                             sw.WriteLine("P1, L, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P1, L, " + x.Location.X + ", " + x.Location.Y + "-";
+                        }
                         else
+                        {
                             sw.WriteLine("P1, P, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P1, P, " + x.Location.X + ", " + x.Location.Y + "-";
+                        }
                     }
                     else if (x is PictureBox && x.Tag == "player2")
                     {
                         if (deadPlayer.Contains(2))
+                        {
                             sw.WriteLine("P2, L, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P2, L, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                         else
+                        {
                             sw.WriteLine("P2, P, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P2, P, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                     }
                     else if (x is PictureBox && x.Tag == "player3")
                     {
-                        if (deadPlayer.Contains(3))
+                        if (deadPlayer.Contains(2))
+                        {
                             sw.WriteLine("P3, L, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P3, L, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                         else
+                        {
                             sw.WriteLine("P3, P, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P3, P, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                     }
                     else if (x is PictureBox && x.Tag == "player4")
                     {
-                        if (deadPlayer.Contains(4))
+                        if (deadPlayer.Contains(2))
+                        {
                             sw.WriteLine("P4, L, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P4, L, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                         else
+                        {
                             sw.WriteLine("P4, P, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P4, P, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                     }
                     else if (x is PictureBox && x.Tag == "player5")
                     {
-                        if (deadPlayer.Contains(5))
+                        if (deadPlayer.Contains(2))
+                        {
                             sw.WriteLine("P5, L, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P5, L, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                         else
+                        {
                             sw.WriteLine("P5, P, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P5, P, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                     }
                     else if (x is PictureBox && x.Tag == "player6")
                     {
-                        if (deadPlayer.Contains(6))
+                        if (deadPlayer.Contains(2))
+                        {
                             sw.WriteLine("P6, L, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P6, L, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                         else
+                        {
                             sw.WriteLine("P6, P, " + x.Location.X + ", " + x.Location.Y);
+                            arg += "P6, P, " + x.Location.X + ", " + x.Location.Y + "-";
+
+                        }
                     }
                 }
+                //TODO
+                // SHENG 
+                // SHENG 
+                // SHENG 
+                // SHENG 
+                // SHENG 
+                // SHENG 
+                // SHENG 
+                // SHENG 
+                //AQUI O ARG JA TEM TODAS AS POSICOES DOS GHOSTS E DOS PLAYERS NA FORMA : "-P6,L,20,40-M,45,82 ... etc"
+                //FALTA AS COINS E FALTA ENVIAR ESTE ARG PARA OS CLIENTES
+
             }
         }
 
