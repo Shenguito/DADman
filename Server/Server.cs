@@ -65,6 +65,7 @@ namespace Server
 
         
     }
+
     public class RemoteServer : MarshalByRefObject, IServer
     {
         internal List<Client> clientList = new List<Client>();
@@ -93,12 +94,17 @@ namespace Server
         {
             Client c = new Client();
             
-            Console.WriteLine("URL: "+url);
+            Console.WriteLine("SERVER: cliente tenta ligar com url "+url+".");
+           
+
             IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),
                 url
             );
-            
+
+            try { Console.WriteLine("SERVER: " + clientProxy.ToString()); }
+            catch (Exception e){ Console.WriteLine(e); }
+
             numberPlayersConnected++;
 
             //Create a connected client with below parameters:
@@ -198,33 +204,25 @@ namespace Server
                 }
                 foreach (Client c in clientList)
                 {
-                    if(c.playernumber!= numberPlayersConnected)
+                        Console.WriteLine("SERVER: startGame para o player" + c.playernumber);
                     try
                     {
-                        Console.WriteLine("foreach connecting: " + arg);
-                        //TODO problem here, sending client list as arg to each client
-                        //each client as: "-" +c.nick+":"+ c.playernumber + ":" + c.url
-                        //c.clientProxy.startGame(numberPlayersConnected, arg);
-                        /*
-                        Thread thread = new Thread(() => c.clientProxy.startGame(numberPlayersConnected, arg));
-                        thread.Start(); 
-                        */
-                        Console.WriteLine("foreach connected: " + arg);
+                        c.clientProxy.startGame(numberPlayersConnected, arg);
                     }
-                    catch (MissingMethodException e)
+                  
+                    catch(Exception e)
                     {
-                        c.connected = false;
-                        Console.WriteLine("Exception: "+e);
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Exception on sendStartGame: ");
+                        Console.WriteLine("Exception on sendStartGame: " + e);
                     }
                 }
 
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 
                 Console.WriteLine("Game started!");
+            }
+            else
+            {
+                Console.WriteLine("SERVER: Not enough players......");
             }
         }
     }

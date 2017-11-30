@@ -29,7 +29,7 @@ namespace Client {
                 {
                     FILENAME = args[6].Trim();
                 }
-                new Client(PLAYERNAME, PORT);
+                new Client();
             }
         }
     }

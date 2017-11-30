@@ -1,5 +1,6 @@
 ﻿using ComLibrary;
 using System;
+using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,22 +51,24 @@ namespace Client {
 
         public List<ConnectedClient> clients;
 
-        public ClientForm(string nickname, int port) {
-            
+        public ClientForm() {
+            nickname = Program.PLAYERNAME;
             clients = new List<ConnectedClient>();
+            System.Diagnostics.Debug.WriteLine("DEBUG---------------------" + nickname);
             InitializeComponent();
+            //tbChat.AppendText("DEBUG-" + nickname);
             this.Text += ": " + nickname;
             label2.Visible = false;
             
-            Init(nickname, port);
+            Init();
 
         }
 
-        public void Init(string nickname, int port)
+        public void Init()
         {
 
-            this.nickname = nickname;
-            this.port = port;
+            this.nickname = Program.PLAYERNAME;
+            this.port = Program.PORT;
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
             
@@ -74,8 +77,11 @@ namespace Client {
                 Program.SERVERURL
             );
             // Registro do cliente
-            RemoteClient rmc = new RemoteClient(nickname, this);
+            RemoteClient rmc = new RemoteClient();
             
+            tbChat.Text += "---" + rmc.form.ToString() + "---";
+
+
             string clientServiceName = Program.SERVERURL.Split(':')[2].Split('/')[1].Trim();
 
             // ## dont know what this does
@@ -84,7 +90,10 @@ namespace Client {
                 clientServiceName,
                 typeof(RemoteClient)
             );
-            
+            rmc.form = this;
+
+            //tbChat.Text+="CLIENTE: " + serverProxy.ToString();
+
             //try catch missed
             if (serverProxy != null)
             {
@@ -102,7 +111,9 @@ namespace Client {
             {
                 tbChat.Text += "Else: Didn't connected to server";
             }
-            
+
+           
+
         }
         
 

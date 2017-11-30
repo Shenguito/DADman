@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -23,15 +24,33 @@ namespace Client
     public delegate void delDead(int playerNumber);
     public delegate void delCoin(int playerNumber, string coinName);
     public delegate void delImageVisible(int playerNumber);
+    public delegate void delDebug(string msg);
+ 
+
+
 
 
     class Client
     {
-        public Client(string playername, int port)
+
+       
+        public Client()
         {
+
+           
+             createClientForm();
+           
+
+
+        }
+
+        public void createClientForm()
+        {
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ClientForm(playername, port));
+            Application.Run(new ClientForm());
+
         }
 
     }
@@ -52,6 +71,7 @@ namespace Client
         }
     }
 
+   
     public class RemoteClient : MarshalByRefObject, IClient
     {
 
@@ -59,20 +79,26 @@ namespace Client
         int clientMessageId=0;
         String nick;
 
-        ClientForm form;
+        public ClientForm form;
+
         
-        public RemoteClient(string nick, ClientForm form)
+        
+        public RemoteClient()
         {
             msgLog = new Dictionary<string, List<int>>();
-            this.nick = nick;
-            this.form = form;
-            
+     
+            nick = Program.PLAYERNAME;
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteClient),
                 "Client",
                 WellKnownObjectMode.Singleton
             );
 
+        }
+
+        public void setForm(ClientForm f)
+        {
+            form = f;
         }
 
         //TODO CHAT, shows up the message to chat according to fault tolerance
@@ -154,10 +180,14 @@ namespace Client
             // Remember: in the server we sent arg as:
             // "-" +c.nick+":"+ c.playernumber + ":" + c.url
             // in for nick=c[0] playernumber=c[1] url=c[2]
-            if (arg!=null)
+            if (arg != null)
             {
-                form.debugFunction(arg);
+
                 string[] rawClient = arg.Split('-');
+                
+                    this.form.debugFunction("wsafsdagf");
+                
+               
                 for (int i = 1; i < rawClient.Length; i++)
                 {
                     try
@@ -171,7 +201,7 @@ namespace Client
                         }
 
 
-                        RemoteClient rmc = new RemoteClient(nick, form);
+                        RemoteClient rmc = new RemoteClient();
                         string clientServiceName = "Client";
 
                         RemotingServices.Marshal(
@@ -199,7 +229,7 @@ namespace Client
                     }
                 }
             }
-            this.form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
+            //form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
         }
     }
 }
