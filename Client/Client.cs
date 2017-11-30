@@ -123,17 +123,14 @@ namespace Client
         //TODO CHAT, every connected client receive the message, and then decide which message show broadcast
         public void send(string nick, string msg)
         {
-            Console.WriteLine("Client sending: "+nick+":"+msg);
             clientMessageId++;
             
             foreach (ConnectedClient connectedClient in form.clients)
             {
-                Console.WriteLine("Delivering to client: " + connectedClient.nick);
                 if (!connectedClient.nick.Equals(nick))
                 {
                     try
                     {
-                        Console.WriteLine("[IF] Delivering to client: " + connectedClient.nick);
                         connectedClient.clientProxy.broadcast(clientMessageId, nick, msg);
                     }
                     catch (SocketException e)
@@ -171,10 +168,9 @@ namespace Client
             {
 
                 string[] rawClient = arg.Split('-');
-                
-                    this.form.debugFunction("wsafsdagf");
-                
-               
+
+                this.form.debugFunction("debug:\r\n"+arg);
+
                 for (int i = 1; i < rawClient.Length; i++)
                 {
                     try

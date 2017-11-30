@@ -46,12 +46,8 @@ namespace Server
 
         public Server()
         {
-            
             createConnection();
-            
         }
-
-
         
         private void createConnection()
         {
@@ -62,7 +58,6 @@ namespace Server
                 WellKnownObjectMode.Singleton
             );
         }
-
         
     }
 
@@ -222,7 +217,6 @@ namespace Server
                 }
 
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
-                
                 Console.WriteLine("Game started!");
             
         }

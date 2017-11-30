@@ -54,14 +54,24 @@ namespace Server {
             deadPlayer = new List<int>();
             string pathString = System.IO.Path.Combine(PATH, "log");
             Directory.CreateDirectory(pathString);
-
-            this.server = remoteServer;
-
             
+            this.server = remoteServer;
+            
+
             if (Program.MSSEC!=0)
                 this.timer1.Interval = Program.MSSEC;
             else
                 this.timer1.Interval = 1000;
+            /*
+            try
+            {
+                tbOutput.AppendText("Game time: " + timer1.Interval.ToString());
+            }
+            catch
+            {
+                tbOutput.AppendText("Time error");
+            }
+            */
         }
         
         public void processMove(int playerNumber, string move)
@@ -126,7 +136,7 @@ namespace Server {
         
         private void updateGhostsPosition()
         {
-
+            tbOutput.AppendText("Updating ghost");
             List<int> moveGhost = new List<int>();
             //move ghosts
             redGhost.Left += ghost1;
@@ -283,7 +293,8 @@ namespace Server {
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            foreach(KeyValuePair<int, string> entry in listMove)
+            this.tbOutput.AppendText("timer...");
+            foreach (KeyValuePair<int, string> entry in listMove)
             {
                 processMove(entry.Key, entry.Value);
             }

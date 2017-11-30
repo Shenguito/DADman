@@ -101,6 +101,7 @@
             this.pictureBox62 = new System.Windows.Forms.PictureBox();
             this.pictureBox63 = new System.Windows.Forms.PictureBox();
             this.pictureBox64 = new System.Windows.Forms.PictureBox();
+            this.tbOutput = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPlayer3)).BeginInit();
@@ -1021,11 +1022,21 @@
             this.pictureBox64.TabStop = false;
             this.pictureBox64.Tag = "coin";
             // 
+            // tbOutput
+            // 
+            this.tbOutput.Enabled = false;
+            this.tbOutput.Location = new System.Drawing.Point(362, 40);
+            this.tbOutput.Multiline = true;
+            this.tbOutput.Name = "tbOutput";
+            this.tbOutput.Size = new System.Drawing.Size(153, 295);
+            this.tbOutput.TabIndex = 150;
+            // 
             // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(356, 343);
+            this.ClientSize = new System.Drawing.Size(527, 343);
+            this.Controls.Add(this.tbOutput);
             this.Controls.Add(this.pictureBox56);
             this.Controls.Add(this.pictureBox57);
             this.Controls.Add(this.pictureBox58);
@@ -1259,6 +1270,7 @@
         private System.Windows.Forms.PictureBox pictureBox62;
         private System.Windows.Forms.PictureBox pictureBox63;
         private System.Windows.Forms.PictureBox pictureBox64;
+        private System.Windows.Forms.TextBox tbOutput;
     }
 }
 
