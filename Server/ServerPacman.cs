@@ -46,26 +46,35 @@ namespace Server {
 
         private RemoteServer server;
 
-        public Timer getTimer()
+        /*public Timer getTimer()
         {
             return this.timer1;
-        }
+        }*/
 
         public ServerForm(RemoteServer remoteServer) {
-            
+
             InitializeComponent();
-            listMove=new Dictionary<int, string>();
+            listMove = new Dictionary<int, string>();
             deadPlayer = new List<int>();
             string pathString = System.IO.Path.Combine(PATH, "log");
             Directory.CreateDirectory(pathString);
-            
-            this.server = remoteServer;
-            
 
-            if (Program.MSSEC!=0)
-                this.timer1.Interval = Program.MSSEC;
+            this.server = remoteServer;
+            this.timer1 = new System.Timers.Timer();
+
+            if (Program.MSSEC != 0) { 
+                this.timer1.Interval = Program.MSSEC; }
             else
+            {
                 this.timer1.Interval = 2000;
+            }
+
+            
+            timer1.Elapsed += timer1_Tick;
+            timer1.Start();
+
+
+            tbOutput.Text += "ServerForm criado." + timer1.ToString(); ;
 
         }
         
@@ -131,7 +140,7 @@ namespace Server {
         
         private void updateGhostsPosition()
         {
-            tbOutput.AppendText("Updating ghost");
+            
             List<int> moveGhost = new List<int>();
             //move ghosts
             redGhost.Left += ghost1;
@@ -192,6 +201,7 @@ namespace Server {
 
             //TODO, writing the server localstate to a file, must be flexible with number of players
             roundID++;
+           // tbOutput.Text += PATH+ Path.DirectorySeparatorChar + "log" + Path.DirectorySeparatorChar + roundID;
             using (StreamWriter sw = File.CreateText(PATH+ Path.DirectorySeparatorChar + "log"+ Path.DirectorySeparatorChar + roundID))
             {
                 foreach (Control x in this.Controls)
@@ -252,6 +262,8 @@ namespace Server {
 
         private void updatePlayerPosition(PictureBox pb, string move)
         {
+            tbOutput.Text += "Recebi move do " + pb.ToString();
+
             if (move.Equals("LEFT"))
             {
                 if (pb.Left > (boardLeft))
@@ -286,9 +298,10 @@ namespace Server {
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        public void timer1_Tick(object sender, EventArgs e)
         {
-            this.tbOutput.AppendText("timer...");
+            tbOutput.Text+=("Ronda "+roundID + " \r\n");
+            
             foreach (KeyValuePair<int, string> entry in listMove)
             {
                 processMove(entry.Key, entry.Value);

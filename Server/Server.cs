@@ -75,8 +75,7 @@ namespace Server
             serverForm = new ServerForm(this);
             Thread thread = new Thread(() => createServerForm());
             thread.Start();
-            Console.WriteLine("Timer is running: " + serverForm.getTimer().Enabled);
-            Console.WriteLine("Timer running time: " + serverForm.getTimer().Interval);
+          
         }
 
         private void createServerForm()

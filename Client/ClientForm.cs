@@ -292,6 +292,7 @@ namespace Client {
             started = true;
 
             getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
+            tbChat.Text += "My Number " + myNumber;
         }
 
 

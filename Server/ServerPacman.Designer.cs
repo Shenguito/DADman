@@ -27,7 +27,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerForm));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            
             this.pictureBoxPlayer1 = new System.Windows.Forms.PictureBox();
             this.pictureBoxPlayer2 = new System.Windows.Forms.PictureBox();
             this.pictureBoxPlayer3 = new System.Windows.Forms.PictureBox();
@@ -200,8 +200,7 @@
             // 
             // timer1
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            
             // 
             // pictureBoxPlayer1
             // 
@@ -1210,7 +1209,7 @@
         private System.Windows.Forms.PictureBox pictureBoxPlayer6;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Timer timer1;
+        private System.Timers.Timer timer1;
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.PictureBox pictureBox6;
         private System.Windows.Forms.PictureBox pictureBox7;
