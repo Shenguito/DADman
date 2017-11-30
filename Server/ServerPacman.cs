@@ -46,10 +46,14 @@ namespace Server {
 
         private RemoteServer server;
 
+        public Timer getTimer()
+        {
+            return this.timer1;
+        }
+
         public ServerForm(RemoteServer remoteServer) {
             
             InitializeComponent();
-            label2.Visible = false;
             listMove=new Dictionary<int, string>();
             deadPlayer = new List<int>();
             string pathString = System.IO.Path.Combine(PATH, "log");
@@ -61,17 +65,8 @@ namespace Server {
             if (Program.MSSEC!=0)
                 this.timer1.Interval = Program.MSSEC;
             else
-                this.timer1.Interval = 1000;
-            /*
-            try
-            {
-                tbOutput.AppendText("Game time: " + timer1.Interval.ToString());
-            }
-            catch
-            {
-                tbOutput.AppendText("Time error");
-            }
-            */
+                this.timer1.Interval = 2000;
+
         }
         
         public void processMove(int playerNumber, string move)

@@ -28,6 +28,7 @@ namespace Client {
         public int port;
         bool started = false;
         bool dead = false;
+        bool sent = false;
 
         // direction player is moving in. Only one will be true
         bool goup;
@@ -111,33 +112,30 @@ namespace Client {
 
         //Todo, sending only if he can
         private void keyisdown(object sender, KeyEventArgs e) {
-            
+            if(!sent)
             if (started)
             {
                 if (!dead)
                 {
                     if (e.KeyCode == Keys.Left)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "LEFT"));
-                        thread.Start();
-
+                        serverProxy.sendMove(nickname, "LEFT");
+                        sent = true;
                     }
                     if (e.KeyCode == Keys.Right)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "RIGHT"));
-                        thread.Start();
-
+                        serverProxy.sendMove(nickname, "RIGHT");
+                        sent = true;
                     }
                     if (e.KeyCode == Keys.Up)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "UP"));
-                        thread.Start();
-
+                        serverProxy.sendMove(nickname, "UP");
+                        sent = true;
                     }
                     if (e.KeyCode == Keys.Down)
                     {
-                        Thread thread = new Thread(() => serverProxy.sendMove(nickname, "DOWN"));
-                        thread.Start();
+                        serverProxy.sendMove(nickname, "DOWN");
+                        sent = true;
                     }
                 }
             }
@@ -200,8 +198,6 @@ namespace Client {
                 }
                 catch (Exception exception)
                 {
-                    //TODO exception
-                    //throw new ThereIsNoCommunication(exception.Message);
                     Console.WriteLine("Debug: " + exception.ToString());
                 }
 
@@ -212,6 +208,7 @@ namespace Client {
             tbChat.Text += nick + ": " + msg + "\r\n";
         }
         
+        //TODO receber messageID, Player+Move, Ghost+move
         public void updateMove(int playernumber, string move)
         {
             goleft = goright = goup = godown = false;
@@ -244,6 +241,7 @@ namespace Client {
                     pb.Image = Properties.Resources.down;
                 }
             }
+            sent = false;
         }
 
         public void updateGhostsMove(int g1, int g2, int g3x, int g3y)

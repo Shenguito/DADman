@@ -75,6 +75,8 @@ namespace Server
             serverForm = new ServerForm(this);
             Thread thread = new Thread(() => createServerForm());
             thread.Start();
+            Console.WriteLine("Timer is running: " + serverForm.getTimer().Enabled);
+            Console.WriteLine("Timer running time: " + serverForm.getTimer().Interval);
         }
 
         private void createServerForm()
@@ -122,12 +124,11 @@ namespace Server
 
         }
 
-        
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendMove(string nick, string move)
         {
             
             int pl_number = player_image_hashmap[nick];
-
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
@@ -136,9 +137,7 @@ namespace Server
             {
                 Console.WriteLine("Client sent a move exception (Server sendMove(...))");
             }
-
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
-            
         }
 
 
