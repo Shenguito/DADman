@@ -53,8 +53,14 @@ namespace PuppetMaster
                 IPuppetMasterLauncher launcher = Activator.GetObject(
                     typeof(IPuppetMasterLauncher), url)
                     as IPuppetMasterLauncher;
-                Console.WriteLine("Launching Process on other PC...");
-                launcher.LaunchProcess(className, args);
+                Console.WriteLine("Launching Process on other PC: "+url);
+                try
+                {
+                    launcher.LaunchProcess(className, args);
+                }catch(Exception e)
+                {
+                    Console.WriteLine("Connect to other pc fail: " + e);
+                }
             }
         }
 
