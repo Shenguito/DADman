@@ -46,16 +46,19 @@ namespace Client {
         int score = 0;
         //TODO to define when game is over
         int total_coins = 61;
+        Dictionary<string, int> delayLog;
         
         private  TcpChannel channel;
         IServer serverProxy;
 
         public List<ConnectedClient> clients;
 
+        
         public ClientForm() {
             
             nickname = Program.PLAYERNAME;
             clients = new List<ConnectedClient>();
+            delayLog = new Dictionary<string, int>();
             InitializeComponent();
             this.Text += ": " + nickname;
             label2.Visible = false;
@@ -157,15 +160,20 @@ namespace Client {
                 godown = false;
             }
         }
-        
-        private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
+
+        private void tbMsg_KeyDown(object sender, KeyEventArgs e)
+        {
             if (e.KeyCode == Keys.Enter)
             {
-                try {
-                    if (!tbMsg.Text.Trim().Equals("")) {
-                        
+                try
+                {
+                    if (!tbMsg.Text.Trim().Equals(""))
+                    {
+
                         string msg = tbMsg.Text;
-                        IClient myself=null;
+                        IClient myself = null;
+                        //TODO for now its synchronos, need to select a client leader to ask a timestamp
+                        DateTime timestamp = DateTime.Now;
                         foreach (ConnectedClient connectedClient in clients)
                         {
                             try
@@ -176,11 +184,12 @@ namespace Client {
                                     //Thread
                                 }
                                 
-                                else */if (!connectedClient.nick.Equals(nickname)&& connectedClient.connected)
+                                else */
+                                if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
                                 {
-                                    connectedClient.clientProxy.send(nickname, msg);
+                                    connectedClient.clientProxy.send(nickname, msg, timestamp, delayLog);
                                 }
-                                else if(connectedClient.nick.Equals(nickname))
+                                else if (connectedClient.nick.Equals(nickname))
                                 {
                                     myself = connectedClient.clientProxy;
                                 }
@@ -190,11 +199,14 @@ namespace Client {
                                 //Client Disconnected
                                 connectedClient.connected = false;
                                 Console.WriteLine("Debug: " + exception.ToString());
-                                
+
                             }
                         }
-                        if (myself!=null)
-                        myself.send(nickname, msg);
+                        if (myself != null)
+                        {
+                            Thread thread = new Thread(() => myself.send(nickname, msg, timestamp, delayLog));
+                            thread.Start();
+                        }
                     }
                     tbMsg.Clear();
                     tbMsg.Enabled = false;
@@ -207,7 +219,7 @@ namespace Client {
 
             }
         }
-
+                
         public void updateChat(string nick, string msg)
         {
             tbChat.Text += nick + ": " + msg + "\r\n";
@@ -321,6 +333,19 @@ namespace Client {
                     Thread thread = new Thread(() => serverProxy.sendMove(nickname, s.Split(',')[1]));
                     thread.Start();
                 }
+            }
+        }
+
+        public void injectDelay(String nick)
+        {
+            int delay = 5000;
+            if (!(delayLog.ContainsKey(nick)))
+            {
+                delayLog.Add(nick, delay);
+            }
+            else
+            {
+                delayLog[nick] += delay;
             }
         }
 

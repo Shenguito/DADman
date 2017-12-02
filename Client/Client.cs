@@ -89,21 +89,25 @@ namespace Client
         }
 
         //TODO CHAT, shows up the message to chat according to fault tolerance
-        public void broadcast(int id, string nick, string msg)
+        public void broadcast(int id, string nick, string msg, DateTime timestamp, Dictionary<string, int> delayLog)
         {
             List<int> lista = new List<int>();
-            if (!(msgLog.ContainsKey(nick))) {
+            if (!(msgLog.ContainsKey(nick)))
+            {
                 lista.Add(id);
                 msgLog.Add(nick, lista);
-                this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
-            }else
+                Thread thread = new Thread(() => chatThread(nick, msg, timestamp, delayLog));
+                thread.Start();
+            }
+            else
             {
                 lista = msgLog[nick];
                 if (!lista.Contains(id))
                 {
                     lista.Add(id);
                     msgLog[nick] = lista;
-                    this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+                    Thread thread = new Thread(() => chatThread(nick, msg, timestamp, delayLog));
+                    thread.Start();
                 }
             }
         }
@@ -136,31 +140,31 @@ namespace Client
         }
 
         //TODO CHAT, every connected client receive the message, and then decide which message show broadcast
-        public void send(string nick, string msg)
+        public void send(string nick, string msg, DateTime timestamp, Dictionary<string, int> delayLog)
         {
             clientMessageId++;
-            
+
             foreach (ConnectedClient connectedClient in form.clients)
             {
                 if (!connectedClient.nick.Equals(nick))
                 {
                     try
                     {
-                        connectedClient.clientProxy.broadcast(clientMessageId, nick, msg);
+                        connectedClient.clientProxy.broadcast(clientMessageId, nick, msg, timestamp, delayLog);
                     }
                     catch (SocketException e)
                     {
                         //Client Disconnected
                         connectedClient.connected = false;
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
-                        Console.WriteLine("Debug: "+e.ToString());
+                        Console.WriteLine("Debug: " + e.ToString());
                     }
                 }
                 else
                 {
-                    Thread thread = new Thread(() => broadcast(clientMessageId, nick, msg));
+                    Thread thread = new Thread(() => broadcast(clientMessageId, nick, msg, timestamp, delayLog));
                     thread.Start();
                 }
             }
@@ -247,5 +251,19 @@ namespace Client
             if (coins_arg != "")
                 coinEaten(roundID, coins_arg);
         }
+
+        public void chatThread(string nick, string msg, DateTime timestamp, Dictionary<string, int> delayLog)
+        {
+            int waitTime = 1000;
+            if (delayLog.ContainsKey(this.nick))
+                waitTime += delayLog[this.nick];
+            //TODO for now its synchronos, need to select a client leader to ask a timestamp
+            DateTime timestamp2 = DateTime.Now;
+            int millisecs = (int)(timestamp2 - timestamp).TotalMilliseconds;
+            if (!(millisecs > waitTime))
+                Thread.Sleep(waitTime - millisecs);
+            this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+        }
+
     }
 }
