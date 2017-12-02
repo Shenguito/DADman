@@ -314,7 +314,6 @@ namespace Server {
 
         private void updatePlayerPosition(int playerNumber, PictureBox pb, string move)
         {
-            tbOutput.Text += "Recebi move do " + pb.ToString();
 
             if (move.Equals("LEFT"))
             {
@@ -355,30 +354,28 @@ namespace Server {
 
         }
 
-        public void timer1_Tick(object sender, EventArgs e)
+        private void processingTimer()
         {
-
-           
-
-            tbOutput.Text+=("Ronda "+roundID + " \r\n");
+            tbOutput.Text += ("Ronda " + roundID + " \r\n");
+            //server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
             server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
-            /*
-            Thread thread = new Thread(() => server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg));
-            thread.Start();
-            */
-
             roundID++;
 
             players_arg = dead_arg = monsters_arg = coins_arg = "";
 
             foreach (KeyValuePair<int, string> entry in listMove)
             {
-                tbOutput.Text+=("*** Process " + entry.Key + " " + entry.Value);
                 processMove(entry.Key, entry.Value);
             }
             listMove = new Dictionary<int, string>();
-            
+
             updateGhostsPosition();
+        }
+
+        public void timer1_Tick(object sender, EventArgs e)
+        {
+            Thread thread = new Thread(() => processingTimer());
+            thread.Start();
         }
 
         public void startGame(int playerNumbers)

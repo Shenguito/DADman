@@ -110,13 +110,12 @@ namespace Client
 
         public void movePlayer(int roundID, string players_arg, string dead_arg)
         {
-            form.debugFunction("player: " + players_arg);
             if (players_arg != "")
             {
                 string[] tok_moves = players_arg.Split('-');
                 for (int i = 1; i < tok_moves.Length; i++)
                 {
-                    this.form.Invoke(new delmove(form.updateMove), new object[] { tok_moves[i].Split(':')[0], tok_moves[i].Split(':')[1] });
+                    this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
                 }
             }
             if (dead_arg != "")

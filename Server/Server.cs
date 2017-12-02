@@ -181,14 +181,9 @@ namespace Server
 
         public void sendRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg) 
         {
-            Console.WriteLine("player: " + players_arg);
-            Console.WriteLine("monster: " + monster_arg);
-            Console.WriteLine("coin: " + coins_arg);
             
             foreach (Client c in clientList)
             {
-                Console.WriteLine("Enviar para client: " + c.nick);
-                Console.WriteLine("Com url: " + c.url);
                 c.clientProxy.receiveRoundUpdate(roundID, players_arg, dead_arg, monster_arg, coins_arg);
             }
         }
