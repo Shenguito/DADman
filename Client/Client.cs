@@ -175,7 +175,7 @@ namespace Client
                 {
                     try
                     {
-                        string[] c = rawClient[1].Split(':');
+                        string[] c = rawClient[i].Split(':');
 
 
                         if (this.nick.Equals(c[0]))
@@ -213,6 +213,17 @@ namespace Client
                 }
                 form.Invoke(new delImageVisible(form.startGame), new object[] { numberPlayersConnected });
             }
+        }
+
+        
+
+        public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
+        {
+            /* TODO implementar estes metodos usando os respetivos args
+            movePlayer(roundID, players_arg, dead_arg);
+            moveGhost(roundID, monster_arg);
+            coinEaten(roundID, coins_arg);
+            */
         }
     }
 }

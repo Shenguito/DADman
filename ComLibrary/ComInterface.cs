@@ -25,6 +25,7 @@ namespace ComLibrary
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
         void startGame(int playerNumber, string arg);
+        void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg);
     }
 
     //TODO not applied yet

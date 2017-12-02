@@ -32,7 +32,12 @@ namespace Server {
         int boardTop = 40;
         //player speed
         int speed = 5;
+        string players_arg = "";
+        string dead_arg = "";
+        string monsters_arg = "";
+        string coins_arg = "";
         
+
         //TO define when the game is over
         int total_coins = 61;
 
@@ -83,7 +88,8 @@ namespace Server {
             PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playerNumber);
             try
             {
-                updatePlayerPosition(pb, move);
+                updatePlayerPosition(playerNumber,pb, move);
+                
                 foreach (Control x in this.Controls)
                 {
                     // checking if the player hits the wall or the ghost, then game is over
@@ -91,14 +97,19 @@ namespace Server {
                     {
                         if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
                         {
-                            sendPlayerDead(playerNumber);
+                            dead_arg += "-" + playerNumber;
+                            
                         }
                     }
                     if (x is PictureBox && x.Tag == "coin")
                     {
                         if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
                         {
+                            
                             Controls.Remove(x);
+                           
+                            coins_arg +="-" + x.Name;
+
                             sendCoinEaten(playerNumber, x.Name);
                         }
                     }
@@ -141,7 +152,7 @@ namespace Server {
         private void updateGhostsPosition()
         {
 
-            string arg = "-";
+            
             //move ghosts
             redGhost.Left += ghost1;
             yellowGhost.Left += ghost2;
@@ -197,7 +208,6 @@ namespace Server {
 
 
             //TODO, writing the server localstate to a file, must be flexible with number of players
-            roundID++;
            // tbOutput.Text += PATH+ Path.DirectorySeparatorChar + "log" + Path.DirectorySeparatorChar + roundID;
             using (StreamWriter sw = File.CreateText(PATH+ Path.DirectorySeparatorChar + "log"+ Path.DirectorySeparatorChar + roundID))
             {
@@ -206,26 +216,26 @@ namespace Server {
                     if (x is PictureBox && x.Tag == "ghost")
                     {
                         sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
-                        arg += "M, " + x.Location.X + ", " + x.Location.Y + "-";
+                        
 
 
                     }
                     else if (x is PictureBox && x.Tag == "coin")
                     {
                         sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
-                        arg += "C, " + x.Location.X + ", " + x.Location.Y + "-";
+                        
                     }
                     else if (x is PictureBox && x.Tag == "player1")
                     {
                         if (deadPlayer.Contains(1))
                         {
                             sw.WriteLine("P1, L, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P1, L, " + x.Location.X + ", " + x.Location.Y + "-";
+                            
                         }
                         else
                         {
                             sw.WriteLine("P1, P, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P1, P, " + x.Location.X + ", " + x.Location.Y + "-";
+                          
                         }
                     }
                     else if (x is PictureBox && x.Tag == "player2")
@@ -233,14 +243,12 @@ namespace Server {
                         if (deadPlayer.Contains(2))
                         {
                             sw.WriteLine("P2, L, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P2, L, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                         else
                         {
                             sw.WriteLine("P2, P, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P2, P, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                     }
                     else if (x is PictureBox && x.Tag == "player3")
@@ -248,14 +256,12 @@ namespace Server {
                         if (deadPlayer.Contains(2))
                         {
                             sw.WriteLine("P3, L, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P3, L, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                         else
                         {
                             sw.WriteLine("P3, P, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P3, P, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                            
                         }
                     }
                     else if (x is PictureBox && x.Tag == "player4")
@@ -263,14 +269,12 @@ namespace Server {
                         if (deadPlayer.Contains(2))
                         {
                             sw.WriteLine("P4, L, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P4, L, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                          
                         }
                         else
                         {
                             sw.WriteLine("P4, P, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P4, P, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                     }
                     else if (x is PictureBox && x.Tag == "player5")
@@ -278,14 +282,12 @@ namespace Server {
                         if (deadPlayer.Contains(2))
                         {
                             sw.WriteLine("P5, L, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P5, L, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                         else
                         {
                             sw.WriteLine("P5, P, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P5, P, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                            
                         }
                     }
                     else if (x is PictureBox && x.Tag == "player6")
@@ -293,33 +295,23 @@ namespace Server {
                         if (deadPlayer.Contains(2))
                         {
                             sw.WriteLine("P6, L, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P6, L, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                         else
                         {
                             sw.WriteLine("P6, P, " + x.Location.X + ", " + x.Location.Y);
-                            arg += "P6, P, " + x.Location.X + ", " + x.Location.Y + "-";
-
+                           
                         }
                     }
                 }
-                //TODO
-                // SHENG 
-                // SHENG 
-                // SHENG 
-                // SHENG 
-                // SHENG 
-                // SHENG 
-                // SHENG 
-                // SHENG 
-                //AQUI O ARG JA TEM TODAS AS POSICOES DOS GHOSTS E DOS PLAYERS NA FORMA : "-P6,L,20,40-M,45,82 ... etc"
-                //FALTA AS COINS E FALTA ENVIAR ESTE ARG PARA OS CLIENTES
+               
 
             }
+
+            monsters_arg += "-" + redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
         }
 
-        private void updatePlayerPosition(PictureBox pb, string move)
+        private void updatePlayerPosition(int playerNumber, PictureBox pb, string move)
         {
             tbOutput.Text += "Recebi move do " + pb.ToString();
 
@@ -329,6 +321,8 @@ namespace Server {
                 {
                     pb.Left -= speed;
                     pb.Image = Properties.Resources.Left;
+
+                    
                 }
             }
             if (move.Equals("RIGHT"))
@@ -355,12 +349,24 @@ namespace Server {
                     pb.Image = Properties.Resources.down;
                 }
             }
+
+            players_arg += "-" + playerNumber + ":" + move;
+
         }
 
         public void timer1_Tick(object sender, EventArgs e)
         {
+
+            roundID++;
+
             tbOutput.Text+=("Ronda "+roundID + " \r\n");
-            
+
+            server.sendRoundUpdate(roundID, players_arg, dead_arg,monsters_arg, coins_arg);
+
+            roundID++;
+
+            players_arg = dead_arg = monsters_arg = coins_arg = "";
+
             foreach (KeyValuePair<int, string> entry in listMove)
             {
                 processMove(entry.Key, entry.Value);

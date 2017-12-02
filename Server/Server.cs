@@ -172,6 +172,18 @@ namespace Server
             string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
         }
 
+        public void sendRoundUpdate(int roundID, string players_arg, 
+            string dead_arg, string monster_arg, string coins_arg) 
+        {
+
+            foreach(Client c in clientList)
+            {
+                c.clientProxy.receiveRoundUpdate(roundID, players_arg, dead_arg, monster_arg, coins_arg);
+            }
+
+        }
+
+
         public void sendCoinEaten(int playerNumber, string coinName)
         {
             foreach (Client c in clientList)
