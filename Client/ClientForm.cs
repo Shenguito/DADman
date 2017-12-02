@@ -172,7 +172,13 @@ namespace Client {
                         {
                             try
                             {
-                                if (!connectedClient.nick.Equals(nickname)&& connectedClient.connected)
+                                /*
+                                if(!connectedClient.nick.Equals(nickname) && connectedClient.connected && delay)
+                                {
+                                    //Thread
+                                }
+                                
+                                else */if (!connectedClient.nick.Equals(nickname)&& connectedClient.connected)
                                 {
                                     connectedClient.clientProxy.send(nickname, msg);
                                 }

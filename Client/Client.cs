@@ -236,11 +236,9 @@ namespace Client
 
         public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
         {
-            
             movePlayer(roundID, players_arg, dead_arg);
             moveGhost(roundID, monster_arg);
             coinEaten(roundID, coins_arg);
-           
         }
     }
 }

@@ -1,8 +1,7 @@
 StartServer S1 tcp://localhost:11000/PCS tcp://localhost:20001/Server 1000 6
 StartClient C1 tcp://localhost:11000/PCS tcp://localhost:30001/Client 1000 6
 StartClient C2 tcp://localhost:11000/PCS tcp://localhost:30002/Client 1000 6
-StartClient C3 tcp://192.168.56.1:11000/PCS tcp://192.168.1.7:30003/Client 1000 6
+StartClient C3 tcp://192.168.56.1:11000/PCS tcp://tcp://192.168.56.1:30003/Client 1000 6
 StartClient C4 tcp://localhost:11000/PCS tcp://localhost:30004/Client 1000 6
 StartClient C5 tcp://localhost:11000/PCS tcp://localhost:30005/Client 1000 6
 StartClient C6 tcp://localhost:11000/PCS tcp://localhost:30006/Client 1000 6
-
