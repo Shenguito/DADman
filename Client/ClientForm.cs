@@ -136,6 +136,7 @@ namespace Client {
                     {
                         serverProxy.sendMove(nickname, "DOWN");
                         sent = true;
+                        tbChat.Text += "enviei " + nickname + "DOWN";
                     }
                 }
             }
@@ -159,7 +160,6 @@ namespace Client {
             }
         }
         
-
         private void tbMsg_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter)
             {
@@ -203,6 +203,7 @@ namespace Client {
 
             }
         }
+
         public void updateChat(string nick, string msg)
         {
             tbChat.Text += nick + ": " + msg + "\r\n";
@@ -268,21 +269,15 @@ namespace Client {
             pb.Top = 25; */
         }
 
-        internal void updateCoin(int playerNumber, string coinName)
+        internal void updateCoin(string pictureBoxName)
         {
             foreach (Control x in this.Controls)
             {
-                if (x is PictureBox && x.Tag == "coin" && x.Name.Equals(coinName))
+                if (x is PictureBox && x.Tag == "coin" && x.Name.Equals(pictureBoxName))
                 {
                     Controls.Remove(x);
                 }
             }
-            if (myNumber==playerNumber)
-            {
-                score++;
-                label1.Text = "Score: " + score;
-            }
-
         }
 
         internal void startGame(int playerNumbers)

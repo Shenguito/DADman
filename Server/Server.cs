@@ -131,6 +131,14 @@ namespace Server
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
+               // Console.WriteLine("*** Recebi " + pl_number + " " + move);
+               // Console.WriteLine("*** " + this.serverForm.listMove.ToString());
+
+                foreach (KeyValuePair<int, string> entry in this.serverForm.listMove)
+                {
+                    Console.WriteLine("***"+ entry.Key + " " + entry.Value);
+                    
+                }
             }
             catch
             {
@@ -178,6 +186,7 @@ namespace Server
 
             foreach(Client c in clientList)
             {
+
                 c.clientProxy.receiveRoundUpdate(roundID, players_arg, dead_arg, monster_arg, coins_arg);
             }
 

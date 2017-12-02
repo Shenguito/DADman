@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -20,7 +21,7 @@ namespace Server {
             ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar +
             "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar;
 
-        public Dictionary<int, string> listMove;
+        public Dictionary<int, string> listMove = new Dictionary<int, string>();
         public List<int> deadPlayer;
         public bool started = false;
 
@@ -120,7 +121,7 @@ namespace Server {
                     {
                         try
                         {
-                            c.clientProxy.movePlayer(playerNumber, move);
+                            //c.clientProxy.movePlayer(playerNumber, move);
 
                         }
                         catch (SocketException exception)
@@ -308,7 +309,7 @@ namespace Server {
 
             }
 
-            monsters_arg += "-" + redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
+            monsters_arg +=redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
         }
 
         private void updatePlayerPosition(int playerNumber, PictureBox pb, string move)
@@ -357,11 +358,14 @@ namespace Server {
         public void timer1_Tick(object sender, EventArgs e)
         {
 
-            roundID++;
+           
 
-            tbOutput.Text+=("Ronda "+roundID + " \r\n");
+           tbOutput.Text+=("Ronda "+roundID + " \r\n");
 
-            server.sendRoundUpdate(roundID, players_arg, dead_arg,monsters_arg, coins_arg);
+
+           //Thread thread = new Thread(() => server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg));
+          // thread.Start();
+            
 
             roundID++;
 
@@ -369,6 +373,7 @@ namespace Server {
 
             foreach (KeyValuePair<int, string> entry in listMove)
             {
+                tbOutput.Text+=("*** Process " + entry.Key + " " + entry.Value);
                 processMove(entry.Key, entry.Value);
             }
             listMove = new Dictionary<int, string>();

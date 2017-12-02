@@ -20,8 +20,8 @@ namespace ComLibrary
     {
         void send(string nick, string msg);
         void broadcast(int id, string nick, string msg);
-        void movePlayer(int numberPlayer, string movement);
-        void moveGhost(List<int> ghostsMove);
+        void movePlayer(int roundID, string players_arg, string dead_arg);
+        void moveGhost(int roundID, string monster_arg);
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
         void startGame(int playerNumber, string arg);
