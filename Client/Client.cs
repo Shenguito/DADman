@@ -197,7 +197,7 @@ namespace Client
                 {
                     try
                     {
-                        string[] c = rawClient[i].Split(':');
+                        string[] c = rawClient[i].Split('_');
 
 
                         if (this.nick.Equals(c[0]))

@@ -215,7 +215,7 @@ namespace Server
                 string arg = " ";
                 foreach (Client c in clientList)
                 {
-                    arg += "-" +c.nick+":"+ c.playernumber + ":" + c.url;
+                    arg += "-" +c.nick+"_"+ c.playernumber + "_" + c.url;
                 }
                 foreach (Client c in clientList)
                 {

@@ -104,9 +104,7 @@ namespace Client {
             {
                 tbChat.Text += "Else: Didn't connected to server";
             }
-
-           
-
+            
         }
         
 
