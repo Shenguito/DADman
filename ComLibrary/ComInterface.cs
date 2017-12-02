@@ -27,6 +27,12 @@ namespace ComLibrary
         void startGame(int playerNumber, string arg);
         void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg);
     }
+    public interface IPuppetMasterLauncher
+    {
+        void LaunchProcess(string name, string args);
+        void ExitAllProcesses();
+        void crashProcess(string pid);
+    }
 
     //TODO not applied yet
     public interface IremotingException
@@ -40,9 +46,6 @@ namespace ComLibrary
         void Freeze();
         void Unfreeze();
     }
-    //TODO not applied yet
-    public interface IPuppetMasterLauncher
-    {
-        void LaunchProcess(string name, string args);
-    }
+    
+    
 }

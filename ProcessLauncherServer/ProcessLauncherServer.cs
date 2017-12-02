@@ -26,9 +26,29 @@ namespace ProcessLauncherServer
             else
             {
                 processes.Add(args.Split(' ')[0], Process.Start(Util.PROJECT_ROOT + name + Util.EXE_PATH + name + ".exe", args));
+                Console.WriteLine("Process " + name + " launched with args: " + args);
             }
             string[] argv = args.Split(' ');
             Console.WriteLine("{0} {1} launched..", name, argv[1]);
+        }
+        public void ExitAllProcesses()
+        {
+            foreach (KeyValuePair<string, Process> entry in processes)
+            {
+                try
+                {
+                    entry.Value.Kill();
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+        }
+        public void crashProcess(string pid)
+        {
+            if (processes[pid] != null)
+                processes[pid].Kill();
         }
     }
 }
