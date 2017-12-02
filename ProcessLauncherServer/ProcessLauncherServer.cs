@@ -10,6 +10,8 @@ namespace ProcessLauncherServer
 {
     class ProcessLauncherServer : MarshalByRefObject, IPuppetMasterLauncher
     {
+        private Dictionary<string, Process> processes=new Dictionary<string, Process>();
+
         public void LaunchProcess(string name, string args)
         {
             Console.WriteLine("Lauching....");
@@ -17,12 +19,12 @@ namespace ProcessLauncherServer
             if (args == null || name == null)
                 return;
             if (Util.IsLinux)
-                Process.Start("mono",
+                processes.Add(args.Split(' ')[0], Process.Start("mono",
                 string.Join(" ", Util.PROJECT_ROOT + name +
-                Util.EXE_PATH + name + ".exe", args));
+                Util.EXE_PATH + name + ".exe", args)));
             else
-                Process.Start(Util.PROJECT_ROOT + name +
-                Util.EXE_PATH + name, args);
+                processes.Add(args.Split(' ')[0], Process.Start(Util.PROJECT_ROOT + name +
+                Util.EXE_PATH + name, args));
 
             string[] argv = args.Split(' ');
             Console.WriteLine("{0} {1} launched..", name, argv[1]);

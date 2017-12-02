@@ -22,40 +22,34 @@ namespace PuppetMaster
         *  Else, commands are read from keyboard
         * 
         */
-        private Dictionary<string, int> processes;
+        private Dictionary<string, Process> processes;
         private string serverURL;
         public ProcessLaucher()
         {
-            processes = new Dictionary<string, int>();
+            processes = new Dictionary<string, Process>();
         }
 
         public void exec(string className, string ip, string port, string args)
         {
-            /* Debug effect
-            Console.WriteLine("DEBUG: " + Util.GetLocalIPAddress());
-            Console.WriteLine("DEBUG: " + ip);
-            Console.WriteLine("DEBUG: " + port);
-            */
             if (ip.Equals("localhost") || ip.Equals("127.0.0.1") || ip.Equals(Util.GetLocalIPAddress()))
             {
                 if (Util.IsLinux)
                 {
-                    Process.Start("mono",
+                    processes.Add(args.Split(' ')[0], Process.Start("mono",
                         string.Join(" ", Util.PROJECT_ROOT + className +
-                        Util.EXE_PATH + className + ".exe", args));
+                        Util.EXE_PATH + className + ".exe", args)));
                 }
                 else
                 {
                     Console.WriteLine("Localhost Launching Process... "+ Util.PROJECT_ROOT + className +
                         Util.EXE_PATH + className+"\r\n"+args);
-                    Process.Start(Util.PROJECT_ROOT + className +
-                        Util.EXE_PATH + className, args);
+                    processes.Add(args.Split(' ')[0], Process.Start(Util.PROJECT_ROOT + className +
+                        Util.EXE_PATH + className, args));
                 }
             }
             else
             {
-                string url = Util.MakeUrl("tcp",
-                    ip, Util.portPCS.ToString(), Util.PCS);
+                string url = Util.MakeUrl("tcp", ip, Util.portPCS.ToString(), Util.PCS);
                 IPuppetMasterLauncher launcher = Activator.GetObject(
                     typeof(IPuppetMasterLauncher), url)
                     as IPuppetMasterLauncher;
@@ -120,11 +114,11 @@ namespace PuppetMaster
 
         public void checkGlobalState()
         {
-            foreach (KeyValuePair<string, int> entry in processes)
+            foreach (KeyValuePair<string, Process> entry in processes)
             {
                 try
                 {
-                    if (Process.GetProcessById(entry.Value).Responding)
+                    if (entry.Value.Responding)
                         Console.WriteLine(entry.Key + " is alive\r\n");
                     else
                         Console.WriteLine(entry.Key + " is not responding\r\n");
@@ -190,29 +184,33 @@ namespace PuppetMaster
                 Console.WriteLine("Invalid PID");
             }
         }
-        public void freezeProcess(int pid)
+        public void freezeProcess(string pid)
         {
 
         }
-        public void unfreezeProcess(int pid)
+        public void unfreezeProcess(string pid)
         {
 
+        }
+        public void crash(string pid)
+        {
+            processes[pid].Kill();
         }
         public void check()
         {
             Console.WriteLine("Process: " + processes.Count + " created");
-            foreach (KeyValuePair<string, int> entry in processes)
+            foreach (KeyValuePair<string, Process> entry in processes)
             {
-                Console.WriteLine(entry.Key + ":" + entry.Value + "\r\n");
+                Console.WriteLine(entry.Key + ":" + entry.Value.MachineName + "\r\n");
             }
         }
         public void killAllProcesses()
         {
-            foreach (KeyValuePair<string, int> entry in processes)
+            foreach (KeyValuePair<string, Process> entry in processes)
             {
                 try
                 {
-                    Process.GetProcessById(entry.Value).Kill();
+                    entry.Value.Kill();
                 }
                 catch
                 {
