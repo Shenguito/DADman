@@ -73,28 +73,17 @@ namespace PuppetMaster
             }
             else if (text.Split(' ')[0].Equals("Crash"))
             {
-                /* int pid = Int32.Parse(text.Split()[1]);
-                 if (processes.ContainsValue(pid))
-                 {
-
-                     Process.GetProcessById(id).Kill();
-                     var item = processes.First(kvp => kvp.Value == id);
-
-                     processes.Remove(item.Key);
-                 }*/
-                Console.WriteLine(text);
+                processLaucher.crash(text.Split(' ')[1]);
             }
             else if (text.Split(' ')[0].Equals("Freeze"))
             {
                 // https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
-                int pid = Int32.Parse(text.Split(' ')[1]);
-                processLaucher.freezeProcess(pid);
+                processLaucher.freezeProcess(text.Split(' ')[1]);
 
             }
             else if (text.Split(' ')[0].Equals("Unfreeze"))
             {
-                int pid = Int32.Parse(text.Split(' ')[1]);
-                processLaucher.unfreezeProcess(pid);
+                processLaucher.unfreezeProcess(text.Split(' ')[1]);
             }
             else if (text.Split(' ')[0].Equals("InjectDelay"))
             {

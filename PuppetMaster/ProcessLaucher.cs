@@ -184,13 +184,17 @@ namespace PuppetMaster
                 Console.WriteLine("Invalid PID");
             }
         }
-        public void freezeProcess(int pid)
+        public void freezeProcess(string pid)
         {
 
         }
-        public void unfreezeProcess(int pid)
+        public void unfreezeProcess(string pid)
         {
 
+        }
+        public void crash(string pid)
+        {
+            processes[pid].Kill();
         }
         public void check()
         {
