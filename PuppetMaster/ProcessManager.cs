@@ -47,10 +47,8 @@ namespace PuppetMaster
                 {
                     Console.WriteLine("Init Error...\r\n" + e.ToString());
                 }
-
-                
             }
-
+            processLaucher.killAllProcesses();
             
         }
 
