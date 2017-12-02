@@ -110,17 +110,22 @@ namespace Client
 
         public void movePlayer(int roundID, string players_arg, string dead_arg)
         {
-            string[] tok_moves = players_arg.Split('-');
-            string[] tok_dead = dead_arg.Split('-');
-
-            for (int i = 0; i < tok_moves.Length; i++)
+            form.debugFunction("player: " + players_arg);
+            if (players_arg != "")
             {
-                this.form.Invoke(new delmove(form.updateMove), new object[] { tok_moves[i].Split(':')[0], tok_moves[i].Split(':')[1] });
+                string[] tok_moves = players_arg.Split('-');
+                for (int i = 1; i < tok_moves.Length; i++)
+                {
+                    this.form.Invoke(new delmove(form.updateMove), new object[] { tok_moves[i].Split(':')[0], tok_moves[i].Split(':')[1] });
+                }
             }
-
-            for (int i = 0; i < tok_dead.Length; i++)
+            if (dead_arg != "")
             {
-                this.form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
+                string[] tok_dead = dead_arg.Split('-');
+                for (int i = 1; i < tok_dead.Length; i++)
+                {
+                    this.form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
+                }
             }
 
         }
@@ -128,7 +133,6 @@ namespace Client
         public void moveGhost(int roundID, string monster_arg)
         {
             string[] monst_tok = monster_arg.Split(':');
-
             this.form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { Int32.Parse(monst_tok[0]), Int32.Parse(monst_tok[1]), Int32.Parse(monst_tok[2]), Int32.Parse(monst_tok[3]) });
         }
 
@@ -167,7 +171,7 @@ namespace Client
         {
             string[] coin_tok = coins_arg.Split('-');
 
-            for (int i = 0; i < coin_tok.Length; i++)
+            for (int i = 1; i < coin_tok.Length; i++)
             {
                 this.form.Invoke(new delCoin(form.updateCoin), new object[] { coin_tok[i] });
             }
@@ -236,9 +240,13 @@ namespace Client
 
         public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
         {
+            
+            //if not null is inside of below function
             movePlayer(roundID, players_arg, dead_arg);
-            moveGhost(roundID, monster_arg);
-            coinEaten(roundID, coins_arg);
+            if(monster_arg!="")
+                moveGhost(roundID, monster_arg);
+            if (coins_arg != "")
+                coinEaten(roundID, coins_arg);
         }
     }
 }

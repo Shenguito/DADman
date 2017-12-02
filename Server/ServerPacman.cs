@@ -309,7 +309,7 @@ namespace Server {
 
             }
 
-            monsters_arg +=redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
+            monsters_arg += redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
         }
 
         private void updatePlayerPosition(int playerNumber, PictureBox pb, string move)
@@ -360,12 +360,12 @@ namespace Server {
 
            
 
-           tbOutput.Text+=("Ronda "+roundID + " \r\n");
-
-
-           //Thread thread = new Thread(() => server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg));
-          // thread.Start();
-            
+            tbOutput.Text+=("Ronda "+roundID + " \r\n");
+            server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
+            /*
+            Thread thread = new Thread(() => server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg));
+            thread.Start();
+            */
 
             roundID++;
 
