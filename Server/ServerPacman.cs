@@ -67,7 +67,6 @@ namespace Server {
 
             this.server = remoteServer;
             this.timer1 = new System.Timers.Timer();
-
             if (Program.MSSEC != 0) { 
                 this.timer1.Interval = Program.MSSEC; }
             else
@@ -76,9 +75,7 @@ namespace Server {
             }
 
             
-            timer1.Elapsed += timer1_Tick;
-            timer1.Start();
-
+            
 
             tbOutput.Text += "ServerForm criado." + timer1.ToString(); ;
 
@@ -382,6 +379,10 @@ namespace Server {
         {
             for (int i = 1; i <= playerNumbers; i++)
                 getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
+
+            timer1.Elapsed += timer1_Tick;
+            timer1.Start();
+
         }
 
         //Get Picture by String

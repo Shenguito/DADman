@@ -23,14 +23,12 @@ namespace PuppetMaster
 
         public void start()
         {
-            string text = "";
+            string text = Console.ReadLine();
             while (!text.Equals("exit"))
             {
-                text = Console.ReadLine();
                 init(text);
                 try
                 {
-                    
                     string inputFile = Util.PROJECT_ROOT+ "PuppetMaster" + Path.DirectorySeparatorChar+
                         "file" + Path.DirectorySeparatorChar + text.Split(' ')[0];
 
@@ -47,9 +45,9 @@ namespace PuppetMaster
                 {
                     Console.WriteLine("Init Error...\r\n" + e.ToString());
                 }
+                text = Console.ReadLine();
             }
             processLaucher.killAllProcesses();
-            
         }
 
         public void init(string text)
