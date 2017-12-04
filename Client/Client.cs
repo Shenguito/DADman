@@ -75,10 +75,16 @@ namespace Client
 
         public ClientForm form;
 
+        //CREATED
+        bool freeze = false;
+        Dictionary<int, string> updateLog;
 
 
         public RemoteClient(ClientForm form)
         {
+            //CREATED
+            updateLog = new Dictionary<int, string>();
+
             msgLog = new Dictionary<int, string>();
             nickLog = new Dictionary<int, string> ();
             this.form = form;
@@ -233,13 +239,7 @@ namespace Client
                         c[2]);
 
                         form.clients.Add(new ConnectedClient(c[0], Int32.Parse(c[1]), c[2], clientProxy));
-
-
-                        //TODO client move by file
-                        if (Program.FILENAME != null)
-                        {
-                            form.sendMoveByFile(Program.FILENAME);
-                        }
+                        
                     }
                     catch
                     {
@@ -252,13 +252,30 @@ namespace Client
 
         public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
         {
-
-            //if not null is inside of below function
-            movePlayer(roundID, players_arg, dead_arg);
-            if (monster_arg != "")
-                moveGhost(roundID, monster_arg);
-            if (coins_arg != "")
-                coinEaten(roundID, coins_arg);
+            //CREATED
+            while (!freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID))
+            {
+                form.debugFunction("\r\n Let's Sleep");
+                Thread.Sleep(1);
+                form.debugFunction("\r\nSleeping");
+                if (!freeze && updateLog.Count == 0)
+                {
+                    break;
+                }
+            }
+            if (!freeze)
+            {
+                //if not null is inside of below function
+                movePlayer(roundID, players_arg, dead_arg);
+                if (monster_arg != "")
+                    moveGhost(roundID, monster_arg);
+                if (coins_arg != "")
+                    coinEaten(roundID, coins_arg);
+            }
+            else if (freeze)
+            {
+                updateLog.Add(roundID, players_arg + " " + dead_arg + " " + monster_arg + " " + coins_arg);
+            }
         }
 
         public void chatThread(string nick, string msg, Dictionary<string, int> delayLog)
@@ -365,6 +382,27 @@ namespace Client
         public int getClientMessageId()
         {
             return clientMessageId;
+        }
+        //CREATED
+        public void Freeze()
+        {
+            freeze = true;
+            form.freeze = true;
+            form.debugFunction("\r\nFreezed");
+        }
+        //CREATED
+        public void Unfreeze()
+        {
+            form.debugFunction("\r\nUnfreezed");
+            freeze = false;
+            form.freeze = false;
+            foreach (KeyValuePair<int, string> entry in updateLog)
+            {
+                receiveRoundUpdate(entry.Key, entry.Value.Split(' ')[0],
+                    entry.Value.Split(' ')[1], entry.Value.Split(' ')[2],
+                    entry.Value.Split(' ')[3]);
+            }
+            updateLog = new Dictionary<int, string>();
         }
     }
 }

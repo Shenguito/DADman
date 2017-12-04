@@ -24,11 +24,15 @@ namespace PuppetMaster
         */
         private Dictionary<string, Process> processes;
         private Dictionary<string, IPuppetMasterLauncher> pcs;
-        private string serverURL;
+        //CREATED
+        private Dictionary<string, IGeneralControlServices> remotingProcesses;
+        private string serverURL="";
         public ProcessLaucher()
         {
             processes = new Dictionary<string, Process>();
             pcs = new Dictionary<string, IPuppetMasterLauncher>();
+            //CREATED
+            remotingProcesses = new Dictionary<string, IGeneralControlServices>();
         }
 
         public void exec(string className, string ip, string port, string args)
@@ -65,13 +69,20 @@ namespace PuppetMaster
                     Console.WriteLine("Connect to other pc fail: " + e);
                 }
             }
+            //CREATED
+            Console.WriteLine("Debug: " + args.Split(' ')[3]);
+            IGeneralControlServices service = Activator.GetObject(
+                    typeof(IGeneralControlServices), args.Split(' ')[2])
+                    as IGeneralControlServices;
+            remotingProcesses.Add(args.Split(' ')[0], service);
         }
 
         public void startServer(string[] input)
         {
             Console.WriteLine("StartServer");
             string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
-            
+
+            //CREATED TODO
             serverURL = input[3].Trim();
             try
             {
@@ -193,13 +204,29 @@ namespace PuppetMaster
                 Console.WriteLine("Invalid PID");
             }
         }
+        //CREATED
         public void freezeProcess(string pid)
         {
-
+            remotingProcesses[pid].Freeze();
+            Console.WriteLine("Freeze called");
         }
         public void unfreezeProcess(string pid)
         {
-
+            try
+            {
+                remotingProcesses[pid].Unfreeze();
+            }
+            catch
+            {
+                if (remotingProcesses[pid] != null)
+                {
+                    Console.WriteLine("Remoting pid não é null");
+                }
+                else
+                {
+                    Console.WriteLine("Remoting pid é null");
+                }
+            }
         }
         public void crash(string pid)
         {

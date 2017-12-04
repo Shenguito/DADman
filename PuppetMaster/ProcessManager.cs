@@ -26,60 +26,64 @@ namespace PuppetMaster
             string text = Console.ReadLine();
             while (!text.Equals("exit"))
             {
+                //CREATED
                 init(text);
-                try
+                if (text.Split('.').Length > 1 && text.Split('.')[1].Equals("txt"))
                 {
-                    string inputFile = Util.PROJECT_ROOT+ "PuppetMaster" + Path.DirectorySeparatorChar+
-                        "file" + Path.DirectorySeparatorChar + text.Split(' ')[0];
-
-                    using (StreamReader sr = File.OpenText(inputFile))
+                    try
                     {
-                        string s = "";
-                        while ((s = sr.ReadLine()) != null)
+                        string inputFile = Util.PROJECT_ROOT + "PuppetMaster" + Path.DirectorySeparatorChar +
+                            "file" + Path.DirectorySeparatorChar + text.Split(' ')[0];
+
+                        using (StreamReader sr = File.OpenText(inputFile))
                         {
-                            init(s);
+                            string s = "";
+                            while ((s = sr.ReadLine()) != null)
+                            {
+                                init(s);
+                            }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Init Error...\r\n" + e.ToString());
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Init Error...\r\n" + e.ToString());
+                    }
                 }
                 text = Console.ReadLine();
             }
             processLaucher.killAllProcesses();
         }
 
+        //CREATED
         public void init(string text)
         {
-
-            if (text.Split(' ')[0].Equals("StartClient"))
+            if ((text.Split(' ').Length == 6 || text.Split(' ').Length == 7) && text.Split(' ')[0].Equals("StartClient"))
             {
                 processLaucher.startClient(text.Split(' '));
             }
-            else if (text.Split(' ')[0].Equals("StartServer"))
+            else if (text.Split(' ').Length == 6 && text.Split(' ')[0].Equals("StartServer"))
             {
                 processLaucher.startServer(text.Split(' '));
             }
-            else if (text.Split(' ')[0].Equals("LocalState"))
+            else if (text.Split(' ').Length == 3 && text.Split(' ')[0].Equals("LocalState"))
             {
                 processLaucher.checkLocalState(text.Split(' '));
             }
-            else if (text.Split(' ')[0].Equals("GlobalStatus"))
+            else if (text.Split(' ').Length == 1 && text.Split(' ')[0].Equals("GlobalStatus"))
             {
                 processLaucher.checkGlobalState();
             }
-            else if (text.Split(' ')[0].Equals("Crash"))
+            else if (text.Split(' ').Length == 2 && text.Split(' ')[0].Equals("Crash"))
             {
                 processLaucher.crash(text.Split(' ')[1]);
             }
-            else if (text.Split(' ')[0].Equals("Freeze"))
+            else if (text.Split(' ').Length == 2 && text.Split(' ')[0].Equals("Freeze"))
             {
                 // https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
                 processLaucher.freezeProcess(text.Split(' ')[1]);
 
             }
-            else if (text.Split(' ')[0].Equals("Unfreeze"))
+            else if (text.Split(' ').Length == 2 && text.Split(' ')[0].Equals("Unfreeze"))
             {
                 processLaucher.unfreezeProcess(text.Split(' ')[1]);
             }
@@ -89,7 +93,7 @@ namespace PuppetMaster
                 //nick.injectDelay(text.Split()[2]);
                 Console.WriteLine(text);
             }
-            else if (text.Split()[0].Equals("Wait"))
+            else if (text.Split(' ').Length == 2 && text.Split()[0].Equals("Wait"))
             {
                 try
                 {
@@ -126,8 +130,5 @@ namespace PuppetMaster
             }
             */
         }
-
-        
-
     }
 }

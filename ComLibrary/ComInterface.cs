@@ -37,19 +37,16 @@ namespace ComLibrary
         void ExitAllProcesses();
         void crashProcess(string pid);
     }
-
-    //TODO not applied yet
-    public interface IremotingException
-    {
-        void MyException(SerializationInfo info, StreamingContext context);
-    }
-    //TODO not applied yet
     public interface IGeneralControlServices
     {
         [OneWay]
         void Freeze();
         void Unfreeze();
     }
-    
-    
+
+    //TODO not applied yet
+    public interface IremotingException
+    {
+        void MyException(SerializationInfo info, StreamingContext context);
+    }
 }

@@ -16,8 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-
+using Microsoft.VisualBasic.FileIO;
 
 namespace Client {
     public partial class ClientForm : Form {
@@ -29,6 +28,8 @@ namespace Client {
         bool started = false;
         bool dead = false;
         bool sent = false;
+        //CREATED
+        public bool freeze = false;
 
         // direction player is moving in. Only one will be true
         bool goup;
@@ -110,41 +111,82 @@ namespace Client {
             }
             
         }
-        
+
+        //CREATED
+        private void doMove(string move)
+        {
+            while (!started)
+            {
+                Thread.Sleep(1);
+                if (started)
+                    break;
+            }
+            while (sent || freeze)
+            {
+                Thread.Sleep(1);
+                if (!sent && !freeze)
+                    break;
+            }
+            if (!dead)
+            {
+                if (move.Equals("LEFT"))
+                {
+                    serverProxy.sendMove(nickname, "LEFT");
+                    sent = true;
+                }
+                else if (move.Equals("RIGHT"))
+                {
+                    serverProxy.sendMove(nickname, "RIGHT");
+                    sent = true;
+                }
+                else if (move.Equals("UP"))
+                {
+                    serverProxy.sendMove(nickname, "UP");
+                    sent = true;
+                }
+                else if (move.Equals("DOWN"))
+                {
+                    serverProxy.sendMove(nickname, "DOWN");
+                    sent = true;
+                }
+            }
+        }
+
 
         //Todo, sending only if he can
         private void keyisdown(object sender, KeyEventArgs e) {
-            if(!sent)
-            if (started)
-            {
-                if (!dead)
+            //CREATED
+            if (!sent && !freeze)
+                if (started)
                 {
-                    if (e.KeyCode == Keys.Left)
+                    if (!dead)
                     {
-                        serverProxy.sendMove(nickname, "LEFT");
-                        sent = true;
-                    }
-                    if (e.KeyCode == Keys.Right)
-                    {
-                        serverProxy.sendMove(nickname, "RIGHT");
-                        sent = true;
-                    }
-                    if (e.KeyCode == Keys.Up)
-                    {
-                        serverProxy.sendMove(nickname, "UP");
-                        sent = true;
-                    }
-                    if (e.KeyCode == Keys.Down)
-                    {
-                        serverProxy.sendMove(nickname, "DOWN");
-                        sent = true;
-                        tbChat.Text += "enviei " + nickname + "DOWN";
+                        if (e.KeyCode == Keys.Left)
+                        {
+                            serverProxy.sendMove(nickname, "LEFT");
+                            sent = true;
+                        }
+                        if (e.KeyCode == Keys.Right)
+                        {
+                            serverProxy.sendMove(nickname, "RIGHT");
+                            sent = true;
+                        }
+                        if (e.KeyCode == Keys.Up)
+                        {
+                            serverProxy.sendMove(nickname, "UP");
+                            sent = true;
+                        }
+                        if (e.KeyCode == Keys.Down)
+                        {
+                            serverProxy.sendMove(nickname, "DOWN");
+                            sent = true;
+                            tbChat.Text += "enviei " + nickname + "DOWN";
+                        }
                     }
                 }
-            }
             if (e.KeyCode == Keys.Enter) {
                     tbMsg.Enabled = true; tbMsg.Focus();
-               }
+            }
         }
 
         private void keyisup(object sender, KeyEventArgs e) {
@@ -340,8 +382,44 @@ namespace Client {
 
             getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
             tbChat.Text += "My Number " + myNumber;
+
+            
+            //CREATED
+            Thread thread = new Thread(() => doWork());
+            thread.Start();
+            
         }
 
+        //CREATED
+        private void doWork()
+        {
+            if (Program.FILENAME != "")
+            {
+                using (TextFieldParser parser = new TextFieldParser(Util.PROJECT_ROOT + "Client" +
+                    Path.DirectorySeparatorChar + "file" + Path.DirectorySeparatorChar + Program.FILENAME))
+                {
+                    parser.TextFieldType = FieldType.Delimited;
+                    parser.SetDelimiters(",");
+                    tbChat.AppendText("\r\nENTREI");
+                    while (!parser.EndOfData)
+                    {
+                        //Processing row
+                        string[] fields = parser.ReadFields();
+                        try
+                        {
+                            for (int i = 1; i < fields.Length; i += 2)
+                            {
+                                doMove(fields[i]);
+                            }
+                        }
+                        catch
+                        {
+                            tbChat.AppendText("\r\nOccur a error reading file");
+                        }
+                    }
+                }
+            }
+        }
 
         //Get Picture by String
         private PictureBox getPictureBoxByName(string name)
@@ -353,22 +431,6 @@ namespace Client {
                         return (PictureBox)p;
             }
             return new PictureBox(); //OR return null;
-        }
-
-        public void sendMoveByFile(string filename)
-        {
-            string clientInput =@".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
-            ".." + Path.DirectorySeparatorChar + "PuppetMaster" + Path.DirectorySeparatorChar +
-            "file" + Path.DirectorySeparatorChar +filename;
-            using (StreamReader sr = File.OpenText(clientInput))
-            {
-                string s = "";
-                while ((s = sr.ReadLine()) != null)
-                {
-                    Thread thread = new Thread(() => serverProxy.sendMove(nickname, s.Split(',')[1]));
-                    thread.Start();
-                }
-            }
         }
 
         public void updateLider(ConnectedClient conn)

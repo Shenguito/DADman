@@ -126,7 +126,17 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendMove(string nick, string move)
         {
-            
+            //CREATED
+            /*
+            foreach (Client c in clientList)
+            {
+                if (c.nick.Equals(nick) && c.connected == false)
+                {
+                    c.connected = true;
+                    //TODO Sheng
+                }
+            }
+            */
             int pl_number = player_image_hashmap[nick];
             try
             {
@@ -184,7 +194,18 @@ namespace Server
             
             foreach (Client c in clientList)
             {
-                c.clientProxy.receiveRoundUpdate(roundID, players_arg, dead_arg, monster_arg, coins_arg);
+                //CREATED
+                //new Thread(() => 
+                //if(c.connected)
+                try
+                {
+                    c.clientProxy.receiveRoundUpdate(roundID, players_arg, dead_arg, monster_arg, coins_arg);
+                }
+                catch
+                {
+                    c.connected = false;
+                }
+                //).Start();
             }
         }
 
