@@ -47,6 +47,7 @@ namespace Client {
         //TODO to define when game is over
         int total_coins = 61;
         Dictionary<string, int> delayLog;
+        ConnectedClient lider;
         
         private  TcpChannel channel;
         IServer serverProxy;
@@ -172,8 +173,41 @@ namespace Client {
 
                         string msg = tbMsg.Text;
                         IClient myself = null;
-                        //TODO for now its synchronos, need to select a client leader to ask a timestamp
-                        DateTime timestamp = DateTime.Now;
+                        int mId = 1;
+                        if(lider != null)
+                        {
+                            try
+                            {
+                                Thread thread2 = new Thread(() => {
+                                    mId = lider.clientProxy.getId();
+                                });
+                                thread2.Start();
+                                thread2.Join();
+                            }
+                            catch(Exception ex)
+                            {
+                                Console.WriteLine("Debug: lider died i am lider now, resend prev message " + ex.ToString());
+                                Thread thread = new Thread(() => takeLider(lider));
+                                thread.Start();
+                            }
+                        }
+                        else {
+                            Thread thread = new Thread(() => takeLider(lider));
+                            thread.Start();
+                            thread.Join();/*   ele demora a fazer o take lider portanto este tem de esperar
+                            if (lider.nick.Equals(this.nickname))
+                            {
+                                Thread thread2 = new Thread(() =>  {
+                                    mId = lider.clientProxy.getId();
+                                    });
+                                thread2.Start();
+                                thread2.Join();
+
+                            }
+                            else
+                                mId = lider.clientProxy.getId(); */
+                        }
+
                         foreach (ConnectedClient connectedClient in clients)
                         {
                             try
@@ -187,7 +221,7 @@ namespace Client {
                                 else */
                                 if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
                                 {
-                                    connectedClient.clientProxy.send(nickname, msg, timestamp, delayLog);
+                                    connectedClient.clientProxy.send(nickname, msg, mId, delayLog);
                                 }
                                 else if (connectedClient.nick.Equals(nickname))
                                 {
@@ -204,9 +238,10 @@ namespace Client {
                         }
                         if (myself != null)
                         {
-                            Thread thread = new Thread(() => myself.send(nickname, msg, timestamp, delayLog));
+                            Thread thread = new Thread(() => myself.send(nickname, msg, mId, delayLog));
                             thread.Start();
                         }
+
                     }
                     tbMsg.Clear();
                     tbMsg.Enabled = false;
@@ -336,8 +371,52 @@ namespace Client {
             }
         }
 
+        public void updateLider(ConnectedClient conn)
+        {
+            lider = conn;
+        }
+
+        public void takeLider(ConnectedClient prev)
+        {
+            int next = 1;
+            IClient myself = null;
+            if (lider != null)
+                next = lider.playernumber + 1;
+
+            foreach (ConnectedClient connectedClient in clients)
+            {
+
+                try
+                {
+                if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                {
+                    connectedClient.clientProxy.sendLider(next);
+                }
+                else if (connectedClient.nick.Equals(nickname))
+                {
+                    myself = connectedClient.clientProxy;
+                }
+                }
+                catch (SocketException exception)
+                {
+                    //Client Disconnected
+                    connectedClient.connected = false;
+                    Console.WriteLine("Debug: " + exception.ToString());
+
+                }
+            }
+            if (myself != null)
+            {
+            Thread thread = new Thread(() => myself.sendLider(next));
+            thread.Start();
+            }
+
+        }
+
+
         public void injectDelay(String nick)
         {
+            //delay value defined
             int delay = 5000;
             if (!(delayLog.ContainsKey(nick)))
             {

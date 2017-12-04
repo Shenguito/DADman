@@ -18,14 +18,18 @@ namespace ComLibrary
     }
     public interface IClient
     {
-        void send(string nick, string msg, DateTime timestamp, Dictionary<string, int> delayLog);
-        void broadcast(int id, string nick, string msg, DateTime timestamp, Dictionary<string, int> delayLog);
+        void send(string nick, string msg, int mId, Dictionary<string, int> delayLog);
+        void broadcast(int id, string nick, string msg, Dictionary<string, int> delayLog);
         void movePlayer(int roundID, string players_arg, string dead_arg);
         void moveGhost(int roundID, string monster_arg);
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
         void startGame(int playerNumber, string arg);
         void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg);
+        int getId();
+        void sendLider(int next);
+        void askMessage(string nick, int id);
+        int getClientMessageId();
     }
     public interface IPuppetMasterLauncher
     {
