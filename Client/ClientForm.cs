@@ -28,7 +28,6 @@ namespace Client {
         bool started = false;
         bool dead = false;
         bool sent = false;
-        //CREATED
         public bool freeze = false;
 
         // direction player is moving in. Only one will be true
@@ -111,8 +110,7 @@ namespace Client {
             }
             
         }
-
-        //CREATED
+        
         private void doMove(string move)
         {
             while (!started)
@@ -155,7 +153,6 @@ namespace Client {
 
         //Todo, sending only if he can
         private void keyisdown(object sender, KeyEventArgs e) {
-            //CREATED
             if (!sent && !freeze)
                 if (started)
                 {
@@ -180,7 +177,6 @@ namespace Client {
                         {
                             serverProxy.sendMove(nickname, "DOWN");
                             sent = true;
-                            tbChat.Text += "enviei " + nickname + "DOWN";
                         }
                     }
                 }
@@ -384,13 +380,12 @@ namespace Client {
             tbChat.Text += "My Number " + myNumber;
 
             
-            //CREATED
+            
             Thread thread = new Thread(() => doWork());
             thread.Start();
             
         }
-
-        //CREATED
+        
         private void doWork()
         {
             if (Program.FILENAME != "")

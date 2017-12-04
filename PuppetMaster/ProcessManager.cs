@@ -26,7 +26,6 @@ namespace PuppetMaster
             string text = Console.ReadLine();
             while (!text.Equals("exit"))
             {
-                //CREATED
                 init(text);
                 if (text.Split('.').Length > 1 && text.Split('.')[1].Equals("txt"))
                 {
@@ -54,7 +53,6 @@ namespace PuppetMaster
             processLaucher.killAllProcesses();
         }
 
-        //CREATED
         public void init(string text)
         {
             if ((text.Split(' ').Length == 6 || text.Split(' ').Length == 7) && text.Split(' ')[0].Equals("StartClient"))

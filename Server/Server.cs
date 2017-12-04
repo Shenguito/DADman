@@ -126,7 +126,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendMove(string nick, string move)
         {
-            //CREATED
+            //TODO, RECONNECT THE CLIENT, IF NEEDED
             /*
             foreach (Client c in clientList)
             {
@@ -194,7 +194,7 @@ namespace Server
             
             foreach (Client c in clientList)
             {
-                //CREATED
+                //TODO, WHETHER NEED A THREAD TO RECEIVE ROUND UPDATE
                 //new Thread(() => 
                 //if(c.connected)
                 try

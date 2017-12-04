@@ -74,15 +74,13 @@ namespace Client
         Dictionary<int, string> msgLog;
 
         public ClientForm form;
-
-        //CREATED
+        
         bool freeze = false;
         Dictionary<int, string> updateLog;
 
 
         public RemoteClient(ClientForm form)
         {
-            //CREATED
             updateLog = new Dictionary<int, string>();
 
             msgLog = new Dictionary<int, string>();
@@ -252,7 +250,6 @@ namespace Client
 
         public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
         {
-            //CREATED
             while (!freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID))
             {
                 form.debugFunction("\r\n Let's Sleep");
@@ -383,14 +380,12 @@ namespace Client
         {
             return clientMessageId;
         }
-        //CREATED
         public void Freeze()
         {
             freeze = true;
             form.freeze = true;
             form.debugFunction("\r\nFreezed");
         }
-        //CREATED
         public void Unfreeze()
         {
             form.debugFunction("\r\nUnfreezed");

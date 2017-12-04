@@ -24,14 +24,12 @@ namespace PuppetMaster
         */
         private Dictionary<string, Process> processes;
         private Dictionary<string, IPuppetMasterLauncher> pcs;
-        //CREATED
         private Dictionary<string, IGeneralControlServices> remotingProcesses;
         private string serverURL="";
         public ProcessLaucher()
         {
             processes = new Dictionary<string, Process>();
             pcs = new Dictionary<string, IPuppetMasterLauncher>();
-            //CREATED
             remotingProcesses = new Dictionary<string, IGeneralControlServices>();
         }
 
@@ -69,8 +67,7 @@ namespace PuppetMaster
                     Console.WriteLine("Connect to other pc fail: " + e);
                 }
             }
-            //CREATED
-            Console.WriteLine("Debug: " + args.Split(' ')[3]);
+            Console.WriteLine("ControlService URL: " + args.Split(' ')[2]);
             IGeneralControlServices service = Activator.GetObject(
                     typeof(IGeneralControlServices), args.Split(' ')[2])
                     as IGeneralControlServices;
@@ -82,7 +79,7 @@ namespace PuppetMaster
             Console.WriteLine("StartServer");
             string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
 
-            //CREATED TODO
+            //TODO, SEND URL OF ALL SERVERS CREATED
             serverURL = input[3].Trim();
             try
             {
@@ -204,7 +201,6 @@ namespace PuppetMaster
                 Console.WriteLine("Invalid PID");
             }
         }
-        //CREATED
         public void freezeProcess(string pid)
         {
             remotingProcesses[pid].Freeze();
