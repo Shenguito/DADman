@@ -224,6 +224,10 @@ namespace PuppetMaster
                 }
             }
         }
+        public void delayProcess(string pid1, string pid2)
+        {
+            remotingProcesses[pid1].InjectDelay(pid1, pid2);
+        }
         public void crash(string pid)
         {
             if (processes[pid] != null)

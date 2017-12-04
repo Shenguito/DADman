@@ -400,10 +400,10 @@ namespace Client
             }
             updateLog = new Dictionary<int, string>();
         }
-        public void InjectDelay()
+        public void InjectDelay(string pid1, string pid2)
         {
             delay = true;
-            form.debugFunction("\r\nInjected Delay");
+            form.debugFunction("\r\nInjected Delay from "+pid1+" to "+pid2);
         }
     }
 }

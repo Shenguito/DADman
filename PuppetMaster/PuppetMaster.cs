@@ -28,8 +28,5 @@ namespace PuppetMaster
             ProcessManager manager = new ProcessManager();
 
         }
-
-
-        
     }
 }

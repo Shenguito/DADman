@@ -471,7 +471,7 @@ namespace Client {
         }
 
 
-        public void injectDelay(String nick)
+        public void injectDelay(string nick)
         {
             //delay value defined
             int delay = 5000;
@@ -487,7 +487,7 @@ namespace Client {
 
         public void debugFunction(string text)
         {
-            tbChat.AppendText("Debug: " + text);
+            tbChat.AppendText(text);
         }
     }
 }
