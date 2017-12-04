@@ -42,6 +42,7 @@ namespace ComLibrary
         [OneWay]
         void Freeze();
         void Unfreeze();
+        void InjectDelay();
     }
 
     //TODO not applied yet

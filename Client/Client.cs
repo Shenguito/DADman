@@ -63,7 +63,7 @@ namespace Client
     }
 
 
-    public class RemoteClient : MarshalByRefObject, IClient
+    public class RemoteClient : MarshalByRefObject, IClient, IGeneralControlServices
     {
 
         public static int clientMessageId = 1;
@@ -76,6 +76,7 @@ namespace Client
         public ClientForm form;
         
         bool freeze = false;
+        bool delay = false;
         Dictionary<int, string> updateLog;
 
 
@@ -398,6 +399,11 @@ namespace Client
                     entry.Value.Split(' ')[3]);
             }
             updateLog = new Dictionary<int, string>();
+        }
+        public void InjectDelay()
+        {
+            delay = true;
+            form.debugFunction("\r\nInjected Delay");
         }
     }
 }
