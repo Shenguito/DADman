@@ -363,6 +363,11 @@ namespace Server {
             updateGhostsPosition();
         }
 
+        public void updateBoard(int roundID, string pl , string monst, string coin)
+        {
+
+        }
+
         public void timer1_Tick(object sender, EventArgs e)
         {
             Thread thread = new Thread(() => processingTimer());

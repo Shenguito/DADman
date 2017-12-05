@@ -279,7 +279,7 @@ namespace Server
             {
                 try
                 {
-                    serverProxy.connect("SERVER", "tcp://" + Util.GetLocalIPAddress() + ":" + port + "/Server");
+                    serverProxy.connect("SERVER", "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(url) + "/Server");
                     serversConnected.Add(serverProxy,true);
                     break;
                 }
@@ -288,7 +288,7 @@ namespace Server
                     Thread.Sleep(1000);
                 }
             }
-            serverProxy.SendFirstRound();
+            
         }
 
         public void requestRound(int id)
@@ -321,22 +321,59 @@ namespace Server
 
         public void SendFirstRound(int roundID)
         {
+            string pl = "";
+            string monst = "";
+            string coin = "";
+
+
+            string roundFile = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar + "bin" +
+                        Path.DirectorySeparatorChar + Program.SERVERNAME + Path.DirectorySeparatorChar + roundID;
+
+            try
+            {
+                using (StreamReader sr = File.OpenText(roundFile))
+                {
+                    string s = "";
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        string[] tok = s.Split(',');
+
+                        if (tok[0].Equals('C'))
+                        {
+                            //ex. C;168;40
+                            coin += tok[1] + ";" + tok[2] + "-";
+                        }else
+                        if (tok[0].Equals('M'))
+                        {
+                            //ex. M;241;172
+                            monst += tok[1] + ";" + tok[2] + "-";
+                        }
+                        else
+                        {
+                            //ex. P6;P;8;240
+                            pl += tok[0] + ";" + tok[1] +";" + tok[2] + ";" + tok[3] + "-";
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Não consegui ler serverLog");
+            }
 
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {
                 if(entry.Value == true)
                 {
-                    entry.Key.UpdateBoard(roundID);
+                    entry.Key.UpdateBoard(roundID, pl ,monst, coin);
                 }
             }
-
-
         }
 
-        public void UpdateBoard(int roundID)
+        public void UpdateBoard(int roundID, string pl, string monst, string coin)
         {
 
-
+            serverForm.updateBoard(roundID,pl,monst,coin);
 
         }
     }
