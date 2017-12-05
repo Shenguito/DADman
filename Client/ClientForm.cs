@@ -351,6 +351,8 @@ namespace Client {
                 }
             }
             sent = false;
+
+            
         }
 
         public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
@@ -408,7 +410,7 @@ namespace Client {
         {
             if (Program.FILENAME != "")
             {
-                using (TextFieldParser parser = new TextFieldParser(Util.PROJECT_ROOT + "Client" +
+                using (TextFieldParser parser = new TextFieldParser(Util.PROJECT_ROOT + "PuppetMaster" +
                     Path.DirectorySeparatorChar + "file" + Path.DirectorySeparatorChar + Program.FILENAME))
                 {
                     parser.TextFieldType = FieldType.Delimited;
@@ -425,6 +427,48 @@ namespace Client {
                         {
                             tbChat.AppendText("\r\nOccur a error reading file");
                         }
+                    }
+                }
+            }
+        }
+
+        public void writeToFile(int roundID)
+        {
+            using (StreamWriter sw = File.CreateText(Client.DIRECTORY + Path.DirectorySeparatorChar + roundID))
+            {
+                foreach (Control x in this.Controls)
+                {
+                    if (x is PictureBox && x.Tag == "ghost")
+                    {
+                        sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "coin")
+                    {
+                        sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player1")
+                    {
+                        sw.WriteLine("P1, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player2")
+                    {
+                        sw.WriteLine("P2, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player3")
+                    {
+                        sw.WriteLine("P3, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player4")
+                    {
+                        sw.WriteLine("P4, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player5")
+                    {
+                        sw.WriteLine("P5, " + x.Location.X + ", " + x.Location.Y);
+                    }
+                    else if (x is PictureBox && x.Tag == "player6")
+                    {
+                        sw.WriteLine("P6, " + x.Location.X + ", " + x.Location.Y);
                     }
                 }
             }

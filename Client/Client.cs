@@ -35,9 +35,16 @@ namespace Client
     class Client
     {
 
-
+        public static string DIRECTORY = Util.PROJECT_ROOT + "Client" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + Program.PLAYERNAME;
         public Client()
         {
+            if (Directory.Exists(DIRECTORY))
+            {
+                Directory.Delete(DIRECTORY, true);
+            }
+
+            Directory.CreateDirectory(DIRECTORY);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ClientForm());
@@ -273,7 +280,12 @@ namespace Client
             else if (freeze)
             {
                 updateLog.Add(roundID, players_arg + " " + dead_arg + " " + monster_arg + " " + coins_arg);
+                return;
             }
+            //TODO roundID received by server
+
+            form.writeToFile(roundID);
+            
         }
 
         public void chatThread(string nick, string msg, Dictionary<string, int> delayLog)
@@ -407,7 +419,6 @@ namespace Client
         }
         public void newServerCreated(string serverURL)
         {
-
             new Thread(() => this.form.connectToServer(serverURL)).Start();
         }
     }

@@ -318,6 +318,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void SendFirstRound(int roundID, string player, string monsters_arg, string atecoin)
         {
+            
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {
                 if (entry.Value == true)
@@ -326,6 +327,11 @@ namespace Server
                 }
             }
             /*
+            var keys = serversConnected.Keys.ToList();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                serversConnected[keys[i]] = false;
+            }
             foreach (IServer key in serversConnected.Keys.ToList())
                 serversConnected[key] = false;
                 */
