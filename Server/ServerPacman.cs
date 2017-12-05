@@ -107,7 +107,7 @@ namespace Server {
                             
                             Controls.Remove(x);
                             coins_arg +="-" + x.Name;
-                            atecoin+="-"+x.Left+":"+x.Top;
+                            atecoin+="-" + x.Name;
                             sendCoinEaten(playerNumber, x.Name);
                         }
                     }
@@ -392,8 +392,8 @@ namespace Server {
             for (int i = 1; i < coin_tok.Length; i++)
             {
                 //TODO, already received ate coins by left:top
-                string[] each_coin = coin_tok[i].Split(':');
-                tbOutput.AppendText("\r\n"+coin_tok[i]);
+                PictureBox pb = getPictureBoxByName(coin_tok[i]);
+                pb.Visible = false;
             }
         }
 
