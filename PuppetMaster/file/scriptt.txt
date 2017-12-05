@@ -1,0 +1,16 @@
+StartServer S1 tcp://localhost:11000/PCS tcp://localhost:20001/Server 200 3
+StartClient C1 tcp://localhost:11000/PCS tcp://localhost:30001/Client 200 3
+StartClient C2 tcp://localhost:11000/PCS tcp://localhost:30002/Client 200 3
+StartClient C3 tcp://localhost:11000/PCS tcp://localhost:30003/Client 200 3
+GlobalStatus
+Wait 1000
+LocalState S1 1
+LocalState C1 1
+LocalState C2 1
+Wait 5000
+LocalState S1 20
+LocalState C1 20
+LocalState C2 20
+GlobalStatus
+Wait 500
+

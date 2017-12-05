@@ -48,7 +48,7 @@ namespace Client {
         int total_coins = 61;
         Dictionary<string, int> delayLog;
         ConnectedClient lider;
-        
+
         private  TcpChannel channel;
         IServer serverProxy;
 
@@ -56,18 +56,18 @@ namespace Client {
 
         public List<IServer> serversConnected = new List<IServer>();
 
-        
+
         public ClientForm() {
-            
+
             nickname = Program.PLAYERNAME;
             clients = new List<ConnectedClient>();
             delayLog = new Dictionary<string, int>();
             InitializeComponent();
             this.Text += ": " + nickname;
             label2.Visible = false;
-            
+
             Init();
-            
+
         }
 
         public void Init()
@@ -77,8 +77,8 @@ namespace Client {
             this.port = Program.PORT;
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
-            
-           
+
+
 
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(this);
@@ -91,7 +91,7 @@ namespace Client {
             );
 
             connectToServer(Program.SERVERURL);
-            
+
         }
 
         public void connectToServer(string serverURL)
@@ -123,7 +123,7 @@ namespace Client {
                 }
             }
         }
-        
+
         private void doMove(string move)
         {
             while (!started)
@@ -199,7 +199,7 @@ namespace Client {
                     }
                 }
             if (e.KeyCode == Keys.Enter) {
-                    tbMsg.Enabled = true; tbMsg.Focus();
+                tbMsg.Enabled = true; tbMsg.Focus();
             }
         }
 
@@ -230,54 +230,41 @@ namespace Client {
                         string msg = tbMsg.Text;
                         IClient myself = null;
                         int mId = 1;
-                        if(lider != null)
+                        if (lider == null)
+                            takeLider(lider);
+
+                        try
                         {
-                            try
+                            if (!lider.nick.Equals(this.nickname))
+                                mId = lider.clientProxy.getId();
+                            else
                             {
-                                Thread thread2 = new Thread(() => {
+                                Thread thread2 = new Thread(() =>
+                                {
                                     mId = lider.clientProxy.getId();
                                 });
                                 thread2.Start();
                                 thread2.Join();
                             }
-                            catch(Exception ex)
-                            {
-                                Console.WriteLine("Debug: lider died i am lider now, resend prev message " + ex.ToString());
-                                Thread thread = new Thread(() => takeLider(lider));
-                                thread.Start();
-                            }
                         }
-                        else {
-                            Thread thread = new Thread(() => takeLider(lider));
-                            thread.Start();
-                            thread.Join();/*   ele demora a fazer o take lider portanto este tem de esperar
-                            if (lider.nick.Equals(this.nickname))
-                            {
-                                Thread thread2 = new Thread(() =>  {
-                                    mId = lider.clientProxy.getId();
-                                    });
-                                thread2.Start();
-                                thread2.Join();
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Debug: lider died i am lider now, resend prev message " + ex.ToString());
+                            takeLider(lider);
 
-                            }
-                            else
-                                mId = lider.clientProxy.getId(); */
                         }
-
                         foreach (ConnectedClient connectedClient in clients)
                         {
                             try
                             {
-                                /*
-                                if(!connectedClient.nick.Equals(nickname) && connectedClient.connected && delay)
+                                if (delayLog.ContainsKey(connectedClient.nick))
                                 {
-                                    //Thread
+                                    Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
+                                    thread.Start();
                                 }
-                                
-                                else */
-                                if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                                else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
                                 {
-                                    connectedClient.clientProxy.send(nickname, msg, mId, delayLog);
+                                    connectedClient.clientProxy.send(nickname, msg, mId);
                                 }
                                 else if (connectedClient.nick.Equals(nickname))
                                 {
@@ -294,7 +281,7 @@ namespace Client {
                         }
                         if (myself != null)
                         {
-                            Thread thread = new Thread(() => myself.send(nickname, msg, mId, delayLog));
+                            Thread thread = new Thread(() => myself.send(nickname, msg, mId));
                             thread.Start();
                         }
 
@@ -310,12 +297,12 @@ namespace Client {
 
             }
         }
-                
+
         public void updateChat(string nick, string msg)
         {
             tbChat.Text += nick + ": " + msg + "\r\n";
         }
-        
+
         //TODO receber messageID, Player+Move, Ghost+move
         public void updateMove(int playernumber, string move)
         {
@@ -332,14 +319,14 @@ namespace Client {
             }
             if (move.Equals("RIGHT"))
             {
-                if (pb.Left < (boardRight)) { 
+                if (pb.Left < (boardRight)) {
                     pb.Left += speed;
                     pb.Image = Properties.Resources.Right;
                 }
             }
             if (move.Equals("UP"))
             {
-                if (pb.Top > (boardTop)) { 
+                if (pb.Top > (boardTop)) {
                     pb.Top -= speed;
                     pb.Image = Properties.Resources.Up;
                 }
@@ -352,7 +339,7 @@ namespace Client {
             }
             sent = false;
 
-            
+
         }
 
         public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
@@ -373,10 +360,10 @@ namespace Client {
                 label2.Visible = true;
                 getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.Black;
             }
-          /*  PictureBox pb = retrievePicture(playerNumber);
+            /*  PictureBox pb = retrievePicture(playerNumber);
 
-            pb.Left = 0;
-            pb.Top = 25; */
+              pb.Left = 0;
+              pb.Top = 25; */
         }
 
         internal void updateCoin(string pictureBoxName)
@@ -399,13 +386,13 @@ namespace Client {
             getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
             tbChat.Text += "My Number " + myNumber;
 
-            
-            
+
+
             Thread thread = new Thread(() => doWork());
             thread.Start();
-            
+
         }
-        
+
         private void doWork()
         {
             if (Program.FILENAME != "")
@@ -503,14 +490,14 @@ namespace Client {
 
                 try
                 {
-                if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
-                {
-                    connectedClient.clientProxy.sendLider(next);
-                }
-                else if (connectedClient.nick.Equals(nickname))
-                {
-                    myself = connectedClient.clientProxy;
-                }
+                    if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                    {
+                        connectedClient.clientProxy.sendLider(next);
+                    }
+                    else if (connectedClient.nick.Equals(nickname))
+                    {
+                        myself = connectedClient.clientProxy;
+                    }
                 }
                 catch (SocketException exception)
                 {
@@ -522,8 +509,8 @@ namespace Client {
             }
             if (myself != null)
             {
-            Thread thread = new Thread(() => myself.sendLider(next));
-            thread.Start();
+                Thread thread = new Thread(() => myself.sendLider(next));
+                thread.Start();
             }
 
         }
@@ -543,6 +530,11 @@ namespace Client {
             }
         }
 
+        public void delayThread(string msg, int mId, ConnectedClient conn)
+        {
+            Thread.Sleep(delayLog[conn.nick]);
+            conn.clientProxy.send(nickname, msg, mId);
+        }
         public void debugFunction(string text)
         {
             tbChat.AppendText(text);

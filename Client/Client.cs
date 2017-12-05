@@ -75,13 +75,15 @@ namespace Client
 
         public static int clientMessageId = 1;
         String nick;
-        public static int totalMessageId = 1;
+        public static int totalMessageId = 0;
         ConnectedClient lider;
         Dictionary<int, string> nickLog;
         Dictionary<int, string> msgLog;
+        Dictionary<int, string> msgQueue;
+        Boolean activeThread = false;
 
         public ClientForm form;
-        
+
         bool freeze = false;
         bool delay = false;
         Dictionary<int, string> updateLog;
@@ -92,7 +94,8 @@ namespace Client
             updateLog = new Dictionary<int, string>();
 
             msgLog = new Dictionary<int, string>();
-            nickLog = new Dictionary<int, string> ();
+            nickLog = new Dictionary<int, string>();
+            msgQueue = new Dictionary<int, string>();
             this.form = form;
             nick = Program.PLAYERNAME;
             RemotingConfiguration.RegisterWellKnownServiceType(
@@ -108,27 +111,27 @@ namespace Client
         }
 
         //TODO CHAT, shows up the message to chat according to fault tolerance
-        public void broadcast(int id, string nick, string msg, Dictionary<string, int> delayLog)
+        public void broadcast(int id, string nick, string msg)
         {
             if (!(msgLog.ContainsKey(id)))
             {
                 nickLog.Add(id, nick);
                 msgLog.Add(id, msg);
-                if (id <= clientMessageId && !delayLog.ContainsKey(this.nick))
+                if (id <= clientMessageId)
                 {
                     clientMessageId++;
                     this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
                 }
-                else if (delayLog.ContainsKey(this.nick))
-                {
-                    Thread thread = new Thread(() => chatThread(nick, msg, delayLog));
-                    thread.Start();
-                }
                 else
                 {
-                    //searchLogs(id);
-                    Thread thread = new Thread(() => chatThread(nick, msg, delayLog));
-                    thread.Start();
+                    searchLogs(id);
+                    msgQueue.Add(id, msg);
+                    if (!activeThread)
+                    {
+                        activeThread = true;
+                        Thread thread = new Thread(() => chatThread());
+                        thread.Start();
+                    }
                 }
             }
 
@@ -162,7 +165,7 @@ namespace Client
         }
 
         //TODO CHAT, every connected client receive the message, and then decide which message show broadcast
-        public void send(string nick, string msg, int mId, Dictionary<string, int> delayLog)
+        public void send(string nick, string msg, int mId)
         {
 
             foreach (ConnectedClient connectedClient in form.clients)
@@ -171,7 +174,7 @@ namespace Client
                 {
                     try
                     {
-                        connectedClient.clientProxy.broadcast(mId, nick, msg, delayLog);
+                        connectedClient.clientProxy.broadcast(mId, nick, msg);
                     }
                     catch (SocketException e)
                     {
@@ -185,7 +188,7 @@ namespace Client
                 }
                 else
                 {
-                    Thread thread = new Thread(() => broadcast(mId, nick, msg, delayLog));
+                    Thread thread = new Thread(() => broadcast(mId, nick, msg));
                     thread.Start();
                 }
             }
@@ -245,7 +248,7 @@ namespace Client
                         c[2]);
 
                         form.clients.Add(new ConnectedClient(c[0], Int32.Parse(c[1]), c[2], clientProxy));
-                        
+
                     }
                     catch
                     {
@@ -285,19 +288,42 @@ namespace Client
             //TODO roundID received by server
 
             form.writeToFile(roundID);
-            
+
         }
 
-        public void chatThread(string nick, string msg, Dictionary<string, int> delayLog)
+        public void chatThread()
         {
             //tempo de espera maximo por uma mensagem
             int waitTime = 1000;
-            if (delayLog.ContainsKey(this.nick))
-                waitTime += delayLog[this.nick];
-
-            Thread.Sleep(waitTime);
-            clientMessageId++;
-            this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+            while (msgQueue.Count != 0)
+            {
+                int max = 0;
+                foreach (KeyValuePair<int, string> entry in msgQueue)
+                {
+                    max = Math.Max(max, entry.Key);
+                }
+                Thread.Sleep(waitTime);
+                searchLogs(max);
+                Thread.Sleep(waitTime);
+                int i = 1;
+                while (i <= max)
+                {
+                    //TODO
+                    if (!msgLog.ContainsKey(i))
+                    {
+                        msgLog.Add(i, "");
+                        clientMessageId++;
+                    }
+                    else if (msgQueue.ContainsKey(i))
+                    {
+                        msgQueue.Remove(i);
+                        clientMessageId++;
+                        this.form.Invoke(new deluc(form.updateChat), new object[] { nickLog[i], msgLog[i] });
+                    }
+                    i++;
+                }
+            }
+            activeThread = false;
         }
         public int getId()
         {
@@ -311,13 +337,13 @@ namespace Client
             {
                 if (connectedClient.playernumber == next)
                 {
-                     /*if (connectedClient.nick.Equals(this.nick))
-                     {
-                         int i = topMessageId();
-                         i = Math.Max(clientMessageId, i);
-                         searchLogs(i);
-                         totalMessageId = i;
-                     }*/
+                    if (connectedClient.nick.Equals(this.nick))
+                    {
+                        int i = topMessageId();
+                        i = Math.Max(clientMessageId, i);
+                        searchLogs(i);
+                        totalMessageId = i;
+                    }
                     this.lider = connectedClient;
                     this.form.Invoke(new delLider(form.updateLider), new object[] { connectedClient });
 
@@ -334,10 +360,20 @@ namespace Client
                 {
 
                     if (connectedClient.nick.Equals(nick))
-                        connectedClient.clientProxy.broadcast(id, nick1, msg, new Dictionary<string, int>());
+                    {
+                        try
+                        {
+                            connectedClient.clientProxy.broadcast(id, nick1, msg);
+                        }
+                        catch (SocketException exception)
+                        {
+                            //Client Disconnected
+                            connectedClient.connected = false;
+                            Console.WriteLine("Debug: " + exception.ToString());
 
 
-
+                        }
+                    }
                 }
             }
 
@@ -345,7 +381,7 @@ namespace Client
         public void searchLogs(int current)
         {
             int i = 1;
-            while ( i < current)
+            while (i < current)
             {
                 if (!msgLog.ContainsKey(i))
                 {
@@ -369,9 +405,10 @@ namespace Client
                             }
 
                         }
-                        
+
                     }
                 }
+                i++;
             }
         }
         public int topMessageId()
@@ -379,15 +416,26 @@ namespace Client
             int temp = 0;
             foreach (ConnectedClient connectedClient in form.clients)
             {
-                if (!connectedClient.nick.Equals(this.nick))
+                try
                 {
-                    int temp2 = connectedClient.clientProxy.getClientMessageId();
-                    if (temp2 > temp)
-                        temp = temp2;
+                    if (!connectedClient.nick.Equals(this.nick))
+                    {
+                        int temp2 = connectedClient.clientProxy.getClientMessageId();
+                        if (temp2 > temp)
+                            temp = temp2;
+                    }
+                }
+                catch (SocketException exception)
+                {
+                    //Client Disconnected
+                    connectedClient.connected = false;
+                    Console.WriteLine("Debug: " + exception.ToString());
+                    return temp - 1;
+
                 }
 
             }
-            return temp-1;
+            return temp - 1;
         }
         public int getClientMessageId()
         {

@@ -20,8 +20,8 @@ namespace ComLibrary
     }
     public interface IClient
     {
-        void send(string nick, string msg, int mId, Dictionary<string, int> delayLog);
-        void broadcast(int id, string nick, string msg, Dictionary<string, int> delayLog);
+        void send(string nick, string msg, int mId);
+        void broadcast(int id, string nick, string msg);
         void movePlayer(int roundID, string players_arg, string dead_arg);
         void moveGhost(int roundID, string monster_arg);
         void coinEaten(int playerNumber, string coinName);
