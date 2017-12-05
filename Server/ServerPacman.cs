@@ -17,9 +17,6 @@ using System.Windows.Forms;
 namespace Server {
     public partial class ServerForm : Form
     {
-        public static string PATH = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
-            ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar +
-            "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar;
 
         public Dictionary<int, string> listMove = new Dictionary<int, string>();
         public List<int> deadPlayer;
@@ -62,8 +59,6 @@ namespace Server {
             InitializeComponent();
             listMove = new Dictionary<int, string>();
             deadPlayer = new List<int>();
-            string pathString = System.IO.Path.Combine(PATH, "log");
-            Directory.CreateDirectory(pathString);
 
             this.server = remoteServer;
             this.timer1 = new System.Timers.Timer();
@@ -206,8 +201,8 @@ namespace Server {
 
 
             //TODO, writing the server localstate to a file, must be flexible with number of players
-           // tbOutput.Text += PATH+ Path.DirectorySeparatorChar + "log" + Path.DirectorySeparatorChar + roundID;
-            using (StreamWriter sw = File.CreateText(PATH+ Path.DirectorySeparatorChar + "log"+ Path.DirectorySeparatorChar + roundID))
+            // tbOutput.Text += PATH+ Path.DirectorySeparatorChar + "log" + Path.DirectorySeparatorChar + roundID;
+            using (StreamWriter sw = File.CreateText(Server.DIRECTORY+ Path.DirectorySeparatorChar + roundID))
             {
                 foreach (Control x in this.Controls)
                 {
@@ -215,8 +210,6 @@ namespace Server {
                     {
                         sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
                         
-
-
                     }
                     else if (x is PictureBox && x.Tag == "coin")
                     {

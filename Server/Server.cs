@@ -38,13 +38,19 @@ namespace Server
         private int MSECROUND = Program.MSSEC; //game speed [communication refresh time]
 
         static TcpChannel channel = new TcpChannel(Program.PORT);
-
-        public static string PATH = @".."+ Path.DirectorySeparatorChar+".."+ Path.DirectorySeparatorChar+
-            ".."+ Path.DirectorySeparatorChar+"Server"+ Path.DirectorySeparatorChar+
-            "bin"+ Path.DirectorySeparatorChar+"Log.txt";
+        
+        public static string DIRECTORY = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar+"bin"+ Path.DirectorySeparatorChar + Program.SERVERNAME;
 
         public Server()
         {
+            if (Directory.Exists(DIRECTORY))
+            {
+                
+                Directory.Delete(DIRECTORY, true);
+                Console.WriteLine("Deleted: " + DIRECTORY);
+            }
+
+            Directory.CreateDirectory(DIRECTORY);
             createConnection();
         }
         
