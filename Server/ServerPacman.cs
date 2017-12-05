@@ -365,7 +365,31 @@ namespace Server {
 
         public void updateBoard(int roundID, string pl , string monst, string coin)
         {
+            this.roundID = roundID;
 
+            string[] pl_tok = pl.Split('-');
+            string[] monst_tok = monst.Split('-');
+            string[] coin_tok = coin.Split('-');
+
+            for (int i = 0; i < pl_tok.Length; i++)
+            {
+                string[] each_player = pl_tok[i].Split(';');
+
+                PictureBox pb = getPictureBoxByName(each_player[0]);
+                pb.Left = Int32.Parse(each_player[1]);
+                pb.Top = Int32.Parse(each_player[2]);
+
+            }
+
+            //TODO ghosts, tem o problema de nao saberes qual é qual
+
+            for (int i = 0; i < coin_tok.Length; i++)
+            {
+                string[] each_coin = coin_tok[i].Split(';');
+
+                // TODO falta meter as coins no board. O problema é que recebes as coins que existem e nao as que faltam... Go Sheng!!
+
+            }
         }
 
         public void timer1_Tick(object sender, EventArgs e)
