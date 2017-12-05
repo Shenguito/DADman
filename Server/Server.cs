@@ -27,7 +27,6 @@ namespace Server
         public int playernumber;
         public string url;
         public IClient clientProxy;
-        // TODO defined at end
         public bool dead;
         public bool connected;
         public int score;
@@ -61,7 +60,7 @@ namespace Server
         
     }
 
-    public class RemoteServer : MarshalByRefObject, IServer
+    public class RemoteServer : MarshalByRefObject, IServer, IServerReplication
     {
         internal List<Client> clientList = new List<Client>();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
@@ -255,6 +254,16 @@ namespace Server
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 Console.WriteLine("Game started!");
             
+        }
+
+        public void connect(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void requestRound(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

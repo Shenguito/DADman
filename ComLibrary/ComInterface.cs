@@ -44,6 +44,11 @@ namespace ComLibrary
         void Unfreeze();
         void InjectDelay(string pid1, string pid2);
     }
+    public interface IServerReplication
+    {
+        void connect(string url);
+        void requestRound(int id);
+    }
 
     //TODO not applied yet
     public interface IremotingException
