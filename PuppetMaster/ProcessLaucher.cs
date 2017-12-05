@@ -160,10 +160,8 @@ namespace PuppetMaster
             {
                 if (input[1][0] == 'S')
                 {
-                    string checkLog = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
-                        ".." + Path.DirectorySeparatorChar + "Server" + Path.DirectorySeparatorChar +
-                        "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar +
-                        "log" + Path.DirectorySeparatorChar + input[2];
+                    string checkLog = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar + "bin" + 
+                        Path.DirectorySeparatorChar + input[1].Trim() + Path.DirectorySeparatorChar + input[2].Trim();
                     try
                     {
                         using (StreamReader sr = File.OpenText(checkLog))
@@ -177,15 +175,13 @@ namespace PuppetMaster
                     }
                     catch
                     {
-
+                        Console.WriteLine("Não consegui ler serverLog");
                     }
                 }
                 else if (input[1][0] == 'C')
                 {
-                    string checkLog = @".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar +
-                        ".." + Path.DirectorySeparatorChar + "Client" + Path.DirectorySeparatorChar +
-                        "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar +
-                        "log" + input[1][1] + Path.DirectorySeparatorChar + input[2];
+                    string checkLog = Util.PROJECT_ROOT+"Client" + Path.DirectorySeparatorChar + "bin" + 
+                        Path.DirectorySeparatorChar + input[1] + Path.DirectorySeparatorChar + input[2];
                     try
                     {
                         using (StreamReader sr = File.OpenText(checkLog))
@@ -199,7 +195,7 @@ namespace PuppetMaster
                     }
                     catch
                     {
-
+                        Console.WriteLine("Não consegui ler clientLog");
                     }
                 }
             }
