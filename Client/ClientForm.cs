@@ -395,17 +395,13 @@ namespace Client {
                 {
                     parser.TextFieldType = FieldType.Delimited;
                     parser.SetDelimiters(",");
-                    tbChat.AppendText("\r\nENTREI");
                     while (!parser.EndOfData)
                     {
                         //Processing row
                         string[] fields = parser.ReadFields();
                         try
                         {
-                            for (int i = 1; i < fields.Length; i += 2)
-                            {
-                                doMove(fields[i]);
-                            }
+                            doMove(fields[1]);
                         }
                         catch
                         {
