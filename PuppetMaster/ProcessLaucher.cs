@@ -81,6 +81,13 @@ namespace PuppetMaster
 
             //TODO, SEND URL OF ALL SERVERS CREATED
             serverURL = input[3].Trim();
+
+            foreach(KeyValuePair <string, IGeneralControlServices> entry in remotingProcesses)
+            {
+                entry.Value.newServerCreated(serverURL);
+            }
+
+
             try
             {
                 if (Util.ExtractIPFromURL(input[3]).Equals("localhost")||

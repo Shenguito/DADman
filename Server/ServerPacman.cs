@@ -355,6 +355,7 @@ namespace Server {
         {
             tbOutput.Text += ("Ronda " + roundID + " \r\n");
             //server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
+            server.SendFirstRound(roundID);
             server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
             roundID++;
 

@@ -405,5 +405,9 @@ namespace Client
             delay = true;
             form.debugFunction("\r\nInjected Delay from "+pid1+" to "+pid2);
         }
+        public void newServerCreated(string serverURL)
+        {
+            this.form.connectToServer(serverURL);
+        }
     }
 }

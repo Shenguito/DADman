@@ -54,6 +54,8 @@ namespace Client {
 
         public List<ConnectedClient> clients;
 
+        public List<IServer> serversConnected = new List<IServer>();
+
         
         public ClientForm() {
             
@@ -76,10 +78,7 @@ namespace Client {
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
             
-            serverProxy = (IServer)Activator.GetObject(
-                typeof(IServer),
-                Program.SERVERURL
-            );
+           
 
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(this);
@@ -91,24 +90,34 @@ namespace Client {
                 typeof(RemoteClient)
             );
 
+            connectToServer(Program.SERVERURL);
+
+            
+        }
+
+        public void connectToServer(string serverURL)
+        {
+            serverProxy = (IServer)Activator.GetObject(
+               typeof(IServer),
+               serverURL
+           );
+
+
             //try catch missed
-            if (serverProxy != null)
+            while (serverProxy != null)
             {
                 try
                 {
-                    serverProxy.connect(nickname, "tcp://"+ Util.GetLocalIPAddress()+":"+ port+"/Client");
+                    serverProxy.connect(nickname, "tcp://" + Util.GetLocalIPAddress() + ":" + port + "/Client");
+                    serversConnected.Add(serverProxy);
+                    break;
                 }
                 catch
                 {
                     tbChat.Text += "Catch: Didn't connected to server";
+                    Thread.Sleep(1000);
                 }
-
             }
-            else
-            {
-                tbChat.Text += "Else: Didn't connected to server";
-            }
-            
         }
         
         private void doMove(string move)
@@ -127,25 +136,27 @@ namespace Client {
             }
             if (!dead)
             {
-                if (move.Equals("LEFT"))
-                {
-                    serverProxy.sendMove(nickname, "LEFT");
-                    sent = true;
-                }
-                else if (move.Equals("RIGHT"))
-                {
-                    serverProxy.sendMove(nickname, "RIGHT");
-                    sent = true;
-                }
-                else if (move.Equals("UP"))
-                {
-                    serverProxy.sendMove(nickname, "UP");
-                    sent = true;
-                }
-                else if (move.Equals("DOWN"))
-                {
-                    serverProxy.sendMove(nickname, "DOWN");
-                    sent = true;
+                foreach (IServer serverProxy in serversConnected) {
+                    if (move.Equals("LEFT"))
+                    {
+                        serverProxy.sendMove(nickname, "LEFT");
+                        sent = true;
+                    }
+                    else if (move.Equals("RIGHT"))
+                    {
+                        serverProxy.sendMove(nickname, "RIGHT");
+                        sent = true;
+                    }
+                    else if (move.Equals("UP"))
+                    {
+                        serverProxy.sendMove(nickname, "UP");
+                        sent = true;
+                    }
+                    else if (move.Equals("DOWN"))
+                    {
+                        serverProxy.sendMove(nickname, "DOWN");
+                        sent = true;
+                    }
                 }
             }
         }
@@ -158,25 +169,28 @@ namespace Client {
                 {
                     if (!dead)
                     {
-                        if (e.KeyCode == Keys.Left)
+                        foreach (IServer serverProxy in serversConnected)
                         {
-                            serverProxy.sendMove(nickname, "LEFT");
-                            sent = true;
-                        }
-                        if (e.KeyCode == Keys.Right)
-                        {
-                            serverProxy.sendMove(nickname, "RIGHT");
-                            sent = true;
-                        }
-                        if (e.KeyCode == Keys.Up)
-                        {
-                            serverProxy.sendMove(nickname, "UP");
-                            sent = true;
-                        }
-                        if (e.KeyCode == Keys.Down)
-                        {
-                            serverProxy.sendMove(nickname, "DOWN");
-                            sent = true;
+                            if (e.KeyCode == Keys.Left)
+                            {
+                                serverProxy.sendMove(nickname, "LEFT");
+                                sent = true;
+                            }
+                            if (e.KeyCode == Keys.Right)
+                            {
+                                serverProxy.sendMove(nickname, "RIGHT");
+                                sent = true;
+                            }
+                            if (e.KeyCode == Keys.Up)
+                            {
+                                serverProxy.sendMove(nickname, "UP");
+                                sent = true;
+                            }
+                            if (e.KeyCode == Keys.Down)
+                            {
+                                serverProxy.sendMove(nickname, "DOWN");
+                                sent = true;
+                            }
                         }
                     }
                 }

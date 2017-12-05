@@ -43,6 +43,8 @@ namespace Server
             ".."+ Path.DirectorySeparatorChar+"Server"+ Path.DirectorySeparatorChar+
             "bin"+ Path.DirectorySeparatorChar+"Log.txt";
 
+       
+
         public Server()
         {
             createConnection();
@@ -60,7 +62,7 @@ namespace Server
         
     }
 
-    public class RemoteServer : MarshalByRefObject, IServer, IServerReplication
+    public class RemoteServer : MarshalByRefObject, IServer, IServerReplication, IGeneralControlServices
     {
         internal List<Client> clientList = new List<Client>();
         private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
@@ -68,7 +70,9 @@ namespace Server
         public delegate void delProcess(int playerNumber, string move);
 
         public ServerForm serverForm;
-        
+        public Dictionary<IServer, bool> serversConnected = new Dictionary<IServer, bool>();
+        public bool firstRound = true;
+
         public RemoteServer()
         {
             serverForm = new ServerForm(this);
@@ -258,12 +262,76 @@ namespace Server
 
         public void connect(string url)
         {
-            throw new NotImplementedException();
+            IServer serverProxy = (IServer)Activator.GetObject(
+                typeof(IServer),
+                url
+            );
+
+
+            //try catch missed
+            while (serverProxy != null)
+            {
+                try
+                {
+                    serverProxy.connect("SERVER", "tcp://" + Util.GetLocalIPAddress() + ":" + port + "/Server");
+                    serversConnected.Add(serverProxy,true);
+                    break;
+                }
+                catch
+                {       
+                    Thread.Sleep(1000);
+                }
+            }
+            serverProxy.SendFirstRound();
         }
 
         public void requestRound(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public void Freeze()
+        {
+            //TODO
+            throw new NotImplementedException();
+        }
+
+        public void Unfreeze()
+        {
+            //TODO
+            throw new NotImplementedException();
+        }
+
+        public void InjectDelay(string pid1, string pid2)
+        {
+            //TODO
+            throw new NotImplementedException();
+        }
+
+        public void newServerCreated(string serverURL)
+        {
+            connect(serverURL);
+        }
+
+        public void SendFirstRound(int roundID)
+        {
+
+            foreach (KeyValuePair<IServer, bool> entry in serversConnected)
+            {
+                if(entry.Value == true)
+                {
+                    entry.Key.UpdateBoard(roundID);
+                }
+            }
+
+
+        }
+
+        public void UpdateBoard(int roundID)
+        {
+
+
+
         }
     }
 }

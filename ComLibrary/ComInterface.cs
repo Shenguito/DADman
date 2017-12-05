@@ -14,6 +14,7 @@ namespace ComLibrary
         void sendMove(string nick, string direction);
         void sendCoinEaten(int playerNumber, string coinName);
         void sendPlayerDead(int playerNumber);
+        void SendFirstRound();
         
     }
     public interface IClient
@@ -43,6 +44,7 @@ namespace ComLibrary
         void Freeze();
         void Unfreeze();
         void InjectDelay(string pid1, string pid2);
+        void newServerCreated(string serverURL);
     }
     public interface IServerReplication
     {
