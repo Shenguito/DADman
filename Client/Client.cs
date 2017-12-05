@@ -407,7 +407,8 @@ namespace Client
         }
         public void newServerCreated(string serverURL)
         {
-            this.form.connectToServer(serverURL);
+
+            new Thread(() => this.form.connectToServer(serverURL)).Start();
         }
     }
 }

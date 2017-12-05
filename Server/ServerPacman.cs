@@ -15,12 +15,17 @@ using System.Windows.Forms;
 
 
 namespace Server {
+
     public partial class ServerForm : Form
     {
 
         public Dictionary<int, string> listMove = new Dictionary<int, string>();
         public List<int> deadPlayer;
+        
+
         public bool started = false;
+
+        string atecoin=" ";
 
         int roundID = 0;
 
@@ -59,6 +64,7 @@ namespace Server {
             InitializeComponent();
             listMove = new Dictionary<int, string>();
             deadPlayer = new List<int>();
+            
 
             this.server = remoteServer;
             this.timer1 = new System.Timers.Timer();
@@ -100,9 +106,8 @@ namespace Server {
                         {
                             
                             Controls.Remove(x);
-                           
                             coins_arg +="-" + x.Name;
-
+                            atecoin+="-"+x.Left+":"+x.Top;
                             sendCoinEaten(playerNumber, x.Name);
                         }
                     }
@@ -194,7 +199,6 @@ namespace Server {
                     else if (x is PictureBox && x.Tag == "coin")
                     {
                         sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
-                        
                     }
                     else if (x is PictureBox && x.Tag == "player1")
                     {
@@ -291,8 +295,6 @@ namespace Server {
                 {
                     pb.Left -= speed;
                     pb.Image = Properties.Resources.Left;
-
-                    
                 }
             }
             if (move.Equals("RIGHT"))
@@ -324,11 +326,30 @@ namespace Server {
 
         }
 
+        private string playerLocation()
+        {
+            string players=
+            pictureBoxPlayer1.Top+" "+
+            pictureBoxPlayer1.Left + " " +
+            pictureBoxPlayer2.Top + " " +
+            pictureBoxPlayer2.Left + " " +
+            pictureBoxPlayer3.Top + " " +
+            pictureBoxPlayer3.Left + " " +
+            pictureBoxPlayer4.Top + " " +
+            pictureBoxPlayer4.Left + " " +
+            pictureBoxPlayer5.Top + " " +
+            pictureBoxPlayer5.Left + " " +
+            pictureBoxPlayer6.Top + " " +
+            pictureBoxPlayer6.Left;
+            return players;
+        }
+
         private void processingTimer()
         {
             tbOutput.Text += ("Ronda " + roundID + " \r\n");
             //server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
-            //server.SendFirstRound(roundID, monsters_arg);
+
+            server.SendFirstRound(roundID, playerLocation(), monsters_arg, atecoin);
             server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
             roundID++;
 
@@ -343,7 +364,7 @@ namespace Server {
             updateGhostsPosition();
         }
 
-        public void updateBoard(int roundID, string pl , string monst, string coin)
+        public void UpdateBoard(int roundID, string pl , string monst, string coin)
         {
             this.roundID = roundID;
 
@@ -353,10 +374,11 @@ namespace Server {
 
             for (int i = 1; i < pl_tok.Length; i++)
             {
-                string[] each_player_parameters = pl_tok[i].Split(';');
-                PictureBox pb = getPictureBoxByName(each_player_parameters[0]);
-                pb.Left = Int32.Parse(each_player_parameters[2]);
-                pb.Top = Int32.Parse(each_player_parameters[3]);
+                string[] each_player_parameters = pl_tok[i].Split(' ');
+                PictureBox pb = getPictureBoxByName("pictureBoxPlayer"+i);
+                tbOutput.AppendText("\r\nPlayer: " + pb.Name);
+                pb.Left = Int32.Parse(each_player_parameters[0]);
+                pb.Top = Int32.Parse(each_player_parameters[1]);
             }
 
             //monsters_arg = redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
@@ -367,10 +389,11 @@ namespace Server {
             pinkGhost.Top = Int32.Parse(monst_tok[3]);
                 
 
-            for (int i = 0; i < coin_tok.Length; i++)
+            for (int i = 1; i < coin_tok.Length; i++)
             {
-                string[] each_coin = coin_tok[i].Split(';');
-                // TODO falta meter as coins no board. O problema é que recebes as coins que existem e nao as que faltam... Go Sheng!!
+                //TODO, already received ate coins by left:top
+                string[] each_coin = coin_tok[i].Split(':');
+                tbOutput.AppendText("\r\n"+coin_tok[i]);
             }
         }
 

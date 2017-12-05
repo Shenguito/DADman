@@ -87,7 +87,7 @@ namespace PuppetMaster
             {
                 if (!entry.Key.Equals(input[1]))
                 {
-                    new Thread(() => entry.Value.newServerCreated(serverURL)).Start();
+                    entry.Value.newServerCreated(serverURL);
                 }
             }
 

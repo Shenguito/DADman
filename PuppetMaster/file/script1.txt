@@ -6,7 +6,7 @@ Wait 1000
 LocalState S1 1
 LocalState C1 1
 LocalState C2 1
-Wait 5000
+Wait 500
 LocalState S1 20
 LocalState C1 20
 LocalState C2 20

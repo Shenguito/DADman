@@ -313,60 +313,28 @@ namespace Server
 
         public void newServerCreated(string serverURL)
         {
-            connect(serverURL);
+            new Thread(() => connect(serverURL)).Start();
         }
-
-        public void SendFirstRound(int roundID, string monsters_arg)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void SendFirstRound(int roundID, string player, string monsters_arg, string atecoin)
         {
-            string roundFile = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar + "bin" +
-                                Path.DirectorySeparatorChar + Program.SERVERNAME + Path.DirectorySeparatorChar + roundID;
-
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {
                 if (entry.Value == true)
                 {
-                    string pl = "";
-                    string monst = "";
-                    string coin = "";
-
-                    try
-                    {
-                        using (StreamReader sr = File.OpenText(roundFile))
-                        {
-                            string s = "";
-                            while ((s = sr.ReadLine()) != null)
-                            {
-                                string[] tok = s.Split(',');
-
-                                if (tok[0].Equals('C'))
-                                {
-                                    //ex. C;168;40
-                                    coin += "-" + tok[1] + ";" + tok[2];
-                                }else if (tok[0].Equals('M'))
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    //ex. P6;P;8;240
-                                    pl += "-"+tok[0] + ";" + tok[1] +";" + tok[2] + ";" + tok[3];
-                                }
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine("send first, Não consegui ler serverLog");
-                    }
-                    entry.Key.UpdateBoard(roundID, pl , monsters_arg, coin);
+                    entry.Key.UpdateBoard(roundID, player, monsters_arg, atecoin);
                 }
             }
+            /*
+            foreach (IServer key in serversConnected.Keys.ToList())
+                serversConnected[key] = false;
+                */
         }
 
         public void UpdateBoard(int roundID, string pl, string monst, string coin)
         {
 
-            serverForm.updateBoard(roundID,pl,monst,coin);
+            serverForm.UpdateBoard(roundID,pl,monst,coin);
         }
     }
 }
