@@ -14,7 +14,6 @@ namespace ComLibrary
         void sendMove(string nick, string direction);
         void sendCoinEaten(int playerNumber, string coinName);
         void sendPlayerDead(int playerNumber);
-        void SendFirstRound(int roundID);
         void UpdateBoard(int roundID, string pl, string monst, string coin);
 
 

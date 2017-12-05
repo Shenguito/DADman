@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace PuppetMaster
 {
@@ -84,9 +85,11 @@ namespace PuppetMaster
 
             foreach(KeyValuePair <string, IGeneralControlServices> entry in remotingProcesses)
             {
-                entry.Value.newServerCreated(serverURL);
+                if (!entry.Key.Equals(input[1]))
+                {
+                    new Thread(() => entry.Value.newServerCreated(serverURL)).Start();
+                }
             }
-
 
             try
             {
@@ -110,13 +113,16 @@ namespace PuppetMaster
             Console.WriteLine("StartClient");
             string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
 
-            if (serverURL != null)
+            if (serverURL != "")
             {
                 if(Util.ExtractIPFromURL(serverURL).Equals("localhost") ||
                     Util.ExtractIPFromURL(serverURL).Equals("127.0.0.1")){
                     argv += " " + "tcp://"+Util.GetLocalIPAddress()+":"+ Util.ExtractPortFromURL(serverURL) + "/Server";
                 }else
                 argv += " " + serverURL;
+            }else
+            {
+                argv += " null";
             }
             if (input.Length > 6)
                 argv += " " + input[6];

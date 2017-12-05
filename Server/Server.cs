@@ -40,9 +40,7 @@ namespace Server
         static TcpChannel channel = new TcpChannel(Program.PORT);
         
         public static string DIRECTORY = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar+"bin"+ Path.DirectorySeparatorChar + Program.SERVERNAME;
-
-       
-
+        
         public Server()
         {
             if (Directory.Exists(DIRECTORY))
@@ -78,6 +76,8 @@ namespace Server
         public ServerForm serverForm;
         public Dictionary<IServer, bool> serversConnected = new Dictionary<IServer, bool>();
         public bool firstRound = true;
+
+        private static int i = 1;
 
         public RemoteServer()
         {
@@ -146,20 +146,17 @@ namespace Server
                 }
             }
             */
+            
             int pl_number = player_image_hashmap[nick];
             try
             {
                 this.serverForm.listMove.Add(pl_number, move);
-               // Console.WriteLine("*** Recebi " + pl_number + " " + move);
-               // Console.WriteLine("*** " + this.serverForm.listMove.ToString());
-
-                foreach (KeyValuePair<int, string> entry in this.serverForm.listMove)
-                {
-                    Console.WriteLine("***"+ entry.Key + " " + entry.Value);
-                }
+                Console.WriteLine(i+"added: " + move + " to player " + pl_number);
+                i++;
             }
             catch
             {
+                //TODO error, solution, threadpool
                 Console.WriteLine("Client sent a move exception (Server sendMove(...))");
             }
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
@@ -319,53 +316,49 @@ namespace Server
             connect(serverURL);
         }
 
-        public void SendFirstRound(int roundID)
+        public void SendFirstRound(int roundID, string monsters_arg)
         {
-            string pl = "";
-            string monst = "";
-            string coin = "";
-
-
             string roundFile = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar + "bin" +
-                        Path.DirectorySeparatorChar + Program.SERVERNAME + Path.DirectorySeparatorChar + roundID;
-
-            try
-            {
-                using (StreamReader sr = File.OpenText(roundFile))
-                {
-                    string s = "";
-                    while ((s = sr.ReadLine()) != null)
-                    {
-                        string[] tok = s.Split(',');
-
-                        if (tok[0].Equals('C'))
-                        {
-                            //ex. C;168;40
-                            coin += tok[1] + ";" + tok[2] + "-";
-                        }else
-                        if (tok[0].Equals('M'))
-                        {
-                            //ex. M;241;172
-                            monst += tok[1] + ";" + tok[2] + "-";
-                        }
-                        else
-                        {
-                            //ex. P6;P;8;240
-                            pl += tok[0] + ";" + tok[1] +";" + tok[2] + ";" + tok[3] + "-";
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                Console.WriteLine("Não consegui ler serverLog");
-            }
+                                Path.DirectorySeparatorChar + Program.SERVERNAME + Path.DirectorySeparatorChar + roundID;
 
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {
-                if(entry.Value == true)
+                if (entry.Value == true)
                 {
-                    entry.Key.UpdateBoard(roundID, pl ,monst, coin);
+                    string pl = "";
+                    string monst = "";
+                    string coin = "";
+
+                    try
+                    {
+                        using (StreamReader sr = File.OpenText(roundFile))
+                        {
+                            string s = "";
+                            while ((s = sr.ReadLine()) != null)
+                            {
+                                string[] tok = s.Split(',');
+
+                                if (tok[0].Equals('C'))
+                                {
+                                    //ex. C;168;40
+                                    coin += "-" + tok[1] + ";" + tok[2];
+                                }else if (tok[0].Equals('M'))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    //ex. P6;P;8;240
+                                    pl += "-"+tok[0] + ";" + tok[1] +";" + tok[2] + ";" + tok[3];
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine("send first, Não consegui ler serverLog");
+                    }
+                    entry.Key.UpdateBoard(roundID, pl , monsters_arg, coin);
                 }
             }
         }
@@ -374,7 +367,6 @@ namespace Server
         {
 
             serverForm.updateBoard(roundID,pl,monst,coin);
-
         }
     }
 }

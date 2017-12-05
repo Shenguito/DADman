@@ -91,17 +91,21 @@ namespace Client {
             );
 
             connectToServer(Program.SERVERURL);
-
             
         }
 
         public void connectToServer(string serverURL)
         {
-            serverProxy = (IServer)Activator.GetObject(
-               typeof(IServer),
-               serverURL
-           );
-
+            if (!serverURL.Equals("null")) {
+                serverProxy = (IServer)Activator.GetObject(
+                   typeof(IServer),
+                   serverURL
+                );
+            }
+            else
+            {
+                serverProxy = null;
+            }
 
             //try catch missed
             while (serverProxy != null)
