@@ -72,13 +72,13 @@ namespace Client
         private delegate void GetCustomerByIdDelegate(int intCustId);
 
         public static int clientMessageId = 1;
-        String nick;
+        string nick;
         public static int totalMessageId = 0;
         ConnectedClient lider;
         Dictionary<int, string> nickLog;
         Dictionary<int, string> msgLog;
         Dictionary<int, string> msgQueue;
-        Boolean activeThread = false;
+        bool activeThread = false;
 
         public ClientForm form;
 
@@ -89,6 +89,7 @@ namespace Client
         private delegate void ReceiveDelegate(string param1, int param2, ArrayList list);
         public RemoteClient(ClientForm form)
         {
+            
             updateLog = new Dictionary<int, string>();
             msgLog = new Dictionary<int, string>();
             nickLog = new Dictionary<int, string>();

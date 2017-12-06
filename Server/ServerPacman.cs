@@ -388,8 +388,8 @@ namespace Server {
                 PictureBox pb = getPictureBoxByName(coin_tok[i]);
                 pb.Visible = false;
             }
-            //timer1.Elapsed += timer1_Tick;
-            //timer1.Start();
+            timer1.Elapsed += timer1_Tick;
+            timer1.Start();
         }
 
         public void timer1_Tick(object sender, EventArgs e)
