@@ -148,7 +148,7 @@ namespace Client
             }
             if (!dead)
             {
-                {
+
                     foreach (KeyValuePair<string, IServer> entry in serversConnected) {
                         if (move.Equals("LEFT"))
                         {
@@ -322,11 +322,6 @@ namespace Client
             {
                 Console.WriteLine("Debug: " + exception.ToString());
             }
-        }
-
-        public void updateChat(string nick, string msg)
-        {
-            tbChat.Text += nick + ": " + msg + "\r\n";
         }
 
             //TODO receber messageID, Player+Move, Ghost+move
