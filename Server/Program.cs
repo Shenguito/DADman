@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ComLibrary;
 
 namespace Server
 {
     class Program
     {
+
         public static string SERVERNAME = "";
         public static int PORT=0;
         public static int MSSEC = 0;
@@ -16,6 +18,7 @@ namespace Server
         
         static void Main(string[] args)
         {
+            
             if (args.Length != 0)
             {
                 SERVERNAME = args[0].Trim();
@@ -29,6 +32,21 @@ namespace Server
             Console.WriteLine("info: " + args[4].Trim());
             new Server();
             Console.ReadLine();
+            
+
+            /* TODO, TESTING THREADPOOL
+            //ThrPool(thread, task);
+            ThrPool tpool = new ThrPool(1, 10);
+            //ThrWork work = null;
+            for (int i = 0; i < 5; i++)
+            {
+                A a = new A(i);
+                tpool.AssyncInvoke(new ThrWork(a.DoWorkA));
+                B b = new B(i);
+                tpool.AssyncInvoke(new ThrWork(b.DoWorkB));
+            }
+            Console.ReadLine();
+            */
         }
     }
 }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ComLibrary
 {
-    //TODO
-    delegate void ThrWork();
+    
+    public delegate void ThrWork();
 
-    class ThrPool
+    public class ThrPool
     {
         private CircularBuffer<ThrWork> buf;
         private Thread[] pool;
@@ -113,7 +113,7 @@ namespace ComLibrary
     }
 
 
-    class A
+    public class A
     {
         private int _id;
 
@@ -129,7 +129,7 @@ namespace ComLibrary
     }
 
 
-    class B
+    public class B
     {
         private int _id;
 
@@ -143,22 +143,5 @@ namespace ComLibrary
             Console.WriteLine("B-{0}", _id);
         }
     }
-    /*
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            ThrPool tpool = new ThrPool(5, 10);
-            //ThrWork work = null;
-            for (int i = 0; i < 5; i++)
-            {
-                A a = new A(i);
-                tpool.AssyncInvoke(new ThrWork(a.DoWorkA));
-                B b = new B(i);
-                tpool.AssyncInvoke(new ThrWork(b.DoWorkB));
-            }
-            Console.ReadLine();
-        }
-    }
-    */
+    
 }

@@ -318,7 +318,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void SendFirstRound(int roundID, string player, string monsters_arg, string atecoin)
         {
-            
+            /*TODO, fix the problem
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {
                 if (entry.Value == true)
@@ -326,6 +326,7 @@ namespace Server
                     entry.Key.UpdateBoard(roundID, player, monsters_arg, atecoin);
                 }
             }
+            */
             /*
             var keys = serversConnected.Keys.ToList();
             for (int i = 0; i < keys.Count; i++)
@@ -339,7 +340,6 @@ namespace Server
 
         public void UpdateBoard(int roundID, string pl, string monst, string coin)
         {
-
             serverForm.UpdateBoard(roundID,pl,monst,coin);
         }
     }

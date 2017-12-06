@@ -26,11 +26,7 @@ namespace Client
     public delegate void delImageVisible(int playerNumber);
     public delegate void delDebug(string msg);
     public delegate void delLider(ConnectedClient nick);
-
-
-
-
-
+    
 
     class Client
     {
@@ -72,6 +68,8 @@ namespace Client
 
     public class RemoteClient : MarshalByRefObject, IClient, IGeneralControlServices
     {
+        //CREATE DELEGATE
+        private delegate void GetCustomerByIdDelegate(int intCustId);
 
         public static int clientMessageId = 1;
         String nick;
@@ -285,8 +283,8 @@ namespace Client
                 updateLog.Add(roundID, players_arg + " " + dead_arg + " " + monster_arg + " " + coins_arg);
                 return;
             }
-            //TODO roundID received by server
 
+            //TODO roundID received by server
             form.writeToFile(roundID);
 
         }
