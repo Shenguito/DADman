@@ -327,19 +327,13 @@ namespace Server {
 
         public string playerLocation()
         {
-            string players=
-            pictureBoxPlayer1.Top+" "+
-            pictureBoxPlayer1.Left + " " +
-            pictureBoxPlayer2.Top + " " +
-            pictureBoxPlayer2.Left + " " +
-            pictureBoxPlayer3.Top + " " +
-            pictureBoxPlayer3.Left + " " +
-            pictureBoxPlayer4.Top + " " +
-            pictureBoxPlayer4.Left + " " +
-            pictureBoxPlayer5.Top + " " +
-            pictureBoxPlayer5.Left + " " +
-            pictureBoxPlayer6.Top + " " +
-            pictureBoxPlayer6.Left;
+            string players = "";
+            for (int i=1; i <= server.numberPlayersConnected; i++)
+            {
+                players += "-"+
+                    getPictureBoxByName("pictureBoxPlayer"+i).Top + ":" +
+                    getPictureBoxByName("pictureBoxPlayer" + i).Left;
+            }
             return players;
         }
 
@@ -371,14 +365,13 @@ namespace Server {
             string[] pl_tok = pl.Split('-');
             
             string[] coin_tok = coin.Split('-');
-
+            
             for (int i = 1; i < pl_tok.Length; i++)
             {
-                string[] each_player_parameters = pl_tok[i].Split(' ');
                 PictureBox pb = getPictureBoxByName("pictureBoxPlayer"+i);
-                tbOutput.AppendText("\r\nPlayer: " + pb.Name);
-                pb.Left = Int32.Parse(each_player_parameters[0]);
-                pb.Top = Int32.Parse(each_player_parameters[1]);
+                pb.Top = Int32.Parse(pl_tok[i].Split(':')[0]);
+                pb.Left = Int32.Parse(pl_tok[i].Split(':')[1]);
+                pb.Visible = true;
             }
 
             //monsters_arg = redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
@@ -395,6 +388,8 @@ namespace Server {
                 PictureBox pb = getPictureBoxByName(coin_tok[i]);
                 pb.Visible = false;
             }
+            //timer1.Elapsed += timer1_Tick;
+            //timer1.Start();
         }
 
         public void timer1_Tick(object sender, EventArgs e)

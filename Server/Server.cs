@@ -362,6 +362,10 @@ namespace Server
 
         public void UpdateBoard(int roundID, string pl, string monst, string coin, string deadplayers)
         {
+            Console.WriteLine("player: " + pl);
+            Console.WriteLine("monster: " + monst);
+            Console.WriteLine("coin: " + coin);
+            Console.WriteLine("dead player: " + deadplayers);
             serverForm.UpdateBoard(roundID,pl,monst,coin, deadplayers);
         }
     }
