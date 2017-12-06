@@ -27,6 +27,7 @@ namespace PuppetMaster
         private Dictionary<string, IPuppetMasterLauncher> pcs;
         private Dictionary<string, IGeneralControlServices> remotingProcesses;
         private string serverURL="";
+        private string serverName = "";
         public ProcessLaucher()
         {
             processes = new Dictionary<string, Process>();
@@ -80,17 +81,28 @@ namespace PuppetMaster
             Console.WriteLine("StartServer");
             string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
 
-            //TODO, SEND URL OF ALL SERVERS CREATED
+            
             serverURL = input[3].Trim();
-
-            foreach(KeyValuePair <string, IGeneralControlServices> entry in remotingProcesses)
+            if (Util.ExtractIPFromURL(serverURL).Equals("localhost") ||
+                    Util.ExtractIPFromURL(serverURL).Equals("127.0.0.1"))
+            {
+                serverURL = " " + "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(serverURL) + "/Server";
+            }
+            serverName += "-" + input[1].Trim() + "_" + input[3].Trim();
+            foreach (KeyValuePair<string, IGeneralControlServices> entry in remotingProcesses)
             {
                 if (!entry.Key.Equals(input[1]))
                 {
-                    entry.Value.newServerCreated(serverURL);
+                    try
+                    {
+                        entry.Value.newServerCreated(input[1].Trim(), serverURL.Trim());
+                    }
+                    catch
+                    {
+                        Console.WriteLine("new server error");
+                    }
                 }
             }
-
             try
             {
                 if (Util.ExtractIPFromURL(input[3]).Equals("localhost")||
@@ -105,6 +117,7 @@ namespace PuppetMaster
             {
                 Console.WriteLine("Create PCS or Server error-> " + e.ToString());
             }
+
             
         }
         public void startClient(string[] input)
@@ -115,11 +128,7 @@ namespace PuppetMaster
 
             if (serverURL != "")
             {
-                if(Util.ExtractIPFromURL(serverURL).Equals("localhost") ||
-                    Util.ExtractIPFromURL(serverURL).Equals("127.0.0.1")){
-                    argv += " " + "tcp://"+Util.GetLocalIPAddress()+":"+ Util.ExtractPortFromURL(serverURL) + "/Server";
-                }else
-                argv += " " + serverURL;
+                argv += " " + serverName;
             }else
             {
                 argv += " null";

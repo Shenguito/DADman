@@ -25,7 +25,7 @@ namespace Client {
 
         string nickname;
         public int port;
-        bool started = false;
+        public bool started = false;
         bool dead = false;
         bool sent = false;
         public bool freeze = false;
@@ -50,11 +50,10 @@ namespace Client {
         ConnectedClient lider;
 
         private  TcpChannel channel;
-        IServer serverProxy;
 
         public List<ConnectedClient> clients;
 
-        public List<IServer> serversConnected = new List<IServer>();
+        public Dictionary<string, IServer> serversConnected = new Dictionary<string, IServer>();
 
 
         public ClientForm() {
@@ -77,8 +76,7 @@ namespace Client {
             this.port = Program.PORT;
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
-
-
+            
 
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(this);
@@ -89,31 +87,37 @@ namespace Client {
                 clientServiceName,
                 typeof(RemoteClient)
             );
-
-            connectToServer(Program.SERVERURL);
-
+            try
+            {
+                if (Program.SERVERURL != "")
+                {
+                    string[] serv = Program.SERVERURL.Split('-');
+                    for (int i = 1; i < serv.Length; i++)
+                    {
+                        connectToServer(serv[i].Split('_')[0], serv[i].Split('_')[1]);
+                    }
+                }
+            }
+            catch { tbChat.AppendText("Catched"); }
+            
         }
 
-        public void connectToServer(string serverURL)
+        public void connectToServer(string servername, string serverURL)
         {
-            if (!serverURL.Equals("null")) {
-                serverProxy = (IServer)Activator.GetObject(
-                   typeof(IServer),
-                   serverURL
-                );
-            }
-            else
-            {
-                serverProxy = null;
-            }
-
             //try catch missed
-            while (serverProxy != null)
+            IServer serverProxy = null;
+            while (serverProxy == null)
             {
+                //TODO, CONNECT TO THE SERVER PROBLEM, WHEN SERVER STARTED BEFORE OR AFTER
+
                 try
                 {
-                    serverProxy.connect(nickname, "tcp://" + Util.GetLocalIPAddress() + ":" + port + "/Client");
-                    serversConnected.Add(serverProxy);
+                    serverProxy = (IServer)Activator.GetObject(
+                    typeof(IServer),
+                    serverURL);
+
+                    serverProxy.connectClient(nickname, "tcp://" + Util.GetLocalIPAddress() + ":" + port + "/Client");
+                    serversConnected.Add(servername, serverProxy);
                     break;
                 }
                 catch
@@ -140,25 +144,25 @@ namespace Client {
             }
             if (!dead)
             {
-                foreach (IServer serverProxy in serversConnected) {
+                foreach (KeyValuePair<string, IServer> entry in serversConnected) {
                     if (move.Equals("LEFT"))
                     {
-                        serverProxy.sendMove(nickname, "LEFT");
+                        entry.Value.sendMove(nickname, "LEFT");
                         sent = true;
                     }
                     else if (move.Equals("RIGHT"))
                     {
-                        serverProxy.sendMove(nickname, "RIGHT");
+                        entry.Value.sendMove(nickname, "RIGHT");
                         sent = true;
                     }
                     else if (move.Equals("UP"))
                     {
-                        serverProxy.sendMove(nickname, "UP");
+                        entry.Value.sendMove(nickname, "UP");
                         sent = true;
                     }
                     else if (move.Equals("DOWN"))
                     {
-                        serverProxy.sendMove(nickname, "DOWN");
+                        entry.Value.sendMove(nickname, "DOWN");
                         sent = true;
                     }
                 }
@@ -173,26 +177,26 @@ namespace Client {
                 {
                     if (!dead)
                     {
-                        foreach (IServer serverProxy in serversConnected)
+                        foreach (KeyValuePair<string, IServer> entry in serversConnected)
                         {
                             if (e.KeyCode == Keys.Left)
                             {
-                                serverProxy.sendMove(nickname, "LEFT");
+                                entry.Value.sendMove(nickname, "LEFT");
                                 sent = true;
                             }
                             if (e.KeyCode == Keys.Right)
                             {
-                                serverProxy.sendMove(nickname, "RIGHT");
+                                entry.Value.sendMove(nickname, "RIGHT");
                                 sent = true;
                             }
                             if (e.KeyCode == Keys.Up)
                             {
-                                serverProxy.sendMove(nickname, "UP");
+                                entry.Value.sendMove(nickname, "UP");
                                 sent = true;
                             }
                             if (e.KeyCode == Keys.Down)
                             {
-                                serverProxy.sendMove(nickname, "DOWN");
+                                entry.Value.sendMove(nickname, "DOWN");
                                 sent = true;
                             }
                         }
@@ -379,18 +383,20 @@ namespace Client {
 
         internal void startGame(int playerNumbers)
         {
-            for (int i = 2; i <= playerNumbers; i++)
-                getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
-            started = true;
+            if (!started)
+            {
+                for (int i = 2; i <= playerNumbers; i++)
+                    getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
+                started = true;
 
-            getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
-            tbChat.Text += "My Number " + myNumber;
+                getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
+                tbChat.Text += "My Number " + myNumber;
 
 
 
-            Thread thread = new Thread(() => doWork());
-            thread.Start();
-
+                Thread thread = new Thread(() => doWork());
+                thread.Start();
+            }
         }
 
         private void doWork()

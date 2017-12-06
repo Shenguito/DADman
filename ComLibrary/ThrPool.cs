@@ -21,7 +21,7 @@ namespace ComLibrary
             pool = new Thread[thrNum];
             for(int i=0; i<pool.Length; i++)
             {
-                //ThreadStart
+                //ThreadStart, this thread may have at most 25 threads
                 pool[i] = new Thread(new ThreadStart(consomeExec));
                 pool[i].Start();
             }
@@ -78,6 +78,7 @@ namespace ComLibrary
             }
             public T Consume()
             {
+                Thread.Sleep(3000);
                 T o;
                 lock (this)
                 {

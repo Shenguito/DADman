@@ -86,11 +86,10 @@ namespace Client
         bool delay = false;
         Dictionary<int, string> updateLog;
 
-
+        private delegate void ReceiveDelegate(string param1, int param2, ArrayList list);
         public RemoteClient(ClientForm form)
         {
             updateLog = new Dictionary<int, string>();
-
             msgLog = new Dictionary<int, string>();
             nickLog = new Dictionary<int, string>();
             msgQueue = new Dictionary<int, string>();
@@ -142,7 +141,7 @@ namespace Client
                 string[] tok_moves = players_arg.Split('-');
                 for (int i = 1; i < tok_moves.Length; i++)
                 {
-                    this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
+                    form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
                 }
             }
             if (dead_arg != "")
@@ -150,16 +149,24 @@ namespace Client
                 string[] tok_dead = dead_arg.Split('-');
                 for (int i = 1; i < tok_dead.Length; i++)
                 {
-                    this.form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
+                    form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
                 }
             }
 
         }
-
         public void moveGhost(int roundID, string monster_arg)
         {
             string[] monst_tok = monster_arg.Split(':');
-            this.form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { Int32.Parse(monst_tok[0]), Int32.Parse(monst_tok[1]), Int32.Parse(monst_tok[2]), Int32.Parse(monst_tok[3]) });
+            form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { Int32.Parse(monst_tok[0]), Int32.Parse(monst_tok[1]), Int32.Parse(monst_tok[2]), Int32.Parse(monst_tok[3]) });
+        }
+        public void coinEaten(int roundID, string coins_arg)
+        {
+            string[] coin_tok = coins_arg.Split('-');
+
+            for (int i = 1; i < coin_tok.Length; i++)
+            {
+                form.Invoke(new delCoin(form.updateCoin), new object[] { coin_tok[i] });
+            }
         }
 
         //TODO CHAT, every connected client receive the message, and then decide which message show broadcast
@@ -192,16 +199,6 @@ namespace Client
             }
         }
 
-        public void coinEaten(int roundID, string coins_arg)
-        {
-            string[] coin_tok = coins_arg.Split('-');
-
-            for (int i = 1; i < coin_tok.Length; i++)
-            {
-                this.form.Invoke(new delCoin(form.updateCoin), new object[] { coin_tok[i] });
-            }
-        }
-
         public void playerDead(int playerNumber)
         {
             this.form.Invoke(new delDead(form.updateDead), new object[] { playerNumber });
@@ -212,7 +209,7 @@ namespace Client
             // Remember: in the server we sent arg as:
             // "-" +c.nick+":"+ c.playernumber + ":" + c.url
             // in for nick=c[0] playernumber=c[1] url=c[2]
-            if (arg != null)
+            if (arg != null&&!form.started)
             {
 
                 string[] rawClient = arg.Split('-');
@@ -259,6 +256,11 @@ namespace Client
 
         public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
         {
+            /*TODO1, thread
+             * if freeze, add to queue 
+             * if !freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID) wait
+             * if !freeze run delegate function
+             */
             while (!freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID))
             {
                 form.debugFunction("\r\n Let's Sleep");
@@ -463,9 +465,9 @@ namespace Client
             delay = true;
             form.debugFunction("\r\nInjected Delay from "+pid1+" to "+pid2);
         }
-        public void newServerCreated(string serverURL)
+        public void newServerCreated(string servername, string serverURL)
         {
-            new Thread(() => this.form.connectToServer(serverURL)).Start();
+            new Thread(() => this.form.connectToServer(servername, serverURL)).Start();
         }
     }
 }

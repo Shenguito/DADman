@@ -22,21 +22,22 @@ namespace Server
             if (args.Length != 0)
             {
                 SERVERNAME = args[0].Trim();
-                PORT= Int32.Parse(args[2].Split(':')[2].Split('/')[0]);
+                PORT = Int32.Parse(Util.ExtractPortFromURL(args[2].Trim()).Trim());
                 MSSEC = Int32.Parse(args[3].Trim());
                 PLAYERNUMBER = Int32.Parse(args[4].Trim());
             }
-            Console.WriteLine("info: "+ args[0].Trim());
-            Console.WriteLine("info: " + args[2].Split(':')[2].Split('/')[0]);
-            Console.WriteLine("info: " + args[3].Trim());
-            Console.WriteLine("info: " + args[4].Trim());
+            Console.WriteLine("info: "+ SERVERNAME);
+            Console.WriteLine("info: " + PORT);
+            Console.WriteLine("info: " + MSSEC);
+            Console.WriteLine("info: " + PLAYERNUMBER);
             new Server();
             Console.ReadLine();
-            
 
-            /* TODO, TESTING THREADPOOL
+
+            /*TODO, TESTING THREADPOOL
+
             //ThrPool(thread, task);
-            ThrPool tpool = new ThrPool(1, 10);
+            ThrPool tpool = new ThrPool(5, 10);
             //ThrWork work = null;
             for (int i = 0; i < 5; i++)
             {

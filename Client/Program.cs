@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ComLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace Client {
             if (args.Length != 0)
             {
                 PLAYERNAME = args[0].Trim();
-                PORT = Int32.Parse(args[2].Split(':')[2].Split('/')[0]);
+                PORT = Int32.Parse(Util.ExtractPortFromURL(args[2]).Trim());
                 //MSSEC = Int32.Parse(args[3].Trim());
                 //PLAYERNUMBER = Int32.Parse(args[4].Trim());
                 SERVERURL = args[5].Trim();

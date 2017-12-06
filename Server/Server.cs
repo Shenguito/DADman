@@ -37,15 +37,15 @@ namespace Server
     {
         private int MSECROUND = Program.MSSEC; //game speed [communication refresh time]
 
-        static TcpChannel channel = new TcpChannel(Program.PORT);
+        private TcpChannel channel;
         
         public static string DIRECTORY = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar+"bin"+ Path.DirectorySeparatorChar + Program.SERVERNAME;
         
         public Server()
         {
+            channel = new TcpChannel(Program.PORT);
             if (Directory.Exists(DIRECTORY))
             {
-                
                 Directory.Delete(DIRECTORY, true);
                 Console.WriteLine("Deleted: " + DIRECTORY);
             }
@@ -74,8 +74,8 @@ namespace Server
         public delegate void delProcess(int playerNumber, string move);
 
         public ServerForm serverForm;
-        public Dictionary<IServer, bool> serversConnected = new Dictionary<IServer, bool>();
-        public bool firstRound = true;
+        public Dictionary<string, IServerReplication> serversConnected = new Dictionary<string, IServerReplication>();
+        public bool firstServer=true;
 
         private static int i = 1;
 
@@ -84,7 +84,6 @@ namespace Server
             serverForm = new ServerForm(this);
             Thread thread = new Thread(() => createServerForm());
             thread.Start();
-          
         }
 
         private void createServerForm()
@@ -95,7 +94,7 @@ namespace Server
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void connect(string nick, string url)
+        public void connectClient(string nick, string url)
         {
             Client c = new Client();
             
@@ -126,7 +125,8 @@ namespace Server
             assignPlayer(c);
             if (numberPlayersConnected == Program.PLAYERNUMBER)
             {
-                Thread thread = new Thread(() => sendStartGame());
+                //TODO3, fix when a server start don't startgame before knowing if he is the first
+                Thread thread = new Thread(() =>  sendStartGame());
                 thread.Start();
             }
 
@@ -200,7 +200,7 @@ namespace Server
             
             foreach (Client c in clientList)
             {
-                //TODO, WHETHER NEED A THREAD TO RECEIVE ROUND UPDATE
+                //TODO1, WHETHER NEED A THREAD TO RECEIVE ROUND UPDATE, probably a delegate
                 //new Thread(() => 
                 //if(c.connected)
                 try
@@ -238,21 +238,23 @@ namespace Server
         
         public void sendStartGame()
         {
-            
+            Thread.Sleep(1000);
+            if (firstServer)
+            {
                 string arg = " ";
                 foreach (Client c in clientList)
                 {
-                    arg += "-" +c.nick+"_"+ c.playernumber + "_" + c.url;
+                    arg += "-" + c.nick + "_" + c.playernumber + "_" + c.url;
                 }
                 foreach (Client c in clientList)
                 {
-                    Console.WriteLine("SERVER: startGame:"+ arg);
+                    Console.WriteLine("SERVER: startGame:" + arg);
                     try
                     {
                         c.clientProxy.startGame(numberPlayersConnected, arg);
                     }
-                  
-                    catch(Exception e)
+
+                    catch (Exception e)
                     {
                         Console.WriteLine("Exception on sendStartGame: " + e);
                     }
@@ -260,29 +262,48 @@ namespace Server
 
                 this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
                 Console.WriteLine("Game started!");
-            
+                
+            }
         }
 
-        public void connect(string url)
+        public void receiveServer(string name, string url, int roundId, string players, string monsters, string atecoins, string deadplayers)
         {
-            IServer serverProxy = (IServer)Activator.GetObject(
-                typeof(IServer),
+            Console.WriteLine("ConnectServer........");
+            firstServer = false;
+            UpdateBoard(roundId, players, monsters, atecoins, deadplayers);
+            try
+            {
+                IServerReplication serverProxy = (IServerReplication)Activator.GetObject(
+                typeof(IServerReplication),
+                url);
+                serversConnected.Add(name, serverProxy);
+            }
+            catch
+            {
+                Console.WriteLine("Received Server error...");
+            }
+        }
+
+        public void connectServer(string name, string url)
+        {
+            IServerReplication serverProxy = (IServerReplication)Activator.GetObject(
+                typeof(IServerReplication),
                 url
             );
-
-
-            //try catch missed
             while (serverProxy != null)
             {
                 try
                 {
-                    serverProxy.connect("SERVER", "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(url) + "/Server");
-                    serversConnected.Add(serverProxy,true);
+                    Console.WriteLine("ConnectServer........");
+                    serversConnected.Add(name, serverProxy);
+                    serverProxy.receiveServer(Program.SERVERNAME, "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(url) + "/Server",
+                        serverForm.roundID, serverForm.playerLocation(),
+                        serverForm.lastMonster, serverForm.atecoin, serverForm.lastDeadPlayer);
                     break;
                 }
                 catch
                 {       
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
             }
             
@@ -311,13 +332,14 @@ namespace Server
             throw new NotImplementedException();
         }
 
-        public void newServerCreated(string serverURL)
+        public void newServerCreated(string serverName, string serverURL)
         {
-            new Thread(() => connect(serverURL)).Start();
+            new Thread(() => connectServer(serverName, serverURL)).Start();
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void SendFirstRound(int roundID, string player, string monsters_arg, string atecoin)
         {
+            //NOT USED YET
             /*TODO, fix the problem
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {
@@ -338,9 +360,9 @@ namespace Server
                 */
         }
 
-        public void UpdateBoard(int roundID, string pl, string monst, string coin)
+        public void UpdateBoard(int roundID, string pl, string monst, string coin, string deadplayers)
         {
-            serverForm.UpdateBoard(roundID,pl,monst,coin);
+            serverForm.UpdateBoard(roundID,pl,monst,coin, deadplayers);
         }
     }
 }

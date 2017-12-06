@@ -1,5 +1,5 @@
-StartClient C1 tcp://localhost:11000/PCS tcp://localhost:30001/Client 200 2 C1.csv
-StartClient C2 tcp://localhost:11000/PCS tcp://localhost:30002/Client 200 2 C2.csv
+StartClient C1 tcp://localhost:11000/PCS tcp://localhost:30001/Client 200 2
+StartClient C2 tcp://localhost:11000/PCS tcp://localhost:30002/Client 200 2
 StartServer S1 tcp://localhost:11000/PCS tcp://localhost:20001/Server 200 2
 GlobalStatus
 Wait 1000

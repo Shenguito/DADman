@@ -25,9 +25,9 @@ namespace Server {
 
         public bool started = false;
 
-        string atecoin=" ";
+        public string atecoin=" ";
 
-        int roundID = 0;
+        public int roundID = 0;
 
         int boardRight = 320;
         int boardBottom = 320;
@@ -39,7 +39,9 @@ namespace Server {
         string dead_arg = "";
         string monsters_arg = "";
         string coins_arg = "";
-        
+
+        public string lastMonster = "";
+        public string lastDeadPlayer = "";
 
         //TO define when the game is over
         int total_coins = 61;
@@ -74,9 +76,6 @@ namespace Server {
             {
                 this.timer1.Interval = 2000;
             }
-
-            
-            
 
             tbOutput.Text += "ServerForm criado." + timer1.ToString(); ;
 
@@ -326,7 +325,7 @@ namespace Server {
 
         }
 
-        private string playerLocation()
+        public string playerLocation()
         {
             string players=
             pictureBoxPlayer1.Top+" "+
@@ -348,8 +347,9 @@ namespace Server {
         {
             tbOutput.Text += ("Ronda " + roundID + " \r\n");
             //server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
-
-            server.SendFirstRound(roundID, playerLocation(), monsters_arg, atecoin);
+            lastMonster = monsters_arg;
+            lastDeadPlayer = dead_arg;
+            //server.SendFirstRound(roundID, playerLocation(), monsters_arg, atecoin);
             server.sendRoundUpdate(roundID, players_arg, dead_arg, monsters_arg, coins_arg);
             roundID++;
 
@@ -364,7 +364,7 @@ namespace Server {
             updateGhostsPosition();
         }
 
-        public void UpdateBoard(int roundID, string pl , string monst, string coin)
+        public void UpdateBoard(int roundID, string pl , string monst, string coin, string deadplayers)
         {
             this.roundID = roundID;
 
@@ -410,7 +410,6 @@ namespace Server {
 
             timer1.Elapsed += timer1_Tick;
             timer1.Start();
-
         }
 
         //Get Picture by String
