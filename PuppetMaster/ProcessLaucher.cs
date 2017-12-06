@@ -248,24 +248,30 @@ namespace PuppetMaster
         }
         public void crash(string pid)
         {
-            if (processes[pid] != null)
+            try
+            {
+                if (processes[pid] != null)
+                {
+                    try
+                    {
+                        processes[pid].Kill();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Already killed");
+                    }
+                }
+            }
+            catch
             {
                 try
                 {
-                    processes[pid].Kill();
+                    pcs[pid].crashProcess(pid);
                 }
                 catch
                 {
-                    Console.WriteLine("Already killed");
+                    Console.WriteLine("Pid invalid...");
                 }
-            }
-            else if (pcs[pid] != null)
-            {
-                pcs[pid].crashProcess(pid);
-            }
-            else
-            {
-                Console.WriteLine("PID invalid");
             }
         }
         public void check()
