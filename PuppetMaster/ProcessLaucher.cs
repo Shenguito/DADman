@@ -88,7 +88,7 @@ namespace PuppetMaster
             {
                 serverURL = " " + "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(serverURL) + "/Server";
             }
-            serverName += "-" + input[1].Trim() + "_" + input[3].Trim();
+            serverName += "-" + input[1].Trim() + "_" + serverURL.Trim();
             foreach (KeyValuePair<string, IGeneralControlServices> entry in remotingProcesses)
             {
                 if (!entry.Key.Equals(input[1]))
