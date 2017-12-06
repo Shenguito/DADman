@@ -18,8 +18,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.FileIO;
 
-namespace Client {
-    public partial class ClientForm : Form {
+namespace Client
+{
+    public partial class ClientForm : Form
+    {
 
         public int myNumber = 1;
 
@@ -49,15 +51,16 @@ namespace Client {
         Dictionary<string, int> delayLog;
         ConnectedClient lider;
 
-        private  TcpChannel channel;
+        private TcpChannel channel;
 
         public List<ConnectedClient> clients;
 
         public Dictionary<string, IServer> serversConnected = new Dictionary<string, IServer>();
 
 
-        public ClientForm() {
-
+        public ClientForm()
+        {
+          
             nickname = Program.PLAYERNAME;
             clients = new List<ConnectedClient>();
             delayLog = new Dictionary<string, int>();
@@ -76,7 +79,8 @@ namespace Client {
             this.port = Program.PORT;
             channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
-            
+
+
 
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(this);
@@ -99,7 +103,7 @@ namespace Client {
                 }
             }
             catch { tbChat.AppendText("Catched"); }
-            
+
         }
 
         public void connectToServer(string servername, string serverURL)
@@ -144,161 +148,179 @@ namespace Client {
             }
             if (!dead)
             {
-                foreach (KeyValuePair<string, IServer> entry in serversConnected) {
-                    if (move.Equals("LEFT"))
-                    {
-                        entry.Value.sendMove(nickname, "LEFT");
-                        sent = true;
-                    }
-                    else if (move.Equals("RIGHT"))
-                    {
-                        entry.Value.sendMove(nickname, "RIGHT");
-                        sent = true;
-                    }
-                    else if (move.Equals("UP"))
-                    {
-                        entry.Value.sendMove(nickname, "UP");
-                        sent = true;
-                    }
-                    else if (move.Equals("DOWN"))
-                    {
-                        entry.Value.sendMove(nickname, "DOWN");
-                        sent = true;
-                    }
+                {
+                    foreach (KeyValuePair<string, IServer> entry in serversConnected) {
+                        if (move.Equals("LEFT"))
+                        {
+                            entry.Value.sendMove(nickname, "LEFT");
+                            sent = true;
+                        }
+                        else if (move.Equals("RIGHT"))
+                        {
+                            entry.Value.sendMove(nickname, "RIGHT");
+                            sent = true;
+                        }
+                        else if (move.Equals("UP"))
+                        {
+                            entry.Value.sendMove(nickname, "UP");
+                            sent = true;
+                        }
+                        else if (move.Equals("DOWN"))
+                        {
+                            entry.Value.sendMove(nickname, "DOWN");
+                            sent = true;
+                        }
                 }
             }
         }
 
 
-        //Todo, sending only if he can
-        private void keyisdown(object sender, KeyEventArgs e) {
-            if (!sent && !freeze)
-                if (started)
-                {
-                    if (!dead)
+            //Todo, sending only if he can
+            private void keyisdown(object sender, KeyEventArgs e)
+            {
+                if (!sent && !freeze)
+                    if (started)
                     {
-                        foreach (KeyValuePair<string, IServer> entry in serversConnected)
+                        if (!dead)
                         {
-                            if (e.KeyCode == Keys.Left)
+                            foreach (KeyValuePair<string, IServer> entry in serversConnected)
                             {
-                                entry.Value.sendMove(nickname, "LEFT");
-                                sent = true;
-                            }
-                            if (e.KeyCode == Keys.Right)
-                            {
-                                entry.Value.sendMove(nickname, "RIGHT");
-                                sent = true;
-                            }
-                            if (e.KeyCode == Keys.Up)
-                            {
-                                entry.Value.sendMove(nickname, "UP");
-                                sent = true;
-                            }
-                            if (e.KeyCode == Keys.Down)
-                            {
-                                entry.Value.sendMove(nickname, "DOWN");
-                                sent = true;
+                                if (e.KeyCode == Keys.Left)
+                                {
+                                    entry.Value.sendMove(nickname, "LEFT");
+                                    sent = true;
+                                }
+                                if (e.KeyCode == Keys.Right)
+                                {
+                                    entry.Value.sendMove(nickname, "RIGHT");
+                                    sent = true;
+                                }
+                                if (e.KeyCode == Keys.Up)
+                                {
+                                    entry.Value.sendMove(nickname, "UP");
+                                    sent = true;
+                                }
+                                if (e.KeyCode == Keys.Down)
+                                {
+                                    entry.Value.sendMove(nickname, "DOWN");
+                                    sent = true;
+                                }
                             }
                         }
                     }
+                if (e.KeyCode == Keys.Enter)
+                {
+                    tbMsg.Enabled = true; tbMsg.Focus();
                 }
-            if (e.KeyCode == Keys.Enter) {
-                tbMsg.Enabled = true; tbMsg.Focus();
             }
-        }
 
-        private void keyisup(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Left) {
-                goleft = false;
+            private void keyisup(object sender, KeyEventArgs e)
+            {
+                if (e.KeyCode == Keys.Left)
+                {
+                    goleft = false;
+                }
+                if (e.KeyCode == Keys.Right)
+                {
+                    goright = false;
+                }
+                if (e.KeyCode == Keys.Up)
+                {
+                    goup = false;
+                }
+                if (e.KeyCode == Keys.Down)
+                {
+                    godown = false;
+                }
             }
-            if (e.KeyCode == Keys.Right) {
-                goright = false;
-            }
-            if (e.KeyCode == Keys.Up) {
-                goup = false;
-            }
-            if (e.KeyCode == Keys.Down) {
-                godown = false;
-            }
-        }
 
-        private void tbMsg_KeyDown(object sender, KeyEventArgs e)
+            private void tbMsg_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                try
+                Thread thread = new Thread(() =>
                 {
-                    if (!tbMsg.Text.Trim().Equals(""))
+                    processMessage();
+                });
+                thread.Start();
+                tbMsg.Enabled = false;
+                this.Focus();
+
+            }
+        }
+
+        private void processMessage()
+        {
+            try
+            {
+                if (!tbMsg.Text.Trim().Equals(""))
+                {
+
+                    string msg = tbMsg.Text;
+                    IClient myself = null;
+                    int mId = 1;
+                    if (lider == null)
                     {
-
-                        string msg = tbMsg.Text;
-                        IClient myself = null;
-                        int mId = 1;
-                        if (lider == null)
+                        Thread thread3 = new Thread(() =>
+                        {
                             takeLider(lider);
+                        });
+                        thread3.Start();
+                        thread3.Join();
+                    }
 
+                    if (!lider.nick.Equals(this.nickname))
+                        mId = askId();
+                    else
+                    {
+                        Thread thread2 = new Thread(() =>
+                        {
+                            mId = askId();
+                        });
+                        thread2.Start();
+                        thread2.Join();
+                    }
+
+                    foreach (ConnectedClient connectedClient in clients)
+                    {
                         try
                         {
-                            if (!lider.nick.Equals(this.nickname))
-                                mId = lider.clientProxy.getId();
-                            else
+                            if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
                             {
-                                Thread thread2 = new Thread(() =>
-                                {
-                                    mId = lider.clientProxy.getId();
-                                });
-                                thread2.Start();
-                                thread2.Join();
+                                Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
+                                thread.Start();
+                            }
+                            else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                            {
+                                connectedClient.clientProxy.send(nickname, msg, mId);
+                            }
+                            else if (connectedClient.nick.Equals(nickname))
+                            {
+                                myself = connectedClient.clientProxy;
                             }
                         }
-                        catch (Exception ex)
+                        catch (SocketException exception)
                         {
-                            Console.WriteLine("Debug: lider died i am lider now, resend prev message " + ex.ToString());
-                            takeLider(lider);
+                            //Client Disconnected
+                            connectedClient.connected = false;
+                            Console.WriteLine("Debug: " + exception.ToString());
 
                         }
-                        foreach (ConnectedClient connectedClient in clients)
-                        {
-                            try
-                            {
-                                if (delayLog.ContainsKey(connectedClient.nick))
-                                {
-                                    Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
-                                    thread.Start();
-                                }
-                                else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
-                                {
-                                    connectedClient.clientProxy.send(nickname, msg, mId);
-                                }
-                                else if (connectedClient.nick.Equals(nickname))
-                                {
-                                    myself = connectedClient.clientProxy;
-                                }
-                            }
-                            catch (SocketException exception)
-                            {
-                                //Client Disconnected
-                                connectedClient.connected = false;
-                                Console.WriteLine("Debug: " + exception.ToString());
-
-                            }
-                        }
-                        if (myself != null)
-                        {
-                            Thread thread = new Thread(() => myself.send(nickname, msg, mId));
-                            thread.Start();
-                        }
-
                     }
-                    tbMsg.Clear();
-                    tbMsg.Enabled = false;
-                    this.Focus();
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine("Debug: " + exception.ToString());
-                }
+                    if (myself != null)
+                    {
+                        Thread thread = new Thread(() => myself.send(nickname, msg, mId));
+                        thread.Start();
+                    }
 
+                }
+                tbMsg.Clear();
+                tbMsg.Enabled = false;
+                this.Focus();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Debug: " + exception.ToString());
             }
         }
 
@@ -307,46 +329,57 @@ namespace Client {
             tbChat.Text += nick + ": " + msg + "\r\n";
         }
 
-        //TODO receber messageID, Player+Move, Ghost+move
-        public void updateMove(int playernumber, string move)
-        {
-            tbChat.AppendText("\r\nUpdateMode");
-            goleft = goright = goup = godown = false;
-            PictureBox pb = getPictureBoxByName("pictureBoxPlayer"+playernumber);
-
-            if (move.Equals("LEFT"))
+            //TODO receber messageID, Player+Move, Ghost+move
+            public void updateChat(string nick, string msg)
             {
-                if (pb.Left > (boardLeft)){
-                    pb.Left -= speed;
-                    pb.Image = Properties.Resources.Left;
-                }
+                tbChat.Text += nick + ": " + msg + "\r\n";
             }
-            if (move.Equals("RIGHT"))
+
+            //TODO receber messageID, Player+Move, Ghost+move
+            public void updateMove(int playernumber, string move)
             {
-                if (pb.Left < (boardRight)) {
-                    pb.Left += speed;
-                    pb.Image = Properties.Resources.Right;
+                tbChat.AppendText("\r\nUpdateMode");
+                goleft = goright = goup = godown = false;
+                PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playernumber);
+
+                if (move.Equals("LEFT"))
+                {
+                    if (pb.Left > (boardLeft))
+                    {
+                        pb.Left -= speed;
+                        pb.Image = Properties.Resources.Left;
+                    }
                 }
-            }
-            if (move.Equals("UP"))
-            {
-                if (pb.Top > (boardTop)) {
-                    pb.Top -= speed;
-                    pb.Image = Properties.Resources.Up;
+                if (move.Equals("RIGHT"))
+                {
+                    if (pb.Left < (boardRight))
+                    {
+                        pb.Left += speed;
+                        pb.Image = Properties.Resources.Right;
+                    }
                 }
-            }
-            if (move.Equals("DOWN")) {
-                if (pb.Top < (boardBottom)){
-                    pb.Top += speed;
-                    pb.Image = Properties.Resources.down;
+                if (move.Equals("UP"))
+                {
+                    if (pb.Top > (boardTop))
+                    {
+                        pb.Top -= speed;
+                        pb.Image = Properties.Resources.Up;
+                    }
                 }
-            }
-            sent = false;
+                if (move.Equals("DOWN"))
+                {
+                    if (pb.Top < (boardBottom))
+                    {
+                        pb.Top += speed;
+                        pb.Image = Properties.Resources.down;
+                    }
+                }
+                sent = false;
 
 
-        }
+            }
 
-        public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
+            public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
         {
             redGhost.Left = g1;
             yellowGhost.Left = g2;
@@ -381,25 +414,25 @@ namespace Client {
             }
         }
 
-        internal void startGame(int playerNumbers)
-        {
-            if (!started)
+            internal void startGame(int playerNumbers)
             {
-                for (int i = 2; i <= playerNumbers; i++)
-                    getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
-                started = true;
+                if (!started)
+                {
+                    for (int i = 2; i <= playerNumbers; i++)
+                        getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
+                    started = true;
 
-                getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
-                tbChat.Text += "My Number " + myNumber;
+                    getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
+                    tbChat.Text += "My Number " + myNumber;
 
 
 
-                Thread thread = new Thread(() => doWork());
-                thread.Start();
+                    Thread thread = new Thread(() => doWork());
+                    thread.Start();
+                }
             }
-        }
 
-        private void doWork()
+            private void doWork()
         {
             if (Program.FILENAME != "")
             {
@@ -487,9 +520,29 @@ namespace Client {
         public void takeLider(ConnectedClient prev)
         {
             int next = 1;
+            Boolean clOk = false;
             IClient myself = null;
+
             if (lider != null)
                 next = lider.playernumber + 1;
+            while (!clOk)
+            {
+                foreach (ConnectedClient connectedClient in clients)
+                {
+                    if (connectedClient.playernumber == next)
+                    {
+                        if (connectedClient.connected)
+                            clOk = true;
+                        else
+                        {
+                            if (next == clients.Count)
+                                next = 1;
+                            else
+                                next++;
+                        }
+                    }
+                }
+            }
 
             foreach (ConnectedClient connectedClient in clients)
             {
@@ -517,6 +570,7 @@ namespace Client {
             {
                 Thread thread = new Thread(() => myself.sendLider(next));
                 thread.Start();
+                thread.Join();
             }
 
         }
@@ -540,6 +594,40 @@ namespace Client {
         {
             Thread.Sleep(delayLog[conn.nick]);
             conn.clientProxy.send(nickname, msg, mId);
+        }
+
+        public int askId()
+        {
+            int temp = 1;
+            try
+            {
+                temp = lider.clientProxy.getId();
+                return temp;
+            }
+            catch (Exception ex)
+            {
+                lider.connected = false;
+                Console.WriteLine("Debug: lider died " + ex.ToString());
+                Thread thread3 = new Thread(() =>
+                {
+                    takeLider(lider);
+                });
+                thread3.Start();
+                thread3.Join();
+                if (!lider.nick.Equals(this.nickname))
+                    temp = lider.clientProxy.getId();
+                else
+                {
+                    Thread thread2 = new Thread(() =>
+                    {
+                        temp = lider.clientProxy.getId();
+                    });
+                    thread2.Start();
+                    thread2.Join();
+                }
+                return temp;
+
+            }
         }
         public void debugFunction(string text)
         {

@@ -26,7 +26,7 @@ namespace Client
     public delegate void delImageVisible(int playerNumber);
     public delegate void delDebug(string msg);
     public delegate void delLider(ConnectedClient nick);
-    
+
 
     class Client
     {
@@ -114,15 +114,15 @@ namespace Client
             {
                 nickLog.Add(id, nick);
                 msgLog.Add(id, msg);
-                if (id <= clientMessageId)
+                if (id == clientMessageId)
                 {
                     clientMessageId++;
                     this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
                 }
                 else
                 {
-                    searchLogs(id);
                     msgQueue.Add(id, msg);
+                    searchLogs(id);
                     if (!activeThread)
                     {
                         activeThread = true;
@@ -141,7 +141,7 @@ namespace Client
                 string[] tok_moves = players_arg.Split('-');
                 for (int i = 1; i < tok_moves.Length; i++)
                 {
-                    form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
+                    this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
                 }
             }
             if (dead_arg != "")
@@ -149,7 +149,7 @@ namespace Client
                 string[] tok_dead = dead_arg.Split('-');
                 for (int i = 1; i < tok_dead.Length; i++)
                 {
-                    form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
+                    this.form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
                 }
             }
 
@@ -159,6 +159,7 @@ namespace Client
             string[] monst_tok = monster_arg.Split(':');
             form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { Int32.Parse(monst_tok[0]), Int32.Parse(monst_tok[1]), Int32.Parse(monst_tok[2]), Int32.Parse(monst_tok[3]) });
         }
+
         public void coinEaten(int roundID, string coins_arg)
         {
             string[] coin_tok = coins_arg.Split('-');
@@ -175,7 +176,7 @@ namespace Client
 
             foreach (ConnectedClient connectedClient in form.clients)
             {
-                if (!connectedClient.nick.Equals(nick))
+                if (!connectedClient.nick.Equals(nick) && connectedClient.connected)
                 {
                     try
                     {
@@ -297,7 +298,7 @@ namespace Client
             int waitTime = 1000;
             while (msgQueue.Count != 0)
             {
-                int max = 0;
+                int max = 1;
                 foreach (KeyValuePair<int, string> entry in msgQueue)
                 {
                     max = Math.Max(max, entry.Key);
@@ -388,7 +389,7 @@ namespace Client
                     foreach (ConnectedClient connectedClient in form.clients)
                     {
 
-                        if (!connectedClient.nick.Equals(this.nick))
+                        if (!connectedClient.nick.Equals(this.nick) && connectedClient.connected)
                         {
                             try
                             {
@@ -418,7 +419,7 @@ namespace Client
             {
                 try
                 {
-                    if (!connectedClient.nick.Equals(this.nick))
+                    if (!connectedClient.nick.Equals(this.nick) && connectedClient.connected)
                     {
                         int temp2 = connectedClient.clientProxy.getClientMessageId();
                         if (temp2 > temp)
@@ -463,7 +464,7 @@ namespace Client
         public void InjectDelay(string pid1, string pid2)
         {
             delay = true;
-            form.debugFunction("\r\nInjected Delay from "+pid1+" to "+pid2);
+            form.debugFunction("\r\nInjected Delay from " + pid1 + " to " + pid2);
         }
         public void newServerCreated(string servername, string serverURL)
         {
