@@ -286,12 +286,12 @@ namespace Server
 
         public void connectServer(string name, string url)
         {
-            IServerReplication serverProxy = (IServerReplication)Activator.GetObject(
-                typeof(IServerReplication),
-                url
-            );
-            while (serverProxy != null)
+            IServerReplication serverProxy = null;
+            while (serverProxy == null)
             {
+                serverProxy = (IServerReplication)Activator.GetObject(
+                typeof(IServerReplication),
+                url);
                 try
                 {
                     Console.WriteLine("ConnectServer........");
@@ -367,6 +367,14 @@ namespace Server
             Console.WriteLine("coin: " + coin);
             Console.WriteLine("dead player: " + deadplayers);
             serverForm.UpdateBoard(roundID,pl,monst,coin, deadplayers);
+        }
+        //debug function
+        public void CheckUserScore()
+        {
+            foreach(Client c in clientList)
+            {
+                Console.WriteLine("client: "+c.nick+"=> score="+c.score);
+            }
         }
     }
 }

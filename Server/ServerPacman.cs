@@ -103,8 +103,9 @@ namespace Server {
                     {
                         if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
                         {
-                            
+                            getPictureBoxByName(x.Name).Visible = false;
                             Controls.Remove(x);
+                            server.clientList.FirstOrDefault(t => t.playernumber == playerNumber).score++;
                             coins_arg +="-" + x.Name;
                             atecoin+="-" + x.Name;
                             sendCoinEaten(playerNumber, x.Name);
@@ -388,14 +389,17 @@ namespace Server {
                 PictureBox pb = getPictureBoxByName(coin_tok[i]);
                 pb.Visible = false;
             }
-            timer1.Elapsed += timer1_Tick;
-            timer1.Start();
+            //TODO, TIMER SYNCHRONIZATION
+            //timer1.Elapsed += timer1_Tick;
+            //timer1.Start();
         }
 
         public void timer1_Tick(object sender, EventArgs e)
         {
             Thread thread = new Thread(() => processingTimer());
             thread.Start();
+            //debug function
+            server.CheckUserScore();
         }
 
         public void startGame(int playerNumbers)
