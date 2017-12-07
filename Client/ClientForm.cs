@@ -261,30 +261,25 @@ namespace Client
                     int mId = 1;
                     if (lider == null)
                     {
-                        Thread thread3 = new Thread(() =>
-                        {
+                        Action act = () => {
                             takeLider(lider);
-                        });
-                        thread3.Start();
-                        thread3.Join();
+                        };
+                        Thread thread = new Thread((new ThreadStart(act)));
+                        thread.Start();
+                        thread.Join();
                     }
 
-                    if (!lider.nick.Equals(this.nickname))
+                    
+                    Action act2 = () => {
                         mId = askId();
-                    else
-                    {
-                        Thread thread2 = new Thread(() =>
-                        {
-                            mId = askId();
-                        });
-                        thread2.Start();
-                        thread2.Join();
-                    }
-
+                    };
+                    Thread thread2 = new Thread((new ThreadStart(act2)));
+                    thread2.Start();
+                    thread2.Join();
+                    
                     foreach (ConnectedClient connectedClient in clients)
                     {
-                        try
-                        {
+                        
                             if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
                             {
                                 Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
@@ -292,25 +287,38 @@ namespace Client
                             }
                             else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
                             {
-                                connectedClient.clientProxy.send(nickname, msg, mId);
+                                Action act3 = () => {
+                                    try
+                                    {
+                                        connectedClient.clientProxy.send(nickname, msg, mId);
+                                    }
+                                    catch (SocketException exception)
+                                    {
+                                        //Client Disconnected
+                                        connectedClient.connected = false;
+                                        Console.WriteLine("Debug: " + exception.ToString());
+
+                                    }
+                                };
+                                Thread thread3 = new Thread((new ThreadStart(act3)));
+                                thread3.Start();
                             }
                             else if (connectedClient.nick.Equals(nickname))
                             {
                                 myself = connectedClient.clientProxy;
                             }
-                        }
-                        catch (SocketException exception)
-                        {
-                            //Client Disconnected
-                            connectedClient.connected = false;
-                            Console.WriteLine("Debug: " + exception.ToString());
-
-                        }
+                        
                     }
                     if (myself != null)
                     {
-                        Thread thread = new Thread(() => myself.send(nickname, msg, mId));
-                        thread.Start();
+                        Action act4 = () =>
+                        {
+                            myself.send(nickname, msg, mId);
+                        };
+                        
+                        Thread thread4 = new Thread((new ThreadStart(act4)));
+                        thread4.Start();
+                        
                     }
 
                 }
@@ -327,7 +335,7 @@ namespace Client
             //TODO receber messageID, Player+Move, Ghost+move
             public void updateChat(string nick, string msg)
             {
-                tbChat.Text += nick + ": " + msg + "\r\n";
+            tbChat.AppendText("\r\n" +nick + ": " + msg);
             }
 
             //TODO receber messageID, Player+Move, Ghost+move
@@ -517,6 +525,7 @@ namespace Client
             int next = 1;
             Boolean clOk = false;
             IClient myself = null;
+            ConnectedClient liderCli = null;
 
             if (lider != null)
                 next = lider.playernumber + 1;
@@ -542,30 +551,66 @@ namespace Client
             foreach (ConnectedClient connectedClient in clients)
             {
 
-                try
-                {
+               
                     if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
                     {
-                        connectedClient.clientProxy.sendLider(next);
+                        if (connectedClient.playernumber == next)
+                            liderCli = connectedClient;
+                        else
+                        {
+                            Action act3 = () =>
+                            {
+                                try
+                                {
+                                    connectedClient.clientProxy.sendLider(next);
+                                }
+                                catch (SocketException exception)
+                                {
+                                    //Client Disconnected
+                                    connectedClient.connected = false;
+                                    Console.WriteLine("Debug: " + exception.ToString());
+
+                                }
+                            };
+                            Thread thread4 = new Thread((new ThreadStart(act3)));
+                            thread4.Start();
+                        }
                     }
                     else if (connectedClient.nick.Equals(nickname))
                     {
                         myself = connectedClient.clientProxy;
                     }
-                }
-                catch (SocketException exception)
-                {
-                    //Client Disconnected
-                    connectedClient.connected = false;
-                    Console.WriteLine("Debug: " + exception.ToString());
-
-                }
+                
             }
             if (myself != null)
             {
-                Thread thread = new Thread(() => myself.sendLider(next));
+                Action act2 = () => {
+                myself.sendLider(next);
+            };
+                Thread thread2 = new Thread((new ThreadStart(act2)));
+                thread2.Start();
+                thread2.Join();
+
+            }
+            if (liderCli != null)
+            {
+                Action act = () => {
+                    try
+                    {
+                        liderCli.clientProxy.sendLider(next);
+                    }
+                    catch (SocketException exception)
+                    {
+                        //Client Disconnected
+                        liderCli.connected = false;
+                        Console.WriteLine("Debug: " + exception.ToString());
+                        takeLider(liderCli);
+                    }
+                };
+                Thread thread = new Thread((new ThreadStart(act)));
                 thread.Start();
                 thread.Join();
+
             }
 
         }
@@ -588,7 +633,17 @@ namespace Client
         public void delayThread(string msg, int mId, ConnectedClient conn)
         {
             Thread.Sleep(delayLog[conn.nick]);
-            conn.clientProxy.send(nickname, msg, mId);
+             try
+                {
+                conn.clientProxy.send(nickname, msg, mId);
+                }
+                catch (SocketException exception)
+                {
+                    //Client Disconnected
+                    conn.connected = false;
+                    Console.WriteLine("Debug: " + exception.ToString());
+
+                }
         }
 
         public int askId()
@@ -601,29 +656,30 @@ namespace Client
             }
             catch (Exception ex)
             {
-                lider.connected = false;
-                Console.WriteLine("Debug: lider died " + ex.ToString());
-                Thread thread3 = new Thread(() =>
+                try
                 {
-                    takeLider(lider);
-                });
-                thread3.Start();
-                thread3.Join();
-                if (!lider.nick.Equals(this.nickname))
-                    temp = lider.clientProxy.getId();
-                else
-                {
-                    Thread thread2 = new Thread(() =>
+                    lider.connected = false;
+                    Console.WriteLine("Debug: lider died " + ex.ToString());
+                    Action act = () =>
                     {
-                        temp = lider.clientProxy.getId();
-                    });
-                    thread2.Start();
-                    thread2.Join();
+                        takeLider(lider);
+                    };
+                    Thread thread = new Thread((new ThreadStart(act)));
+                    thread.Start();
+                    thread.Join();
+
+                    temp = lider.clientProxy.getId();
+                    return temp;
+
+                }catch(Exception exception)
+                {
+
                 }
+            }
                 return temp;
 
-            }
         }
+        
         public void debugFunction(string text)
         {
             tbChat.AppendText(text);

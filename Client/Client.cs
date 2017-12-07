@@ -73,7 +73,7 @@ namespace Client
 
         public static int clientMessageId = 1;
         string nick;
-        public static int totalMessageId = 0;
+        public int totalMessageId = 0;
         ConnectedClient lider;
         Dictionary<int, string> nickLog;
         Dictionary<int, string> msgLog;
@@ -113,8 +113,8 @@ namespace Client
         {
             if (!(msgLog.ContainsKey(id)))
             {
-                nickLog.Add(id, nick);
                 msgLog.Add(id, msg);
+                nickLog.Add(id, nick);
                 if (id == clientMessageId)
                 {
                     clientMessageId++;
@@ -123,7 +123,13 @@ namespace Client
                 else
                 {
                     msgQueue.Add(id, msg);
-                    searchLogs(id);
+                    Action act = () =>
+                    {
+                        searchLogs(id);
+
+                    };
+                    Thread thread2 = new Thread((new ThreadStart(act)));
+                    thread2.Start();
                     if (!activeThread)
                     {
                         activeThread = true;
@@ -296,7 +302,7 @@ namespace Client
         public void chatThread()
         {
             //tempo de espera maximo por uma mensagem
-            int waitTime = 1000;
+            int waitTime = 3000;
             while (msgQueue.Count != 0)
             {
                 int max = 1;
@@ -304,8 +310,6 @@ namespace Client
                 {
                     max = Math.Max(max, entry.Key);
                 }
-                Thread.Sleep(waitTime);
-                searchLogs(max);
                 Thread.Sleep(waitTime);
                 int i = 1;
                 while (i <= max)
@@ -343,8 +347,14 @@ namespace Client
                     {
                         int i = topMessageId();
                         i = Math.Max(clientMessageId, i);
-                        searchLogs(i);
-                        totalMessageId = i;
+                        i -= 1;
+                        this.totalMessageId = i;
+                        Action act = () =>
+                        {
+                            searchLogs(i);
+                        };
+                        Thread thread = new Thread((new ThreadStart(act)));
+                        thread.Start();
                     }
                     this.lider = connectedClient;
                     this.form.Invoke(new delLider(form.updateLider), new object[] { connectedClient });
@@ -415,7 +425,7 @@ namespace Client
         }
         public int topMessageId()
         {
-            int temp = 0;
+            int temp = 1;
             foreach (ConnectedClient connectedClient in form.clients)
             {
                 try
@@ -432,12 +442,10 @@ namespace Client
                     //Client Disconnected
                     connectedClient.connected = false;
                     Console.WriteLine("Debug: " + exception.ToString());
-                    return temp - 1;
-
                 }
 
             }
-            return temp - 1;
+            return temp;
         }
         public int getClientMessageId()
         {
