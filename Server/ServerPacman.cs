@@ -146,11 +146,11 @@ namespace Server {
         {
             server.sendCoinEaten(playerNumber, coinName);
         }
-        
+
         private void updateGhostsPosition()
         {
 
-            
+
             //move ghosts
             redGhost.Left += ghost1;
             yellowGhost.Left += ghost2;
@@ -185,104 +185,106 @@ namespace Server {
                 ghost3y = -ghost3y;
             }
 
-            //TODO, writing the server localstate to a file, must be flexible with number of players
+            //TODO IMPORTANT, writing the server localstate to a file, must be flexible with number of players
             // tbOutput.Text += PATH+ Path.DirectorySeparatorChar + "log" + Path.DirectorySeparatorChar + roundID;
-            using (StreamWriter sw = File.CreateText(Server.DIRECTORY+ Path.DirectorySeparatorChar + roundID))
-            {
-                foreach (Control x in this.Controls)
+            try {
+                using (StreamWriter sw = File.CreateText(Server.DIRECTORY + Path.DirectorySeparatorChar + roundID))
                 {
-                    if (x is PictureBox && x.Tag == "ghost")
+                    foreach (Control x in this.Controls)
                     {
-                        sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
-                        
-                    }
-                    else if (x is PictureBox && x.Tag == "coin")
-                    {
-                        sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player1")
-                    {
-                        if (deadPlayer.Contains(1))
+                        if (x is PictureBox && x.Tag == "ghost")
                         {
-                            sw.WriteLine("P1, L, " + x.Location.X + ", " + x.Location.Y);
-                            
+                            sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
+
                         }
-                        else
+                        else if (x is PictureBox && x.Tag == "coin")
                         {
-                            sw.WriteLine("P1, P, " + x.Location.X + ", " + x.Location.Y);
-                          
+                            sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
                         }
-                    }
-                    else if (x is PictureBox && x.Tag == "player2")
-                    {
-                        if (deadPlayer.Contains(2))
+                        else if (x is PictureBox && x.Tag == "player1")
                         {
-                            sw.WriteLine("P2, L, " + x.Location.X + ", " + x.Location.Y);
-                           
+                            if (deadPlayer.Contains(1))
+                            {
+                                sw.WriteLine("P1, L, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
+                            else
+                            {
+                                sw.WriteLine("P1, P, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
                         }
-                        else
+                        else if (x is PictureBox && x.Tag == "player2")
                         {
-                            sw.WriteLine("P2, P, " + x.Location.X + ", " + x.Location.Y);
-                           
+                            if (deadPlayer.Contains(2))
+                            {
+                                sw.WriteLine("P2, L, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
+                            else
+                            {
+                                sw.WriteLine("P2, P, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
                         }
-                    }
-                    else if (x is PictureBox && x.Tag == "player3")
-                    {
-                        if (deadPlayer.Contains(2))
+                        else if (x is PictureBox && x.Tag == "player3")
                         {
-                            sw.WriteLine("P3, L, " + x.Location.X + ", " + x.Location.Y);
-                           
+                            if (deadPlayer.Contains(2))
+                            {
+                                sw.WriteLine("P3, L, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
+                            else
+                            {
+                                sw.WriteLine("P3, P, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
                         }
-                        else
+                        else if (x is PictureBox && x.Tag == "player4")
                         {
-                            sw.WriteLine("P3, P, " + x.Location.X + ", " + x.Location.Y);
-                            
+                            if (deadPlayer.Contains(2))
+                            {
+                                sw.WriteLine("P4, L, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
+                            else
+                            {
+                                sw.WriteLine("P4, P, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
                         }
-                    }
-                    else if (x is PictureBox && x.Tag == "player4")
-                    {
-                        if (deadPlayer.Contains(2))
+                        else if (x is PictureBox && x.Tag == "player5")
                         {
-                            sw.WriteLine("P4, L, " + x.Location.X + ", " + x.Location.Y);
-                          
+                            if (deadPlayer.Contains(2))
+                            {
+                                sw.WriteLine("P5, L, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
+                            else
+                            {
+                                sw.WriteLine("P5, P, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
                         }
-                        else
+                        else if (x is PictureBox && x.Tag == "player6")
                         {
-                            sw.WriteLine("P4, P, " + x.Location.X + ", " + x.Location.Y);
-                           
-                        }
-                    }
-                    else if (x is PictureBox && x.Tag == "player5")
-                    {
-                        if (deadPlayer.Contains(2))
-                        {
-                            sw.WriteLine("P5, L, " + x.Location.X + ", " + x.Location.Y);
-                           
-                        }
-                        else
-                        {
-                            sw.WriteLine("P5, P, " + x.Location.X + ", " + x.Location.Y);
-                            
-                        }
-                    }
-                    else if (x is PictureBox && x.Tag == "player6")
-                    {
-                        if (deadPlayer.Contains(2))
-                        {
-                            sw.WriteLine("P6, L, " + x.Location.X + ", " + x.Location.Y);
-                           
-                        }
-                        else
-                        {
-                            sw.WriteLine("P6, P, " + x.Location.X + ", " + x.Location.Y);
-                           
+                            if (deadPlayer.Contains(2))
+                            {
+                                sw.WriteLine("P6, L, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
+                            else
+                            {
+                                sw.WriteLine("P6, P, " + x.Location.X + ", " + x.Location.Y);
+
+                            }
                         }
                     }
                 }
-               
 
             }
-
+            catch { }
+            
             monsters_arg += redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
         }
 
@@ -398,8 +400,9 @@ namespace Server {
         {
             Thread thread = new Thread(() => processingTimer());
             thread.Start();
+
             //debug function
-            server.CheckUserScore();
+            //server.CheckUserScore();
         }
 
         public void startGame(int playerNumbers)

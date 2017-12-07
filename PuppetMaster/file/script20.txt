@@ -1,12 +1,12 @@
-StartServer S1 tcp://1.2.3.4:11000/PCS tcp://1.2.3.4:20001/Server 20 6
-StartClient C1 tcp://1.2.3.4:11000/PCS tcp://1.2.3.4:30001/Client 20 6
-StartClient C2 tcp://1.2.3.4:11000/PCS tcp://1.2.3.4:30002/Client 20 6
-StartClient C3 tcp://1.2.3.4:11000/PCS tcp://1.2.3.4:30003/Client 20 6
-StartClient C4 tcp://1.2.3.5:11000/PCS tcp://1.2.3.5:30004/Client 20 6
-StartClient C5 tcp://1.2.3.5:11000/PCS tcp://1.2.3.5:30005/Client 20 6
-StartClient C6 tcp://1.2.3.5:11000/PCS tcp://1.2.3.5:30006/Client 20 6
+StartServer S1 tcp://localhost:11000/PCS tcp://localhost:20001/Server 20 6
+StartClient C1 tcp://localhost:11000/PCS tcp://localhost:30001/Client 20 6
+StartClient C2 tcp://localhost:11000/PCS tcp://localhost:30002/Client 20 6
+StartClient C3 tcp://localhost:11000/PCS tcp://localhost:30003/Client 20 6
+StartClient C4 tcp://localhost:11000/PCS tcp://localhost:30004/Client 20 6
+StartClient C5 tcp://localhost:11000/PCS tcp://localhost:30005/Client 20 6
+StartClient C6 tcp://localhost:11000/PCS tcp://localhost:30006/Client 20 6
 GlobalStatus
-Wait 100
+Wait 1000
 LocalState S1 1
 LocalState C1 1
 LocalState C2 1
