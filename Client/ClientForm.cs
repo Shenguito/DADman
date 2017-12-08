@@ -20,6 +20,7 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Client
 {
+    public delegate void doWork(object sender, EventArgs e);
     public partial class ClientForm : Form
     {
         public int roundID = -1;
@@ -58,8 +59,9 @@ namespace Client
         public Dictionary<string, IServer> serversConnected = new Dictionary<string, IServer>();
 
         public Dictionary<int, BoardInfo> boardByRound;
+        private ReceivingInput moveThread;
 
-        
+
         public ClientForm()
         {
           
@@ -70,6 +72,8 @@ namespace Client
             InitializeComponent();
             this.Text += ": " + nickname;
             label2.Visible = false;
+
+            moveThread = new ReceivingInput();
 
             Init();
 
@@ -349,7 +353,6 @@ namespace Client
                 getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
                 tbChat.Text += "My Number " + myNumber;
 
-                //thread Threadpool, dentro do dowork() chama domove()
                 Thread thread = new Thread((new ThreadStart(doWork)));
                 thread.Start();
             }
@@ -370,7 +373,7 @@ namespace Client
                         string[] fields = parser.ReadFields();
                         try
                         {
-                            doMove(fields[1]);
+                            moveThread.AssyncInvoke(new Movement(roundID, nickname, myNumber, fields[1]), ref tbChat);
                         }
                         catch
                         {

@@ -38,6 +38,7 @@ namespace ComLibrary
             while (true)
             {
                 ThrWork tw = buf.Consume();
+                //call class A or B to string
                 tw();
             }
         }
