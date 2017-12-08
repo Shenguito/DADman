@@ -138,7 +138,7 @@ namespace Client
 
         private void doMove(string move)
         {
-            //TODO IMPORTANT
+            //TODO IMPORTANT Queria thread pool para fazer estes moves
             while (!started)
             {
                 Thread.Sleep(1);
@@ -349,7 +349,7 @@ namespace Client
                 getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
                 tbChat.Text += "My Number " + myNumber;
 
-                //thread
+                //thread Threadpool, dentro do dowork() chama domove()
                 Thread thread = new Thread((new ThreadStart(doWork)));
                 thread.Start();
             }

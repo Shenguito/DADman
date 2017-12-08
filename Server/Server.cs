@@ -289,7 +289,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void SendFirstRound(int roundID, string player, string monsters_arg, string atecoin)
         {
-            //NOT USED YET
+            //NOT USED YET!!!
             /*TODO, fix the problem
             foreach (KeyValuePair<IServer, bool> entry in serversConnected)
             {

@@ -210,7 +210,7 @@ namespace Client
             if (!freeze)
             {
                 //if not null is inside of below function
-                //PROBLEM PLAYER MOVE DELEGATE
+                //TODO, PROBLEM PLAYER MOVE DELEGATE TEIXEIRA
                 if (board.move != "")
                     movePlayer(board.RoundID, board.move);
                 if (board.Monsters != "")

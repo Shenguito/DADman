@@ -250,7 +250,7 @@ namespace Server {
             }
             listMove = new Dictionary<int, string>();
             updateGhostsPosition();
-            //to remember players_arg=LEFT:D  && playerLocation=-x:y IMPORTANT
+            //to remember players_arg=LEFT:D  && playerLocation=-x:y
             BoardInfo thisround = new BoardInfo(roundID, playerLocation(), players_arg, monsters_arg, coins_arg);
             try
             {
@@ -289,7 +289,6 @@ namespace Server {
 
             for (int i = 1; i < coin_tok.Length; i++)
             {
-                //TODO, already received ate coins by left:top
                 PictureBox pb = getPictureBoxByName(coin_tok[i]);
                 pb.Visible = false;
                 Controls.Remove(pb);
@@ -317,7 +316,7 @@ namespace Server {
 
         public void ReceivingMove(Movement move)
         {
-            //TODO roundIDsheng
+            //TODO IMPORTANTE roundIDsheng, aqui está o problema do 6 players a por mesma roundid
             if (!listMove.ContainsKey(move.roundID))
                 try
                 {
