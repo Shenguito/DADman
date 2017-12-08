@@ -211,13 +211,13 @@ namespace Client
             {
                 //if not null is inside of below function
                 //PROBLEM PLAYER MOVE DELEGATE
-                if (board.Players.Split('_')[1] != "")
-                    movePlayer(board.RoundID, board.Players.Split('_')[1]);
+                if (board.move != "")
+                    movePlayer(board.RoundID, board.move);
                 if (board.Monsters != "")
                     moveGhost(board.RoundID, board.Monsters);
                 if (board.Coins != "")
                     coinEaten(board.RoundID, board.Coins);
-                form.roundID = board.RoundID+1;
+                form.roundID = board.RoundID + 1;
                 form.boardByRound.Add(board.RoundID, board);
             }
             else if (freeze)
