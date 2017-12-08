@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    class threadLock
+    class ThreadLock
     {
 
         

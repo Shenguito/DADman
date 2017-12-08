@@ -63,7 +63,10 @@ namespace Server
 
         public ServerForm serverForm;
         public Dictionary<string, IServerReplication> serversConnected = new Dictionary<string, IServerReplication>();
-        public bool firstServer=true;
+        
+
+        public bool freeze=false;
+        public bool delay=false;
         
 
         public RemoteServer()
@@ -102,7 +105,7 @@ namespace Server
 
             clientList.Add(c);
             
-            if (numberPlayersConnected == Program.PLAYERNUMBER)
+            if (numberPlayersConnected == Program.PLAYERNUMBER&&Program.FIRSTSERVER)
             {
                 //TODO3, fix when a server start don't startgame before knowing if he is the first
                 Thread thread = new Thread(() =>  sendStartGame());
@@ -139,6 +142,7 @@ namespace Server
             }
         }
         //SEND TO CLIENT
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendRoundUpdate(BoardInfo board) 
         {
             /*
@@ -164,7 +168,6 @@ namespace Server
                 {
                     disconnectedPlayers.Add(c.playernumber);
                     Console.WriteLine("Client "+c.nick+" receiving is down...");
-                    Console.WriteLine(e);
                 }
                 //).Start();
             }
@@ -192,39 +195,34 @@ namespace Server
         
         public void sendStartGame()
         {
-            Thread.Sleep(1000);
-            if (firstServer)
+            string arg = " ";
+            foreach (ConnectedClient c in clientList)
             {
-                string arg = " ";
-                foreach (ConnectedClient c in clientList)
-                {
-                    arg += "-" + c.nick + "_" + c.playernumber + "_" + c.url;
-                }
-                foreach (ConnectedClient c in clientList)
-                {
-                    Console.WriteLine("SERVER: startGame:" + arg);
-                    try
-                    {
-                        c.clientProxy.startGame(numberPlayersConnected, arg);
-                    }
-
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception on sendStartGame: " + e);
-                    }
-                }
-
-                this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
-                Console.WriteLine("Game started!");
-                
+                arg += "-" + c.nick + "_" + c.playernumber + "_" + c.url;
             }
+            foreach (ConnectedClient c in clientList)
+            {
+                Console.WriteLine("SERVER: startGame:" + arg);
+                try
+                {
+                    c.clientProxy.startGame(numberPlayersConnected, arg);
+                }
+
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception on sendStartGame: " + e);
+                }
+            }
+
+            this.serverForm.Invoke(new delImageVisible(serverForm.startGame), new object[] { numberPlayersConnected });
+            Console.WriteLine("Game started!");
+                
         }
 
         //RECEIVE CONNECTION FROM SERVER
         public void receiveServer(string name, string url, BoardInfo board, List<ConnectedClient> clients)
         {
             Console.WriteLine("ConnectedServer........");
-            firstServer = false;
             clientList = clients;
             UpdateBoard(board);
             try
@@ -243,6 +241,7 @@ namespace Server
         //CONNECT DO SERVER
         public void connectServer(string name, string url)
         {
+
             IServerReplication serverProxy = null;
             while (serverProxy == null)
             {
@@ -251,15 +250,21 @@ namespace Server
                 url);
                 try
                 {
-                    Console.WriteLine("ConnectServer........");
-                    serversConnected.Add(name, serverProxy);
-                    serverProxy.receiveServer(Program.SERVERNAME, "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(url) + "/Server",
+                    Console.WriteLine("ConnectServer........"+name);
+                    Console.WriteLine("ConnectServer........" + url);
+                    if(!serversConnected.ContainsKey(name))
+                        serversConnected.Add(name, serverProxy);
+                    serverProxy.receiveServer(Program.SERVERNAME,
+                        "tcp://" + Util.GetLocalIPAddress() + ":" + Program.PORT + "/Server",
                         serverForm.boardByRound[serverForm.boardByRound.Count-1], clientList);
+                    Console.WriteLine("ConnectedServer........");
                     break;
                 }
-                catch
-                {       
-                    Thread.Sleep(500);
+                catch(Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                    Thread.Sleep(10000);
+                    serverProxy = null;
                 }
             }
             
@@ -268,48 +273,27 @@ namespace Server
         public void Freeze()
         {
             //TODO
-            throw new NotImplementedException();
+            freeze = true;
         }
 
         public void Unfreeze()
         {
             //TODO
-            throw new NotImplementedException();
+            freeze = false;
         }
 
         public void InjectDelay(string pid2)
         {
             //TODO
-            throw new NotImplementedException();
+            delay = true;
         }
 
         public void newServerCreated(string serverName, string serverURL)
         {
+            Console.WriteLine("Enter new server: "+serverName);
             new Thread(() => connectServer(serverName, serverURL)).Start();
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void SendFirstRound(int roundID, string player, string monsters_arg, string atecoin)
-        {
-            //NOT USED YET!!!
-            /*TODO, fix the problem
-            foreach (KeyValuePair<IServer, bool> entry in serversConnected)
-            {
-                if (entry.Value == true)
-                {
-                    entry.Key.UpdateBoard(roundID, player, monsters_arg, atecoin);
-                }
-            }
-            */
-            /*
-            var keys = serversConnected.Keys.ToList();
-            for (int i = 0; i < keys.Count; i++)
-            {
-                serversConnected[keys[i]] = false;
-            }
-            foreach (IServer key in serversConnected.Keys.ToList())
-                serversConnected[key] = false;
-                */
-        }
+        
 
         public void UpdateBoard(BoardInfo board)
         {
@@ -325,6 +309,7 @@ namespace Server
         {
             return serverForm.getLocalState(roundID);
         }
+
         //debug function
         public void CheckUserScore()
         {
@@ -333,7 +318,6 @@ namespace Server
                 Console.WriteLine("client: "+c.nick+"=> score="+c.score);
             }
         }
-
         
     }
 }

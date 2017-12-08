@@ -62,7 +62,7 @@ namespace Client
 
         public Thread movePool;
         private List<Movement> listMove;
-        private threadLock tlock;
+        private ThreadLock tlock;
 
 
         public ClientForm()
@@ -78,7 +78,7 @@ namespace Client
 
             listMove = new List<Movement>();
             //ThreadStart, this thread may have at most 25 threads
-            tlock = new threadLock();
+            tlock = new ThreadLock();
             movePool = new Thread(new ThreadStart(retrieveMove));
             movePool.Start();
 

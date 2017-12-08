@@ -295,8 +295,8 @@ namespace Server {
             }
             //TODO, TIMER SYNCHRONIZATION
             tbOutput.AppendText("set timer");
-            timer1.Elapsed += timer1_Tick;
-            timer1.Start();
+            //timer1.Elapsed += timer1_Tick;
+            //timer1.Start();
             tbOutput.AppendText("timer setted");
         }
 
@@ -330,6 +330,7 @@ namespace Server {
         }
         public void timer1_Tick(object sender, EventArgs e)
         {
+            //try delegate
             Thread t = new Thread(new ThreadStart(processingTimer));
             t.Start();
         }

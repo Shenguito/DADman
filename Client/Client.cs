@@ -99,11 +99,6 @@ namespace Client
             */
         }
 
-        public void setForm(ClientForm f)
-        {
-            form = f;
-        }
-
         public void movePlayer(int roundID, string players_arg)
         {
             
@@ -190,7 +185,11 @@ namespace Client
 
         public void receiveRoundUpdate(BoardInfo board)
         {
-            /*TODO1, thread
+            receiveUpdate2(board);
+        }   
+        private void receiveUpdate2(BoardInfo board)
+        {
+            /*TODO1, threadasd
              * if freeze, add to queue 
              * if !freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID) wait
              * if !freeze run delegate function
@@ -211,44 +210,37 @@ namespace Client
             }
             if (!freeze)
             {
-                //if not null is inside of below function
+                //TODO function 1
                 if (board.move != "")
                 {
-                    Action act = () =>
-                    {
-                        movePlayer(board.RoundID, board.move);
-                    };
-                    Thread thread = new Thread((new ThreadStart(act)));
-                    thread.Start();
+                    movePlayer(board.RoundID, board.move);
                 }
                 if (board.Monsters != "")
                 {
-                    Action act2 = () =>
-                    {
-                        moveGhost(board.RoundID, board.Monsters);
-                    };
-                    Thread thread2 = new Thread((new ThreadStart(act2)));
-                    thread2.Start();
+                    moveGhost(board.RoundID, board.Monsters);
                 }
                 if (board.Coins != "")
                 {
-                    Action act3 = () =>
-                    {
-                        coinEaten(board.RoundID, board.Coins);
-                    };
-                    Thread thread3 = new Thread((new ThreadStart(act3)));
-                    thread3.Start();
+                    coinEaten(board.RoundID, board.Coins);
                 }
                 form.roundID = board.RoundID + 1;
-                form.boardByRound.Add(board.RoundID, board);
+                form.debugFunction("\r\nID:" + form.roundID);
+                //error, duplicate
+                try
+                {
+                    form.boardByRound.Add(board.RoundID, board);
+                }
+                catch (Exception e)
+                {
+                    form.debugFunction("\r\nErrorID:" + form.roundID);
+                }
             }
             else if (freeze)
             {
                 temporaryBoard.Add(board.RoundID, board);
                 return;
             }
-
-        }   
+        }
         
         public void Freeze()
         {

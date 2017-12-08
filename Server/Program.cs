@@ -15,7 +15,8 @@ namespace Server
         public static int PORT=0;
         public static int MSSEC = 0;
         public static int PLAYERNUMBER = 0;
-        
+        public static bool FIRSTSERVER = false;
+
         static void Main(string[] args)
         {
             
@@ -25,11 +26,15 @@ namespace Server
                 PORT = Int32.Parse(Util.ExtractPortFromURL(args[2].Trim()).Trim());
                 MSSEC = Int32.Parse(args[3].Trim());
                 PLAYERNUMBER = Int32.Parse(args[4].Trim());
+                if (args[5].Trim().Equals("T"))
+                    FIRSTSERVER = true;
+
             }
             Console.WriteLine("info: "+ SERVERNAME);
             Console.WriteLine("info: " + PORT);
             Console.WriteLine("info: " + MSSEC);
             Console.WriteLine("info: " + PLAYERNUMBER);
+            Console.WriteLine("info: " + FIRSTSERVER);
             new Server();
             Console.ReadLine();
 

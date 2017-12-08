@@ -28,6 +28,7 @@ namespace PuppetMaster
         private Dictionary<string, IGeneralControlServices> remotingProcesses;
         private string serverURL="";
         private string serverName = "";
+        private string firstServer = "T";
         public ProcessLaucher()
         {
             processes = new Dictionary<string, Process>();
@@ -79,9 +80,9 @@ namespace PuppetMaster
         public void startServer(string[] input)
         {
             Console.WriteLine("StartServer");
-            string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5];
+            string argv = input[1] + " " + input[2] + " " + input[3] + " " + input[4] + " " + input[5]+" "+ firstServer;
+            firstServer = "F";
 
-            
             serverURL = input[3].Trim();
             if (Util.ExtractIPFromURL(serverURL).Equals("localhost") ||
                     Util.ExtractIPFromURL(serverURL).Equals("127.0.0.1"))
