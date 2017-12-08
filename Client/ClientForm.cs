@@ -254,88 +254,6 @@ namespace Client
             }
         }
 
-        private void processMessage()
-        {
-            try
-            {
-                if (!tbMsg.Text.Trim().Equals(""))
-                {
-
-                    string msg = tbMsg.Text;
-                    tbMsg.Clear();
-                    IClient myself = null;
-                    int mId = 1;
-                    if (lider == null)
-                    {
-                        Action act = () => {
-                            takeLider(lider);
-                        };
-                        Thread thread = new Thread((new ThreadStart(act)));
-                        thread.Start();
-                        thread.Join();
-                    }
-
-                    
-                    Action act2 = () => {
-                        mId = askId();
-                    };
-                    Thread thread2 = new Thread((new ThreadStart(act2)));
-                    thread2.Start();
-                    thread2.Join();
-                    
-                    foreach (ConnectedClient connectedClient in clients)
-                    {
-                        
-                        if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
-                        {
-                            Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
-                            thread.Start();
-                        }
-                        else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
-                        {
-                            Action act3 = () => {
-                                try
-                                {
-                                    connectedClient.clientProxy.send(nickname, msg, mId);
-                                }
-                                catch (SocketException exception)
-                                {
-                                    //Client Disconnected
-                                    connectedClient.connected = false;
-                                    Console.WriteLine("Debug: " + exception.ToString());
-
-                                }
-                            };
-                            Thread thread3 = new Thread((new ThreadStart(act3)));
-                            thread3.Start();
-                        }
-                        else if (connectedClient.nick.Equals(nickname))
-                        {
-                            myself = connectedClient.clientProxy;
-                        }
-                        
-                    }
-                    if (myself != null)
-                    {
-                        Action act4 = () =>
-                        {
-                            myself.send(nickname, msg, mId);
-                        };
-                        
-                        Thread thread4 = new Thread((new ThreadStart(act4)));
-                        thread4.Start();
-                        
-                    }
-
-                }
-                tbMsg.Clear();
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Debug: " + exception.ToString());
-            }
-        }
-
         //TODO receber messageID, Player+Move, Ghost+move
         public void updateChat(string nick, string msg)
         {
@@ -476,6 +394,124 @@ namespace Client
             return new PictureBox(); //OR return null;
         }
 
+
+        /*****************************************  chat methods  ***************************************************/
+
+
+        private void processMessage()
+        {
+            try
+            {
+                if (!tbMsg.Text.Trim().Equals(""))
+                {
+
+                    string msg = tbMsg.Text;
+                    tbMsg.Clear();
+                    IClient myself = null;
+                    int mId = 1;
+                    if (lider == null)
+                    {
+                        Action act = () => {
+                            takeLider(lider);
+                        };
+                        Thread thread = new Thread((new ThreadStart(act)));
+                        thread.Start();
+                        thread.Join();
+                    }
+
+
+                    Action act2 = () => {
+                        mId = askId();
+                    };
+                    Thread thread2 = new Thread((new ThreadStart(act2)));
+                    thread2.Start();
+                    thread2.Join();
+
+                    foreach (ConnectedClient connectedClient in clients)
+                    {
+
+                        if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
+                        {
+                            Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
+                            thread.Start();
+                        }
+                        else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                        {
+                            Action act3 = () => {
+                                try
+                                {
+                                    connectedClient.clientProxy.send(nickname, msg, mId);
+                                }
+                                catch (SocketException exception)
+                                {
+                                    //Client Disconnected
+                                    connectedClient.connected = false;
+                                    Console.WriteLine("Debug: " + exception.ToString());
+
+                                }
+                            };
+                            Thread thread3 = new Thread((new ThreadStart(act3)));
+                            thread3.Start();
+                        }
+                        else if (connectedClient.nick.Equals(nickname))
+                        {
+                            myself = connectedClient.clientProxy;
+                        }
+
+                    }
+                    if (myself != null)
+                    {
+                        Action act4 = () =>
+                        {
+                            myself.send(nickname, msg, mId);
+                        };
+
+                        Thread thread4 = new Thread((new ThreadStart(act4)));
+                        thread4.Start();
+
+                    }
+
+                }
+                tbMsg.Clear();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Debug: " + exception.ToString());
+            }
+        }
+
+        public void injectDelay(string nick, int delay)
+        {
+            //delay value defined
+            if (!delayLog.ContainsKey(nick))
+            {
+                delayLog.Add(nick, delay);
+            }
+            else
+            {
+                delayLog[nick] += delay;
+            }
+        }
+
+        public void delayThread(string msg, int mId, ConnectedClient conn)
+        {
+            Thread.Sleep(delayLog[conn.nick]);
+             try
+                {
+                conn.clientProxy.send(nickname, msg, mId);
+                }
+                catch (SocketException exception)
+                {
+                    //Client Disconnected
+                    conn.connected = false;
+                    Console.WriteLine("Debug: " + exception.ToString());
+
+                }
+        }
+
+        /*****************************************  Lider methods  ***************************************************/
+
+
         public void updateLider(ConnectedClient conn)
         {
             lider = conn;
@@ -512,42 +548,42 @@ namespace Client
             foreach (ConnectedClient connectedClient in clients)
             {
 
-               
-                    if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
-                    {
-                        if (connectedClient.playernumber == next)
-                            liderCli = connectedClient;
-                        else
-                        {
-                            Action act3 = () =>
-                            {
-                                try
-                                {
-                                    connectedClient.clientProxy.sendLider(next);
-                                }
-                                catch (SocketException exception)
-                                {
-                                    //Client Disconnected
-                                    connectedClient.connected = false;
-                                    Console.WriteLine("Debug: " + exception.ToString());
 
-                                }
-                            };
-                            Thread thread4 = new Thread((new ThreadStart(act3)));
-                            thread4.Start();
-                        }
-                    }
-                    else if (connectedClient.nick.Equals(nickname))
+                if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                {
+                    if (connectedClient.playernumber == next)
+                        liderCli = connectedClient;
+                    else
                     {
-                        myself = connectedClient.clientProxy;
+                        Action act3 = () =>
+                        {
+                            try
+                            {
+                                connectedClient.clientProxy.sendLider(next);
+                            }
+                            catch (SocketException exception)
+                            {
+                                //Client Disconnected
+                                connectedClient.connected = false;
+                                Console.WriteLine("Debug: " + exception.ToString());
+
+                            }
+                        };
+                        Thread thread4 = new Thread((new ThreadStart(act3)));
+                        thread4.Start();
                     }
-                
+                }
+                else if (connectedClient.nick.Equals(nickname))
+                {
+                    myself = connectedClient.clientProxy;
+                }
+
             }
             if (myself != null)
             {
                 Action act2 = () => {
-                myself.sendLider(next);
-            };
+                    myself.sendLider(next);
+                };
                 Thread thread2 = new Thread((new ThreadStart(act2)));
                 thread2.Start();
                 thread2.Join();
@@ -574,37 +610,6 @@ namespace Client
 
             }
 
-        }
-
-
-        public void injectDelay(string nick)
-        {
-            //delay value defined
-            int delay = 5000;
-            if (!delayLog.ContainsKey(nick))
-            {
-                delayLog.Add(nick, delay);
-            }
-            else
-            {
-                delayLog[nick] += delay;
-            }
-        }
-
-        public void delayThread(string msg, int mId, ConnectedClient conn)
-        {
-            Thread.Sleep(delayLog[conn.nick]);
-             try
-                {
-                conn.clientProxy.send(nickname, msg, mId);
-                }
-                catch (SocketException exception)
-                {
-                    //Client Disconnected
-                    conn.connected = false;
-                    Console.WriteLine("Debug: " + exception.ToString());
-
-                }
         }
 
         public int askId()

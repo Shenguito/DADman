@@ -104,52 +104,6 @@ namespace Client
             form = f;
         }
 
-        //TODO CHAT, shows up the message to chat according to fault tolerance
-        public void broadcast(int id, string nick, string msg)
-        {
-            if (!freeze)
-            {
-                if (!(msgLog.ContainsKey(id)))
-                {
-                    msgLog.Add(id, msg);
-                    nickLog.Add(id, nick);
-                    if (id == clientMessageId)
-                    {
-                        clientMessageId++;
-                        this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
-                    }
-                    else
-                    {
-                        msgQueue.Add(id, msg);
-                        Action act = () =>
-                        {
-                            searchLogs(id);
-
-                        };
-                        Thread thread2 = new Thread((new ThreadStart(act)));
-                        thread2.Start();
-                        if (!activeThread)
-                        {
-                            activeThread = true;
-                            Thread thread = new Thread(() => chatThread());
-                            thread.Start();
-                        }
-                    }
-                }
-            }
-            else
-            {
-                MessageInfo mInf = new MessageInfo();
-                mInf.nick = nick;
-                mInf.id = id;
-                mInf.msg = msg;
-                mInf.isSend = false;
-                holderCount++;
-                messageHolder.Add(holderCount, mInf);
-            }
-
-        }
-
         public void movePlayer(int roundID, string players_arg)
         {
             
@@ -187,52 +141,7 @@ namespace Client
             }
         }
 
-        //TODO CHAT, every connected client receive the message, and then decide which message show broadcast
-        public void send(string nick, string msg, int mId)
-        {
-            if (!freeze)
-            {
-                foreach (ConnectedClient connectedClient in form.clients)
-                {
-                    if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
-                    {
-                        Thread thread = new Thread(() => delayThread(nick, msg, mId, connectedClient));
-                        thread.Start();
-                    }
-                    else if (!connectedClient.nick.Equals(nick) && connectedClient.connected)
-                    {
-                        try
-                        {
-                            connectedClient.clientProxy.broadcast(mId, nick, msg);
-                        }
-                        catch (SocketException e)
-                        {
-                            //Client Disconnected
-                            connectedClient.connected = false;
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Debug: " + e.ToString());
-                        }
-                    }
-                    else
-                    {
-                        Thread thread = new Thread(() => broadcast(mId, nick, msg));
-                        thread.Start();
-                    }
-                }
-            }
-            else
-            {
-                MessageInfo mInf = new MessageInfo();
-                mInf.nick = nick;
-                mInf.id = mId;
-                mInf.msg = msg;
-                mInf.isSend = true;
-                holderCount++;
-                messageHolder.Add(holderCount, mInf);
-            }
-        }
+        
 
         public void playerDead(int playerNumber)
         {
@@ -320,6 +229,137 @@ namespace Client
             //TODO roundID received by server
             //form.writeToFile(roundID);
 
+        }   
+        
+        public void Freeze()
+        {
+            freeze = true;
+            form.freeze = true;
+            form.debugFunction("\r\nFreezed");
+        }
+        public void Unfreeze()
+        {
+            form.debugFunction("\r\nUnfreezed");
+            freeze = false;
+            form.freeze = false;
+            foreach (KeyValuePair<int, BoardInfo> entry in temporaryBoard)
+            {
+                receiveRoundUpdate(entry.Value);
+            }
+            temporaryBoard = new Dictionary<int, BoardInfo>();
+            foreach (KeyValuePair<int, MessageInfo> entry in messageHolder)
+            {
+                if(entry.Value.isSend)
+                    send(entry.Value.nick, entry.Value.msg, entry.Value.id);
+                else
+                    broadcast(entry.Value.id, entry.Value.nick, entry.Value.msg);
+            }
+            messageHolder = new Dictionary<int, MessageInfo>();
+        }
+        
+        public BoardInfo getLocalState(int roundID)
+        {
+            return form.getLocalState(roundID);
+        }
+        public void newServerCreated(string servername, string serverURL)
+        {
+            new Thread(() => this.form.connectToServer(servername, serverURL)).Start();
+        }
+
+
+
+        /*****************************************  chat methods  ***************************************************/
+
+
+        public void broadcast(int id, string nick, string msg)
+        {
+            if (!freeze)
+            {
+                if (!(msgLog.ContainsKey(id)))
+                {
+                    msgLog.Add(id, msg);
+                    nickLog.Add(id, nick);
+                    if (id == clientMessageId)
+                    {
+                        clientMessageId++;
+                        this.form.Invoke(new deluc(form.updateChat), new object[] { nick, msg });
+                    }
+                    else
+                    {
+                        msgQueue.Add(id, msg);
+                        Action act = () =>
+                        {
+                            searchLogs(id);
+
+                        };
+                        Thread thread2 = new Thread((new ThreadStart(act)));
+                        thread2.Start();
+                        if (!activeThread)
+                        {
+                            activeThread = true;
+                            Thread thread = new Thread(() => chatThread());
+                            thread.Start();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageInfo mInf = new MessageInfo();
+                mInf.nick = nick;
+                mInf.id = id;
+                mInf.msg = msg;
+                mInf.isSend = false;
+                holderCount++;
+                messageHolder.Add(holderCount, mInf);
+            }
+
+        }
+
+        public void send(string nick, string msg, int mId)
+        {
+            if (!freeze)
+            {
+                foreach (ConnectedClient connectedClient in form.clients)
+                {
+                    if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
+                    {
+                        Thread thread = new Thread(() => delayThread(nick, msg, mId, connectedClient));
+                        thread.Start();
+                    }
+                    else if (!connectedClient.nick.Equals(nick) && connectedClient.connected)
+                    {
+                        try
+                        {
+                            connectedClient.clientProxy.broadcast(mId, nick, msg);
+                        }
+                        catch (SocketException e)
+                        {
+                            //Client Disconnected
+                            connectedClient.connected = false;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Debug: " + e.ToString());
+                        }
+                    }
+                    else
+                    {
+                        Thread thread = new Thread(() => broadcast(mId, nick, msg));
+                        thread.Start();
+                    }
+                }
+            }
+            else
+            {
+                MessageInfo mInf = new MessageInfo();
+                mInf.nick = nick;
+                mInf.id = mId;
+                mInf.msg = msg;
+                mInf.isSend = true;
+                holderCount++;
+                messageHolder.Add(holderCount, mInf);
+            }
         }
 
         public void chatThread()
@@ -354,65 +394,7 @@ namespace Client
             }
             activeThread = false;
         }
-        public int getId()
-        {
-            totalMessageId++;
-            return totalMessageId;
-        }
-        public void sendLider(int next)
-        {
 
-            foreach (ConnectedClient connectedClient in form.clients)
-            {
-                if (connectedClient.playernumber == next)
-                {
-                    if (connectedClient.nick.Equals(this.nick))
-                    {
-                        int i = topMessageId();
-                        i = Math.Max(clientMessageId, i);
-                        i -= 1;
-                        this.totalMessageId = i;
-                        Action act = () =>
-                        {
-                            searchLogs(i);
-                        };
-                        Thread thread = new Thread((new ThreadStart(act)));
-                        thread.Start();
-                    }
-                    this.lider = connectedClient;
-                    this.form.Invoke(new delLider(form.updateLider), new object[] { connectedClient });
-
-                }
-            }
-        }
-        public void askMessage(string nick, int id)
-        {
-            if (msgLog.ContainsKey(id))
-            {
-                string msg = msgLog[id];
-                string nick1 = nickLog[id];
-                foreach (ConnectedClient connectedClient in form.clients)
-                {
-
-                    if (connectedClient.nick.Equals(nick))
-                    {
-                        try
-                        {
-                            connectedClient.clientProxy.broadcast(id, nick1, msg);
-                        }
-                        catch (SocketException exception)
-                        {
-                            //Client Disconnected
-                            connectedClient.connected = false;
-                            Console.WriteLine("Debug: " + exception.ToString());
-
-
-                        }
-                    }
-                }
-            }
-
-        }
         public void searchLogs(int current)
         {
             int i = 1;
@@ -446,6 +428,104 @@ namespace Client
                 i++;
             }
         }
+
+        public void askMessage(string nick, int id)
+        {
+            if (msgLog.ContainsKey(id))
+            {
+                string msg = msgLog[id];
+                string nick1 = nickLog[id];
+                foreach (ConnectedClient connectedClient in form.clients)
+                {
+
+                    if (connectedClient.nick.Equals(nick))
+                    {
+                        try
+                        {
+                            connectedClient.clientProxy.broadcast(id, nick1, msg);
+                        }
+                        catch (SocketException exception)
+                        {
+                            //Client Disconnected
+                            connectedClient.connected = false;
+                            Console.WriteLine("Debug: " + exception.ToString());
+
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+        public void InjectDelay(string pid2)
+        {
+            //delay time defined
+            int delay = 5000;
+            if (!delayLog.ContainsKey(pid2))
+            {
+                delayLog.Add(pid2, delay);
+            }
+            else
+            {
+                delayLog[pid2] += delay;
+            }
+
+            this.form.injectDelay(pid2, delay);
+            form.debugFunction("\r\nInjected Delay to " + pid2);
+        }
+
+        public void delayThread(string nickname, string msg, int mId, ConnectedClient conn)
+        {
+            Thread.Sleep(delayLog[conn.nick]);
+            try
+            {
+                conn.clientProxy.broadcast(mId, nickname, msg);
+            }
+            catch (SocketException exception)
+            {
+                //Client Disconnected
+                conn.connected = false;
+                Console.WriteLine("Debug: " + exception.ToString());
+
+            }
+        }
+
+        /*****************************************  Lider methods  ***************************************************/
+
+
+        public int getId()
+        {
+            totalMessageId++;
+            return totalMessageId;
+        }
+        public void sendLider(int next)
+        {
+
+            foreach (ConnectedClient connectedClient in form.clients)
+            {
+                if (connectedClient.playernumber == next)
+                {
+                    if (connectedClient.nick.Equals(this.nick))
+                    {
+                        int i = topMessageId();
+                        i = Math.Max(clientMessageId, i);
+                        i -= 1;
+                        this.totalMessageId = i;
+                        Action act = () =>
+                        {
+                            searchLogs(i);
+                        };
+                        Thread thread = new Thread((new ThreadStart(act)));
+                        thread.Start();
+                    }
+                    this.lider = connectedClient;
+                    this.form.Invoke(new delLider(form.updateLider), new object[] { connectedClient });
+
+                }
+            }
+        }
+
         public int topMessageId()
         {
             int temp = 1;
@@ -473,71 +553,6 @@ namespace Client
         public int getClientMessageId()
         {
             return clientMessageId;
-        }
-        public void Freeze()
-        {
-            freeze = true;
-            form.freeze = true;
-            form.debugFunction("\r\nFreezed");
-        }
-        public void Unfreeze()
-        {
-            form.debugFunction("\r\nUnfreezed");
-            freeze = false;
-            form.freeze = false;
-            foreach (KeyValuePair<int, BoardInfo> entry in temporaryBoard)
-            {
-                receiveRoundUpdate(entry.Value);
-            }
-            temporaryBoard = new Dictionary<int, BoardInfo>();
-            foreach (KeyValuePair<int, MessageInfo> entry in messageHolder)
-            {
-                if(entry.Value.isSend)
-                    send(entry.Value.nick, entry.Value.msg, entry.Value.id);
-                else
-                    broadcast(entry.Value.id, entry.Value.nick, entry.Value.msg);
-            }
-            messageHolder = new Dictionary<int, MessageInfo>();
-        }
-        public void InjectDelay(string pid2)
-        {
-            int delay = 5000;
-            if (!delayLog.ContainsKey(pid2))
-            {
-                delayLog.Add(pid2, delay);
-            }
-            else
-            {
-                delayLog[pid2] += delay;
-            }
-
-            this.form.injectDelay(pid2);
-            form.debugFunction("\r\nInjected Delay to " + pid2);
-        }
-
-        public void delayThread(string nickname, string msg, int mId, ConnectedClient conn)
-        {
-            Thread.Sleep(delayLog[conn.nick]);
-            try
-            {
-                conn.clientProxy.broadcast(mId, nickname, msg);
-            }
-            catch (SocketException exception)
-            {
-                //Client Disconnected
-                conn.connected = false;
-                Console.WriteLine("Debug: " + exception.ToString());
-
-            }
-        }
-
-        public BoardInfo getLocalState(int roundID)
-        {
-            return form.getLocalState(roundID);
-        }
-        public void newServerCreated(string servername, string serverURL)
-        {
-            new Thread(() => this.form.connectToServer(servername, serverURL)).Start();
         }
     }
 }

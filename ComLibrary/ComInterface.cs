@@ -20,19 +20,21 @@ namespace ComLibrary
     }
     public interface IClient
     {
-        void send(string nick, string msg, int mId);
-        void broadcast(int id, string nick, string msg);
         void movePlayer(int roundID, string players_arg);
         void moveGhost(int roundID, string monster_arg);
         void coinEaten(int playerNumber, string coinName);
         void playerDead(int playerNumber);
         void startGame(int playerNumber, string arg);
         void receiveRoundUpdate(BoardInfo board);
+
+        void broadcast(int id, string nick, string msg);
+        void send(string nick, string msg, int mId);
+        void askMessage(string nick, int id);
         int getId();
         void sendLider(int next);
-        void askMessage(string nick, int id);
         int getClientMessageId();
     }
+
     public interface IPuppetMasterLauncher
     {
         void LaunchProcess(string name, string args);
