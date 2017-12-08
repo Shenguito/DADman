@@ -87,8 +87,6 @@ namespace PuppetMaster
             }
             else if (text.Split(' ')[0].Equals("InjectDelay"))
             {
-                //string nick = text.Split()[1];
-                //nick.injectDelay(text.Split()[2]);
                 processLaucher.delayProcess(text.Split(' ')[1], text.Split(' ')[2]);
             }
             else if (text.Split(' ').Length == 2 && text.Split()[0].Equals("Wait"))

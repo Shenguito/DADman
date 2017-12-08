@@ -262,6 +262,7 @@ namespace Client
                 {
 
                     string msg = tbMsg.Text;
+                    tbMsg.Clear();
                     IClient myself = null;
                     int mId = 1;
                     if (lider == null)
@@ -328,8 +329,6 @@ namespace Client
 
                 }
                 tbMsg.Clear();
-                tbMsg.Enabled = false;
-                this.Focus();
             }
             catch (Exception exception)
             {
@@ -582,7 +581,7 @@ namespace Client
         {
             //delay value defined
             int delay = 5000;
-            if (!(delayLog.ContainsKey(nick)))
+            if (!delayLog.ContainsKey(nick))
             {
                 delayLog.Add(nick, delay);
             }
