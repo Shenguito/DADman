@@ -146,6 +146,7 @@ namespace Server
             {
                 if (c.playernumber == playerNumber)
                 {
+                    serverForm.deadPlayer.Add(playerNumber);
                     c.dead = true;
                 }
                 if(!disconnectedPlayers.Contains(c.playernumber))
@@ -333,8 +334,7 @@ namespace Server
             Console.WriteLine("round: " + board.RoundID);
             Console.WriteLine("player: " + board.Players);
             Console.WriteLine("monster: " + board.Monsters);
-            Console.WriteLine("coin: " + board.AteCoins);
-            Console.WriteLine("dead player: " + board.PlayerDead);
+            Console.WriteLine("coin: " + board.Coins);
             serverForm.UpdateBoard(board);
         }
 

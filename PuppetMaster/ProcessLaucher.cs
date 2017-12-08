@@ -173,14 +173,23 @@ namespace PuppetMaster
         {
             try
             {
-                //TODO
                 BoardInfo board = remotingProcesses[input[1].Trim()].getLocalState(Int32.Parse(input[2].Trim()));
-                Console.WriteLine("start:");
-                Console.WriteLine("player: "+board.Players+" : "+board.PlayerDead);
-                Console.WriteLine("Monster: "+board.Monsters);
-                Console.WriteLine("AteCoins: "+board.AteCoins);
-                Console.WriteLine("Coins: " + board.Coins);
-                Console.WriteLine("end...");
+                Console.WriteLine("localstate of "+ input[1].Trim() + ":");
+                for (int i = 1; i < board.Players.Split('_')[0].Split('-').Length; i++)
+                {
+                    Console.WriteLine("player"+i+"=" + board.Players.Split('_')[0].Split('-')[i].Split(':')[0] + ":"+
+                        board.Players.Split('_')[0].Split('-')[i].Split(':')[1]+" is "+ board.Players.Split('_')[0].Split('-')[i].Split(':')[2]);
+                }
+                for (int i = 0, j = 0; j < board.Monsters.Split(':').Length; i++, j += 2)
+                {
+                    Console.WriteLine("Monster" + i + "=" + board.Monsters.Split(':')[j] + ":" + board.Monsters.Split(':')[j + 1]);
+                }
+                for (int i = 1; i < board.Coins.Split('-').Length; i++)
+                {
+                    Console.WriteLine("Eaten Coins: " + board.Coins.Split('-')[i]);
+                }
+                
+                Console.WriteLine();
             }
             catch
             {

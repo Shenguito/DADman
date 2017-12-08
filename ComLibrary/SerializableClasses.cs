@@ -12,18 +12,14 @@ namespace ComLibrary
         public int RoundID;
         public string Players;
         public string Monsters;
-        public string AteCoins;
         public string Coins;
-        public string PlayerDead;
 
-        public BoardInfo(int roundId, string Players, string Monsters, string AteCoins, string Coins, string PlayerDead)
+        public BoardInfo(int roundId, string Players, string Monsters, string Coins)
         {
             this.RoundID = roundId;
             this.Players = Players;
             this.Monsters = Monsters;
-            this.AteCoins = AteCoins;
             this.Coins = Coins;
-            this.PlayerDead = PlayerDead;
         }
     }
     [Serializable]

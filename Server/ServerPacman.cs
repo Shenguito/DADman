@@ -28,8 +28,6 @@ namespace Server {
 
         public bool started = false;
 
-        public string atecoin=" ";
-
         public int roundID = 0;
 
         int boardRight = 320;
@@ -85,14 +83,14 @@ namespace Server {
             tbOutput.Text += "ServerForm criado." + timer1.ToString(); ;
 
         }
-        
+
         public void processMove(int playerNumber, string move)
         {
             PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playerNumber);
             try
             {
                 updatePlayerPosition(playerNumber, pb, move);
-                
+
                 foreach (Control x in this.Controls)
                 {
                     // checking if the player hits the wall or the ghost, then game is over
@@ -100,8 +98,7 @@ namespace Server {
                     {
                         if (((PictureBox)x).Bounds.IntersectsWith(pb.Bounds))
                         {
-                            dead_arg += "-" + playerNumber;
-                            
+                            sendPlayerDead(playerNumber);
                         }
                     }
                     if (x is PictureBox && x.Tag == "coin")
@@ -111,26 +108,25 @@ namespace Server {
                             getPictureBoxByName(x.Name).Visible = false;
                             Controls.Remove(x);
                             server.clientList.FirstOrDefault(t => t.playernumber == playerNumber).score++;
-                            coins_arg +="-" + x.Name;
-                            atecoin+="-" + x.Name;
+                            coins_arg += "-" + x.Name;
                             sendCoinEaten(playerNumber, x.Name);
                         }
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Start: \r\n" + e.ToString() + "\r\nEnd");
             }
-            
+
         }
-        /*
+        
         public void sendPlayerDead(int playerNumber)
         {
             server.sendPlayerDead(playerNumber);
             deadPlayer.Add(playerNumber);
         }
-        */
+        
         public void sendCoinEaten(int playerNumber, string coinName)
         {
             server.sendCoinEaten(playerNumber, coinName);
@@ -173,7 +169,8 @@ namespace Server {
                 ghost3y = -ghost3y;
             }
             
-            monsters_arg += redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
+            monsters_arg = redGhost.Left + ":"+ redGhost.Top+":" + yellowGhost.Left + ":" +
+                yellowGhost.Top + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
         }
 
         private void updatePlayerPosition(int playerNumber, PictureBox pb, string move)
@@ -214,7 +211,7 @@ namespace Server {
             players_arg += "-" + playerNumber + ":" + move;
         }
 
-        public string playerLocation()
+        private string playerLocation()
         {
             string players = "";
             for (int i=1; i <= server.numberPlayersConnected; i++)
@@ -222,6 +219,14 @@ namespace Server {
                 players += "-"+
                     getPictureBoxByName("pictureBoxPlayer"+i).Top + ":" +
                     getPictureBoxByName("pictureBoxPlayer" + i).Left;
+                if (deadPlayer.Contains(i))
+                {
+                    players += ":D";
+                }
+                else
+                {
+                    players += ":A";
+                }
             }
             return players;
         }
@@ -230,7 +235,7 @@ namespace Server {
         {
             tbOutput.Text += ("Ronda " + roundID + " \r\n");
             roundID++;
-            players_arg = dead_arg = monsters_arg = coins_arg = "";
+            players_arg = "";
             
             for(int i=1; i<= server.numberPlayersConnected; i++)
             {
@@ -251,8 +256,8 @@ namespace Server {
             */
             listMove = new Dictionary<int, string>();
             updateGhostsPosition();
-            //TODO
-            BoardInfo thisround = new BoardInfo(roundID, players_arg, monsters_arg, coins_arg, "c", dead_arg);
+            //to remember players_arg=LEFT:D  && playerLocation=-x:y
+            BoardInfo thisround = new BoardInfo(roundID, playerLocation()+"_"+ players_arg, monsters_arg, coins_arg);
             try
             {
                 //TODO IMPORTANT, board put error
@@ -272,7 +277,7 @@ namespace Server {
             boardByRound.Add(roundID, board);
             string[] pl_tok = board.Players.Split('-');
             
-            string[] coin_tok = board.AteCoins.Split('-');
+            string[] coin_tok = board.Coins.Split('-');
             
             for (int i = 1; i < pl_tok.Length; i++)
             {
@@ -285,9 +290,9 @@ namespace Server {
             //monsters_arg = redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
             string[] monst_tok = board.Monsters.Split(':');
             redGhost.Left = Int32.Parse(monst_tok[0]);
-            yellowGhost.Left = Int32.Parse(monst_tok[1]);
-            pinkGhost.Left = Int32.Parse(monst_tok[2]);
-            pinkGhost.Top = Int32.Parse(monst_tok[3]);
+            yellowGhost.Left = Int32.Parse(monst_tok[2]);
+            pinkGhost.Left = Int32.Parse(monst_tok[4]);
+            pinkGhost.Top = Int32.Parse(monst_tok[5]);
                 
 
             for (int i = 1; i < coin_tok.Length; i++)

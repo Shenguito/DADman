@@ -125,7 +125,7 @@ namespace Client
 
         }
 
-        public void movePlayer(int roundID, string players_arg, string dead_arg)
+        public void movePlayer(int roundID, string players_arg)
         {
             if (players_arg != "")
             {
@@ -135,6 +135,7 @@ namespace Client
                     this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
                 }
             }
+            /*
             if (dead_arg != "")
             {
                 string[] tok_dead = dead_arg.Split('-');
@@ -143,12 +144,13 @@ namespace Client
                     this.form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
                 }
             }
+            */
 
         }
         public void moveGhost(int roundID, string monster_arg)
         {
             string[] monst_tok = monster_arg.Split(':');
-            form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { Int32.Parse(monst_tok[0]), Int32.Parse(monst_tok[1]), Int32.Parse(monst_tok[2]), Int32.Parse(monst_tok[3]) });
+            form.Invoke(new delmoveGhost(form.updateGhostsMove), new object[] { Int32.Parse(monst_tok[0]), Int32.Parse(monst_tok[2]), Int32.Parse(monst_tok[4]), Int32.Parse(monst_tok[5]) });
         }
 
         public void coinEaten(int roundID, string coins_arg)
@@ -256,12 +258,12 @@ namespace Client
             if (!freeze)
             {
                 //if not null is inside of below function
-                
-                movePlayer(board.RoundID, board.Players, board.PlayerDead);
+                //PROBLEM PLAYER MOVE
+                movePlayer(board.RoundID, board.Players.Split('_')[1]);
                 if (board.Monsters != "")
                     moveGhost(board.RoundID, board.Monsters);
-                if (board.AteCoins != "")
-                    coinEaten(board.RoundID, board.AteCoins);
+                if (board.Coins != "")
+                    coinEaten(board.RoundID, board.Coins);
                 
                 form.addBoard(board);
             }

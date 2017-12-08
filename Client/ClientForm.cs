@@ -350,7 +350,7 @@ namespace Client
         //TODO receber messageID, Player+Move, Ghost+move
         public void updateMove(int playernumber, string move)
         {
-            tbChat.AppendText("\r\nUpdateMode");
+            tbChat.AppendText("\r\nUpdateMode:"+move);
             goleft = goright = goup = godown = false;
             PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playernumber);
 
