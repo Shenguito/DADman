@@ -50,7 +50,7 @@ namespace ComLibrary
     public interface IServerReplication
     {
         void connectServer(string nick, string url);
-        void receiveServer(string nick, string url, BoardInfo board);
+        void receiveServer(string nick, string url, BoardInfo board, List<ConnectedClient> clients);
         void UpdateBoard(BoardInfo board);
     }
 

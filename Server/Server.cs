@@ -56,7 +56,7 @@ namespace Server
 
     public class RemoteServer : MarshalByRefObject, IServer, IServerReplication, IGeneralControlServices
     {
-        internal List<ConnectedClient> clientList = new List<ConnectedClient>();
+        public List<ConnectedClient> clientList = new List<ConnectedClient>();
         List<int> disconnectedPlayers = new List<int>();
         public int numberPlayersConnected = 0;
         public delegate void delProcess(int playerNumber, string move);
@@ -137,7 +137,7 @@ namespace Server
                 }
             }
         }
-        
+        //SEND TO CLIENT
         public void sendRoundUpdate(BoardInfo board) 
         {
             /*
@@ -162,7 +162,8 @@ namespace Server
                 catch(Exception e)
                 {
                     disconnectedPlayers.Add(c.playernumber);
-                    Console.WriteLine("Client "+c.nick+" is down...");
+                    Console.WriteLine("Client "+c.nick+" receiving is down...");
+                    Console.WriteLine(e);
                 }
                 //).Start();
             }
@@ -218,10 +219,12 @@ namespace Server
             }
         }
 
-        public void receiveServer(string name, string url, BoardInfo board)
+        //RECEIVE CONNECTION FROM SERVER
+        public void receiveServer(string name, string url, BoardInfo board, List<ConnectedClient> clients)
         {
-            Console.WriteLine("ConnectServer........");
+            Console.WriteLine("ConnectedServer........");
             firstServer = false;
+            clientList = clients;
             UpdateBoard(board);
             try
             {
@@ -236,6 +239,7 @@ namespace Server
             }
         }
 
+        //CONNECT DO SERVER
         public void connectServer(string name, string url)
         {
             IServerReplication serverProxy = null;
@@ -249,7 +253,7 @@ namespace Server
                     Console.WriteLine("ConnectServer........");
                     serversConnected.Add(name, serverProxy);
                     serverProxy.receiveServer(Program.SERVERNAME, "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(url) + "/Server",
-                        serverForm.boardByRound[serverForm.boardByRound.Count-1]);
+                        serverForm.boardByRound[serverForm.boardByRound.Count-1], clientList);
                     break;
                 }
                 catch

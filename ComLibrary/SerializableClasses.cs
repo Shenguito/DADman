@@ -11,13 +11,15 @@ namespace ComLibrary
     {
         public int RoundID;
         public string Players;
+        public string move;
         public string Monsters;
         public string Coins;
 
-        public BoardInfo(int roundId, string Players, string Monsters, string Coins)
+        public BoardInfo(int roundId, string Players, string move, string Monsters, string Coins)
         {
             this.RoundID = roundId;
             this.Players = Players;
+            this.move = move;
             this.Monsters = Monsters;
             this.Coins = Coins;
         }

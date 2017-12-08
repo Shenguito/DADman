@@ -215,13 +215,19 @@ namespace Server {
         private string playerLocation()
         {
             string players = "";
-            for (int i=1; i <= server.numberPlayersConnected; i++)
+            for (int i=1; i <= server.clientList.Count; i++)
             {
                 players += "-"+
                     getPictureBoxByName("pictureBoxPlayer"+i).Top + ":" +
                     getPictureBoxByName("pictureBoxPlayer" + i).Left;
+
                 if (deadPlayer.Contains(i))
                 {
+                    players += ":D";
+                }
+                else if (server.clientList[i - 1].dead)
+                {
+                    deadPlayer.Add(server.clientList[i - 1].playernumber);
                     players += ":D";
                 }
                 else
@@ -238,21 +244,14 @@ namespace Server {
             roundID++;
             players_arg = "";
             
-            for(int i=1; i<= server.numberPlayersConnected; i++)
+            foreach (KeyValuePair<int, string> entry in listMove)
             {
-                if (listMove.ContainsKey(i))
-                {
-                    processMove(i, listMove[i]);
-                }
-                else
-                {
-                    processMove(i, "null");
-                }
+                processMove(entry.Key, entry.Value);
             }
             listMove = new Dictionary<int, string>();
             updateGhostsPosition();
-            //to remember players_arg=LEFT:D  && playerLocation=-x:y
-            BoardInfo thisround = new BoardInfo(roundID, playerLocation()+"_"+ players_arg, monsters_arg, coins_arg);
+            //to remember players_arg=LEFT:D  && playerLocation=-x:y IMPORTANT
+            BoardInfo thisround = new BoardInfo(roundID, playerLocation(), players_arg, monsters_arg, coins_arg);
             try
             {
                 boardByRound.Add(roundID, thisround);
@@ -287,7 +286,6 @@ namespace Server {
             yellowGhost.Left = Int32.Parse(monst_tok[2]);
             pinkGhost.Left = Int32.Parse(monst_tok[4]);
             pinkGhost.Top = Int32.Parse(monst_tok[5]);
-                
 
             for (int i = 1; i < coin_tok.Length; i++)
             {
@@ -302,8 +300,6 @@ namespace Server {
             timer1.Start();
             tbOutput.AppendText("timer setted");
         }
-
-        
 
         public void startGame(int playerNumbers)
         {
@@ -321,6 +317,7 @@ namespace Server {
 
         public void ReceivingMove(Movement move)
         {
+            //TODO roundIDsheng
             if (!listMove.ContainsKey(move.roundID))
                 try
                 {
