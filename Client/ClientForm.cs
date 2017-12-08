@@ -59,11 +59,7 @@ namespace Client
 
         public Dictionary<int, BoardInfo> boardByRound;
 
-        public void addBoard(BoardInfo board)
-        {
-            //TODO IMPORTANT BOARD INPUT ERROR
-            boardByRound.Add(board.RoundID, board);
-        }
+        
         public ClientForm()
         {
           
@@ -436,8 +432,8 @@ namespace Client
                 getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
                 tbChat.Text += "My Number " + myNumber;
 
-                
-                Thread thread = new Thread(() => doWork());
+                //thread
+                Thread thread = new Thread((new ThreadStart(doWork)));
                 thread.Start();
             }
         }

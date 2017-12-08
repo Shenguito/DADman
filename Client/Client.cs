@@ -127,13 +127,12 @@ namespace Client
 
         public void movePlayer(int roundID, string players_arg)
         {
-            if (players_arg != "")
+            
+            string[] tok_moves = players_arg.Split('-');
+            for (int i = 1; i < tok_moves.Length; i++)
             {
-                string[] tok_moves = players_arg.Split('-');
-                for (int i = 1; i < tok_moves.Length; i++)
-                {
-                    this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
-                }
+                if(!tok_moves[i].Split(':')[1].Equals("null"))
+                this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
             }
             /*
             if (dead_arg != "")
@@ -245,6 +244,8 @@ namespace Client
              * if !freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID) wait
              * if !freeze run delegate function
              */
+            if (form.boardByRound.ContainsValue(board))
+                return;
             while (!freeze && temporaryBoard.Count != 0 && !temporaryBoard.ContainsKey(board.RoundID))
             {
                 form.debugFunction("\r\n Let's Sleep");
@@ -258,14 +259,15 @@ namespace Client
             if (!freeze)
             {
                 //if not null is inside of below function
-                //PROBLEM PLAYER MOVE
-                movePlayer(board.RoundID, board.Players.Split('_')[1]);
+                //PROBLEM PLAYER MOVE DELEGATE
+                if (board.Players.Split('_')[1] != "")
+                    movePlayer(board.RoundID, board.Players.Split('_')[1]);
                 if (board.Monsters != "")
                     moveGhost(board.RoundID, board.Monsters);
                 if (board.Coins != "")
                     coinEaten(board.RoundID, board.Coins);
-                
-                form.addBoard(board);
+                form.roundID = board.RoundID+1;
+                form.boardByRound.Add(board.RoundID, board);
             }
             else if (freeze)
             {

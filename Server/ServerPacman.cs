@@ -19,6 +19,7 @@ namespace Server {
 
     public partial class ServerForm : Form
     {
+        public delegate void ThrWork();
 
         public Dictionary<int, string> listMove = new Dictionary<int, string>();
         public List<int> deadPlayer;
@@ -233,7 +234,7 @@ namespace Server {
 
         private void processingTimer()
         {
-            tbOutput.Text += ("Ronda " + roundID + " \r\n");
+            //tbOutput.Text += ("Ronda " + roundID + " \r\n");
             roundID++;
             players_arg = "";
             
@@ -248,19 +249,12 @@ namespace Server {
                     processMove(i, "null");
                 }
             }
-            /*
-            foreach (KeyValuePair<int, string> entry in listMove)
-            {
-                processMove(entry.Key, entry.Value);
-            }
-            */
             listMove = new Dictionary<int, string>();
             updateGhostsPosition();
             //to remember players_arg=LEFT:D  && playerLocation=-x:y
             BoardInfo thisround = new BoardInfo(roundID, playerLocation()+"_"+ players_arg, monsters_arg, coins_arg);
             try
             {
-                //TODO IMPORTANT, board put error
                 boardByRound.Add(roundID, thisround);
             }
             catch
@@ -272,8 +266,8 @@ namespace Server {
 
         public void UpdateBoard(BoardInfo board)
         {
+            tbOutput.AppendText("updating");
             this.roundID = board.RoundID;
-            //TODO IMPORTANTE BOARD
             boardByRound.Add(roundID, board);
             string[] pl_tok = board.Players.Split('-');
             
@@ -303,18 +297,13 @@ namespace Server {
                 Controls.Remove(pb);
             }
             //TODO, TIMER SYNCHRONIZATION
-            //timer1.Elapsed += timer1_Tick;
-            //timer1.Start();
+            tbOutput.AppendText("set timer");
+            timer1.Elapsed += timer1_Tick;
+            timer1.Start();
+            tbOutput.AppendText("timer setted");
         }
 
-        public void timer1_Tick(object sender, EventArgs e)
-        {
-            Thread thread = new Thread(() => processingTimer());
-            thread.Start();
-
-            //debug function
-            //server.CheckUserScore();
-        }
+        
 
         public void startGame(int playerNumbers)
         {
@@ -328,6 +317,25 @@ namespace Server {
         public BoardInfo getLocalState(int roundID)
         {
             return boardByRound[roundID];
+        }
+
+        public void ReceivingMove(Movement move)
+        {
+            if (!listMove.ContainsKey(move.roundID))
+                try
+                {
+                    listMove.Add(move.playernumber, move.move);
+                }
+                catch
+                {
+                    //TODO problem
+                    tbOutput.AppendText("\r\n"+move.nick + ":" + move.roundID+" already exists");
+                }
+        }
+        public void timer1_Tick(object sender, EventArgs e)
+        {
+            Thread t = new Thread(new ThreadStart(processingTimer));
+            t.Start();
         }
 
         //Get Picture by String

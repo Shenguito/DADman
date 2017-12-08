@@ -111,35 +111,12 @@ namespace Server
 
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendMove(Movement move)
         {
-            //TODO, RECONNECT THE CLIENT, IF NEEDED
-            /*
-            foreach (Client c in clientList)
-            {
-                if (c.nick.Equals(nick) && c.connected == false)
-                {
-                    c.connected = true;
-                    //TODO Sheng
-                }
-            }
-            */
-            try
-            {
-                this.serverForm.listMove.Add(move.playernumber, move.move);
-                Console.WriteLine(serverForm.roundID+"added: " + move.move + " to player " + move.playernumber + " with score="+clientList[move.playernumber - 1].score);
-            }
-            catch
-            {
-                //TODO error, solution, threadpool
-                Console.WriteLine("Client sent a move exception (Server sendMove(...))");
-            }
-            
-            //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
+            Console.WriteLine(move.roundID + "-round");
+            this.serverForm.ReceivingMove(move);
         }
         
-        //TO REMOVE
         public void sendPlayerDead(int playerNumber)
         {
             foreach (ConnectedClient c in clientList)
@@ -351,5 +328,7 @@ namespace Server
                 Console.WriteLine("client: "+c.nick+"=> score="+c.score);
             }
         }
+
+        
     }
 }
