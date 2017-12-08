@@ -48,24 +48,6 @@ namespace Client
 
     }
 
-    public class ConnectedClient
-    {
-        public string nick;
-        public int playernumber;
-        public string url;
-        public IClient clientProxy;
-        public bool connected;
-        public ConnectedClient(string nick, int playernumber, string url, IClient clientProxy)
-        {
-            this.nick = nick;
-            this.playernumber = playernumber;
-            this.url = url;
-            this.clientProxy = clientProxy;
-            connected = true;
-        }
-    }
-
-
     public class RemoteClient : MarshalByRefObject, IClient, IGeneralControlServices
     {
         //CREATE DELEGATE
@@ -84,23 +66,25 @@ namespace Client
 
         bool freeze = false;
         bool delay = false;
-        Dictionary<int, string> updateLog;
+        Dictionary<int, BoardInfo> temporaryBoard;
 
         private delegate void ReceiveDelegate(string param1, int param2, ArrayList list);
         public RemoteClient(ClientForm form)
         {
             
-            updateLog = new Dictionary<int, string>();
+            temporaryBoard = new Dictionary<int, BoardInfo>();
             msgLog = new Dictionary<int, string>();
             nickLog = new Dictionary<int, string>();
             msgQueue = new Dictionary<int, string>();
             this.form = form;
             nick = Program.PLAYERNAME;
+            /*
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteClient),
                 "Client",
                 WellKnownObjectMode.Singleton
             );
+            */
         }
 
         public void setForm(ClientForm f)
@@ -235,17 +219,7 @@ namespace Client
                         {
                             form.myNumber = Int32.Parse(c[1]);
                         }
-
-                        /*
-                        RemoteClient rmc = new RemoteClient(form);
-                        string clientServiceName = "Client";
-
-                        RemotingServices.Marshal(
-                            rmc,
-                            clientServiceName,
-                            typeof(RemoteClient)
-                        );
-                        */
+                        
                         IClient clientProxy = (IClient)Activator.GetObject(
                         typeof(IClient),
                         c[2]);
@@ -262,19 +236,19 @@ namespace Client
             }
         }
 
-        public void receiveRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg)
+        public void receiveRoundUpdate(BoardInfo board)
         {
             /*TODO1, thread
              * if freeze, add to queue 
              * if !freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID) wait
              * if !freeze run delegate function
              */
-            while (!freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID))
+            while (!freeze && temporaryBoard.Count != 0 && !temporaryBoard.ContainsKey(board.RoundID))
             {
                 form.debugFunction("\r\n Let's Sleep");
                 Thread.Sleep(1);
                 form.debugFunction("\r\nSleeping");
-                if (!freeze && updateLog.Count == 0)
+                if (!freeze && temporaryBoard.Count == 0)
                 {
                     break;
                 }
@@ -282,20 +256,23 @@ namespace Client
             if (!freeze)
             {
                 //if not null is inside of below function
-                movePlayer(roundID, players_arg, dead_arg);
-                if (monster_arg != "")
-                    moveGhost(roundID, monster_arg);
-                if (coins_arg != "")
-                    coinEaten(roundID, coins_arg);
+                
+                movePlayer(board.RoundID, board.Players, board.PlayerDead);
+                if (board.Monsters != "")
+                    moveGhost(board.RoundID, board.Monsters);
+                if (board.AteCoins != "")
+                    coinEaten(board.RoundID, board.AteCoins);
+                
+                form.addBoard(board);
             }
             else if (freeze)
             {
-                updateLog.Add(roundID, players_arg + " " + dead_arg + " " + monster_arg + " " + coins_arg);
+                temporaryBoard.Add(board.RoundID, board);
                 return;
             }
 
             //TODO roundID received by server
-            form.writeToFile(roundID);
+            //form.writeToFile(roundID);
 
         }
 
@@ -462,18 +439,20 @@ namespace Client
             form.debugFunction("\r\nUnfreezed");
             freeze = false;
             form.freeze = false;
-            foreach (KeyValuePair<int, string> entry in updateLog)
+            foreach (KeyValuePair<int, BoardInfo> entry in temporaryBoard)
             {
-                receiveRoundUpdate(entry.Key, entry.Value.Split(' ')[0],
-                    entry.Value.Split(' ')[1], entry.Value.Split(' ')[2],
-                    entry.Value.Split(' ')[3]);
+                receiveRoundUpdate(entry.Value);
             }
-            updateLog = new Dictionary<int, string>();
+            temporaryBoard = new Dictionary<int, BoardInfo>();
         }
         public void InjectDelay(string pid1, string pid2)
         {
             delay = true;
             form.debugFunction("\r\nInjected Delay from " + pid1 + " to " + pid2);
+        }
+        public BoardInfo getLocalState(int roundID)
+        {
+            return form.getLocalState(roundID);
         }
         public void newServerCreated(string servername, string serverURL)
         {

@@ -173,51 +173,20 @@ namespace PuppetMaster
         {
             try
             {
-                if (input[1][0] == 'S')
-                {
-                    string checkLog = Util.PROJECT_ROOT + "Server" + Path.DirectorySeparatorChar + "bin" + 
-                        Path.DirectorySeparatorChar + input[1].Trim() + Path.DirectorySeparatorChar + input[2].Trim();
-                    try
-                    {
-                        using (StreamReader sr = File.OpenText(checkLog))
-                        {
-                            string s = "";
-                            while ((s = sr.ReadLine()) != null)
-                            {
-                                Console.WriteLine(s);
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Não consegui ler serverLog");
-                    }
-                }
-                else if (input[1][0] == 'C')
-                {
-                    string checkLog = Util.PROJECT_ROOT+"Client" + Path.DirectorySeparatorChar + "bin" + 
-                        Path.DirectorySeparatorChar + input[1] + Path.DirectorySeparatorChar + input[2];
-                    try
-                    {
-                        using (StreamReader sr = File.OpenText(checkLog))
-                        {
-                            string s = "";
-                            while ((s = sr.ReadLine()) != null)
-                            {
-                                Console.WriteLine(s);
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Não consegui ler clientLog");
-                    }
-                }
+                //TODO
+                BoardInfo board = remotingProcesses[input[1].Trim()].getLocalState(Int32.Parse(input[2].Trim()));
+                Console.WriteLine("start:");
+                Console.WriteLine("player: "+board.Players+" : "+board.PlayerDead);
+                Console.WriteLine("Monster: "+board.Monsters);
+                Console.WriteLine("AteCoins: "+board.AteCoins);
+                Console.WriteLine("Coins: " + board.Coins);
+                Console.WriteLine("end...");
             }
             catch
             {
-                Console.WriteLine("Invalid PID");
+                Console.WriteLine(input[1].Trim() + " localstate is not responding\r\n");
             }
+            
         }
         public void freezeProcess(string pid)
         {

@@ -22,7 +22,7 @@ namespace Client
 {
     public partial class ClientForm : Form
     {
-
+        public int roundID = -1;
         public int myNumber = 1;
 
         string nickname;
@@ -57,13 +57,20 @@ namespace Client
 
         public Dictionary<string, IServer> serversConnected = new Dictionary<string, IServer>();
 
+        public Dictionary<int, BoardInfo> boardByRound;
 
+        public void addBoard(BoardInfo board)
+        {
+            //TODO IMPORTANT BOARD INPUT ERROR
+            boardByRound.Add(board.RoundID, board);
+        }
         public ClientForm()
         {
           
             nickname = Program.PLAYERNAME;
             clients = new List<ConnectedClient>();
             delayLog = new Dictionary<string, int>();
+            boardByRound = new Dictionary<int, BoardInfo>();
             InitializeComponent();
             this.Text += ": " + nickname;
             label2.Visible = false;
@@ -81,11 +88,11 @@ namespace Client
             ChannelServices.RegisterChannel(channel, false);
 
 
-
+            
             // Registro do cliente
             RemoteClient rmc = new RemoteClient(this);
             string clientServiceName = "Client";
-            // ## dont know what this does
+            
             RemotingServices.Marshal(
                 rmc,
                 clientServiceName,
@@ -126,7 +133,8 @@ namespace Client
                 }
                 catch
                 {
-                    tbChat.Text += "Catch: Didn't connected to server";
+                    tbChat.Text += "Catch: Didn't connected to server, trying again";
+                    serverProxy = null;
                     Thread.Sleep(1000);
                 }
             }
@@ -134,6 +142,7 @@ namespace Client
 
         private void doMove(string move)
         {
+            //TODO IMPORTANT
             while (!started)
             {
                 Thread.Sleep(1);
@@ -149,92 +158,92 @@ namespace Client
             if (!dead)
             {
 
-                    foreach (KeyValuePair<string, IServer> entry in serversConnected) {
-                        if (move.Equals("LEFT"))
-                        {
-                            entry.Value.sendMove(nickname, "LEFT");
-                            sent = true;
-                        }
-                        else if (move.Equals("RIGHT"))
-                        {
-                            entry.Value.sendMove(nickname, "RIGHT");
-                            sent = true;
-                        }
-                        else if (move.Equals("UP"))
-                        {
-                            entry.Value.sendMove(nickname, "UP");
-                            sent = true;
-                        }
-                        else if (move.Equals("DOWN"))
-                        {
-                            entry.Value.sendMove(nickname, "DOWN");
-                            sent = true;
-                        }
+                foreach (KeyValuePair<string, IServer> entry in serversConnected) {
+                    if (move.Equals("LEFT"))
+                    {
+                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "LEFT"));
+                        sent = true;
+                    }
+                    else if (move.Equals("RIGHT"))
+                    {
+                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "RIGHT"));
+                        sent = true;
+                    }
+                    else if (move.Equals("UP"))
+                    {
+                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "UP"));
+                        sent = true;
+                    }
+                    else if (move.Equals("DOWN"))
+                    {
+                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "DOWN"));
+                        sent = true;
+                    }
                 }
             }
         }
 
 
-            //Todo, sending only if he can
-            private void keyisdown(object sender, KeyEventArgs e)
-            {
-                if (!sent && !freeze)
-                    if (started)
+        //Todo, sending only if he can
+        private void keyisdown(object sender, KeyEventArgs e)
+        {
+            if (!sent && !freeze)
+                if (started)
+                {
+                    if (!dead)
                     {
-                        if (!dead)
+                        foreach (KeyValuePair<string, IServer> entry in serversConnected)
                         {
-                            foreach (KeyValuePair<string, IServer> entry in serversConnected)
+                            if (e.KeyCode == Keys.Left)
                             {
-                                if (e.KeyCode == Keys.Left)
-                                {
-                                    entry.Value.sendMove(nickname, "LEFT");
-                                    sent = true;
-                                }
-                                if (e.KeyCode == Keys.Right)
-                                {
-                                    entry.Value.sendMove(nickname, "RIGHT");
-                                    sent = true;
-                                }
-                                if (e.KeyCode == Keys.Up)
-                                {
-                                    entry.Value.sendMove(nickname, "UP");
-                                    sent = true;
-                                }
-                                if (e.KeyCode == Keys.Down)
-                                {
-                                    entry.Value.sendMove(nickname, "DOWN");
-                                    sent = true;
-                                }
+                                entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "LEFT"));
+                                sent = true;
+                            }
+                            if (e.KeyCode == Keys.Right)
+                            {
+                                entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "RIGHT"));
+                                sent = true;
+                            }
+                            if (e.KeyCode == Keys.Up)
+                            {
+                                entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "UP"));
+                                sent = true;
+                            }
+                            if (e.KeyCode == Keys.Down)
+                            {
+                                entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "DOWN"));
+                                sent = true;
                             }
                         }
                     }
-                if (e.KeyCode == Keys.Enter)
-                {
-                    tbMsg.Enabled = true; tbMsg.Focus();
                 }
-            }
-
-            private void keyisup(object sender, KeyEventArgs e)
+            if (e.KeyCode == Keys.Enter)
             {
-                if (e.KeyCode == Keys.Left)
-                {
-                    goleft = false;
-                }
-                if (e.KeyCode == Keys.Right)
-                {
-                    goright = false;
-                }
-                if (e.KeyCode == Keys.Up)
-                {
-                    goup = false;
-                }
-                if (e.KeyCode == Keys.Down)
-                {
-                    godown = false;
-                }
+                tbMsg.Enabled = true; tbMsg.Focus();
             }
+        }
 
-            private void tbMsg_KeyDown(object sender, KeyEventArgs e)
+        private void keyisup(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Left)
+            {
+                goleft = false;
+            }
+            if (e.KeyCode == Keys.Right)
+            {
+                goright = false;
+            }
+            if (e.KeyCode == Keys.Up)
+            {
+                goup = false;
+            }
+            if (e.KeyCode == Keys.Down)
+            {
+                godown = false;
+            }
+        }
+
+        private void tbMsg_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -332,57 +341,55 @@ namespace Client
             }
         }
 
-            //TODO receber messageID, Player+Move, Ghost+move
-            public void updateChat(string nick, string msg)
+        //TODO receber messageID, Player+Move, Ghost+move
+        public void updateChat(string nick, string msg)
+        {
+        tbChat.AppendText("\r\n" +nick + ": " + msg);
+        }
+
+        //TODO receber messageID, Player+Move, Ghost+move
+        public void updateMove(int playernumber, string move)
+        {
+            tbChat.AppendText("\r\nUpdateMode");
+            goleft = goright = goup = godown = false;
+            PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playernumber);
+
+            if (move.Equals("LEFT"))
             {
-            tbChat.AppendText("\r\n" +nick + ": " + msg);
+                if (pb.Left > (boardLeft))
+                {
+                    pb.Left -= speed;
+                    pb.Image = Properties.Resources.Left;
+                }
             }
-
-            //TODO receber messageID, Player+Move, Ghost+move
-            public void updateMove(int playernumber, string move)
+            if (move.Equals("RIGHT"))
             {
-                tbChat.AppendText("\r\nUpdateMode");
-                goleft = goright = goup = godown = false;
-                PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playernumber);
-
-                if (move.Equals("LEFT"))
+                if (pb.Left < (boardRight))
                 {
-                    if (pb.Left > (boardLeft))
-                    {
-                        pb.Left -= speed;
-                        pb.Image = Properties.Resources.Left;
-                    }
+                    pb.Left += speed;
+                    pb.Image = Properties.Resources.Right;
                 }
-                if (move.Equals("RIGHT"))
-                {
-                    if (pb.Left < (boardRight))
-                    {
-                        pb.Left += speed;
-                        pb.Image = Properties.Resources.Right;
-                    }
-                }
-                if (move.Equals("UP"))
-                {
-                    if (pb.Top > (boardTop))
-                    {
-                        pb.Top -= speed;
-                        pb.Image = Properties.Resources.Up;
-                    }
-                }
-                if (move.Equals("DOWN"))
-                {
-                    if (pb.Top < (boardBottom))
-                    {
-                        pb.Top += speed;
-                        pb.Image = Properties.Resources.down;
-                    }
-                }
-                sent = false;
-
-
             }
+            if (move.Equals("UP"))
+            {
+                if (pb.Top > (boardTop))
+                {
+                    pb.Top -= speed;
+                    pb.Image = Properties.Resources.Up;
+                }
+            }
+            if (move.Equals("DOWN"))
+            {
+                if (pb.Top < (boardBottom))
+                {
+                    pb.Top += speed;
+                    pb.Image = Properties.Resources.down;
+                }
+            }
+            sent = false;
+        }
 
-            public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
+        public void updateGhostsMove(int g1, int g2, int g3x, int g3y)
         {
             redGhost.Left = g1;
             yellowGhost.Left = g2;
@@ -417,25 +424,25 @@ namespace Client
             }
         }
 
-            internal void startGame(int playerNumbers)
+        internal void startGame(int playerNumbers)
+        {
+            if (!started)
             {
-                if (!started)
-                {
-                    for (int i = 2; i <= playerNumbers; i++)
-                        getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
-                    started = true;
+                roundID = 0;
+                for (int i = 2; i <= playerNumbers; i++)
+                    getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
+                started = true;
 
-                    getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
-                    tbChat.Text += "My Number " + myNumber;
+                getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
+                tbChat.Text += "My Number " + myNumber;
 
-
-
-                    Thread thread = new Thread(() => doWork());
-                    thread.Start();
-                }
+                
+                Thread thread = new Thread(() => doWork());
+                thread.Start();
             }
+        }
 
-            private void doWork()
+        private void doWork()
         {
             if (Program.FILENAME != "")
             {
@@ -460,48 +467,7 @@ namespace Client
                 }
             }
         }
-
-        public void writeToFile(int roundID)
-        {
-            using (StreamWriter sw = File.CreateText(Client.DIRECTORY + Path.DirectorySeparatorChar + roundID))
-            {
-                foreach (Control x in this.Controls)
-                {
-                    if (x is PictureBox && x.Tag == "ghost")
-                    {
-                        sw.WriteLine("M, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "coin")
-                    {
-                        sw.WriteLine("C, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player1")
-                    {
-                        sw.WriteLine("P1, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player2")
-                    {
-                        sw.WriteLine("P2, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player3")
-                    {
-                        sw.WriteLine("P3, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player4")
-                    {
-                        sw.WriteLine("P4, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player5")
-                    {
-                        sw.WriteLine("P5, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                    else if (x is PictureBox && x.Tag == "player6")
-                    {
-                        sw.WriteLine("P6, " + x.Location.X + ", " + x.Location.Y);
-                    }
-                }
-            }
-        }
+ 
 
         //Get Picture by String
         private PictureBox getPictureBoxByName(string name)
@@ -679,7 +645,11 @@ namespace Client
                 return temp;
 
         }
-        
+        public BoardInfo getLocalState(int roundID)
+        {
+            return boardByRound[roundID];
+        }
+
         public void debugFunction(string text)
         {
             tbChat.AppendText(text);

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ComException.cs" />
     <Compile Include="ComInterface.cs" />
+    <Compile Include="SerializableClasses.cs" />
     <Compile Include="ThrPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />

@@ -20,18 +20,6 @@ using System.Xml.Serialization;
 namespace Server
 {
     public delegate void delImageVisible(int playerNumber);
-    //client in server
-    class Client
-    {
-        public string nick;
-        public int playernumber;
-        public string url;
-        public IClient clientProxy;
-        public bool dead;
-        public bool connected;
-        public int score;
-       
-    }
 
     public class Server
     {
@@ -68,16 +56,15 @@ namespace Server
 
     public class RemoteServer : MarshalByRefObject, IServer, IServerReplication, IGeneralControlServices
     {
-        internal List<Client> clientList = new List<Client>();
-        private Dictionary<string, int> player_image_hashmap = new Dictionary<string, int>();
+        internal List<ConnectedClient> clientList = new List<ConnectedClient>();
+        List<int> disconnectedPlayers = new List<int>();
         public int numberPlayersConnected = 0;
         public delegate void delProcess(int playerNumber, string move);
 
         public ServerForm serverForm;
         public Dictionary<string, IServerReplication> serversConnected = new Dictionary<string, IServerReplication>();
         public bool firstServer=true;
-
-        private static int i = 1;
+        
 
         public RemoteServer()
         {
@@ -96,7 +83,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void connectClient(string nick, string url)
         {
-            Client c = new Client();
+            
             
             Console.WriteLine("SERVER: cliente tenta ligar com url "+url+".");
            
@@ -110,19 +97,11 @@ namespace Server
             catch (Exception e){ Console.WriteLine(e); }
 
             numberPlayersConnected++;
-
+            ConnectedClient c = new ConnectedClient(nick, numberPlayersConnected, url, clientProxy);
             //Create a connected client with below parameters:
-            c.nick = nick;
-            c.url = url;
-            c.clientProxy = clientProxy;
-            c.playernumber = numberPlayersConnected;
-            c.dead = false;
-            c.connected = true;
-            c.score = 0;
 
             clientList.Add(c);
-
-            assignPlayer(c);
+            
             if (numberPlayersConnected == Program.PLAYERNUMBER)
             {
                 //TODO3, fix when a server start don't startgame before knowing if he is the first
@@ -133,7 +112,7 @@ namespace Server
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void sendMove(string nick, string move)
+        public void sendMove(Movement move)
         {
             //TODO, RECONNECT THE CLIENT, IF NEEDED
             /*
@@ -146,95 +125,90 @@ namespace Server
                 }
             }
             */
-            
-            int pl_number = player_image_hashmap[nick];
             try
             {
-                this.serverForm.listMove.Add(pl_number, move);
-                Console.WriteLine(i+"added: " + move + " to player " + pl_number);
-                i++;
+                this.serverForm.listMove.Add(move.playernumber, move.move);
+                Console.WriteLine(serverForm.roundID+"added: " + move.move + " to player " + move.playernumber + " with score="+clientList[move.playernumber - 1].score);
             }
             catch
             {
                 //TODO error, solution, threadpool
                 Console.WriteLine("Client sent a move exception (Server sendMove(...))");
             }
+            
             //this.serverForm.Invoke(new delProcess(serverForm.processMove), new object[] { pl_number, move });
         }
-
-
-        private void assignPlayer(Client c)
-        {
-            player_image_hashmap.Add(c.nick, c.playernumber);
-
-            foreach (KeyValuePair<string, int> entry in player_image_hashmap)
-            {
-                Console.WriteLine("INFO: " + entry.Key + " is " + entry.Value);
-            }
-
-        }
-
+        
+        //TO REMOVE
         public void sendPlayerDead(int playerNumber)
         {
-            foreach (Client c in clientList)
+            foreach (ConnectedClient c in clientList)
             {
                 if (c.playernumber == playerNumber)
                 {
                     c.dead = true;
                 }
+                if(!disconnectedPlayers.Contains(c.playernumber))
                 try
                 {
                     c.clientProxy.playerDead(playerNumber);
                 }
                 catch
                 {
-                    c.connected = false;
                     Console.WriteLine("Exception on server sendPlayerDead()");
                 }
             }
-            string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
         }
-
-        public void sendRoundUpdate(int roundID, string players_arg, string dead_arg, string monster_arg, string coins_arg) 
+        
+        public void sendRoundUpdate(BoardInfo board) 
         {
-            
-            foreach (Client c in clientList)
+            /*
+            Console.WriteLine("start:");
+            Console.WriteLine("round: " + board.RoundID);
+            Console.WriteLine("player: " + board.Players + " : " + board.PlayerDead);
+            Console.WriteLine("Monster: " + board.Monsters);
+            Console.WriteLine("AteCoins: " + board.AteCoins);
+            Console.WriteLine("Coins: " + board.Coins);
+            Console.WriteLine("end...");
+            */
+            foreach (ConnectedClient c in clientList)
             {
                 //TODO1, WHETHER NEED A THREAD TO RECEIVE ROUND UPDATE, probably a delegate
                 //new Thread(() => 
                 //if(c.connected)
+                if(!disconnectedPlayers.Contains(c.playernumber))
                 try
                 {
-                    c.clientProxy.receiveRoundUpdate(roundID, players_arg, dead_arg, monster_arg, coins_arg);
+                    c.clientProxy.receiveRoundUpdate(board);
                 }
-                catch
+                catch(Exception e)
                 {
-                    c.connected = false;
+                    disconnectedPlayers.Add(c.playernumber);
+                    Console.WriteLine("Client "+c.nick+" is down...");
                 }
                 //).Start();
             }
         }
-
-
+        
+        
         public void sendCoinEaten(int playerNumber, string coinName)
         {
-            foreach (Client c in clientList)
+            foreach (ConnectedClient c in clientList)
             {
+                if(!disconnectedPlayers.Contains(c.playernumber))
                 try
                 {
                     c.clientProxy.coinEaten(playerNumber, coinName);
                 }
                 catch
                 {
-                    c.connected = false;
+                    disconnectedPlayers.Add(c.playernumber);
                     Console.WriteLine("Exception on server sendCoinEaten()");
                 }
 
             }
-            string nick = player_image_hashmap.FirstOrDefault(x => x.Value == playerNumber).Key;
-            
         }
-
+        
         
         public void sendStartGame()
         {
@@ -242,11 +216,11 @@ namespace Server
             if (firstServer)
             {
                 string arg = " ";
-                foreach (Client c in clientList)
+                foreach (ConnectedClient c in clientList)
                 {
                     arg += "-" + c.nick + "_" + c.playernumber + "_" + c.url;
                 }
-                foreach (Client c in clientList)
+                foreach (ConnectedClient c in clientList)
                 {
                     Console.WriteLine("SERVER: startGame:" + arg);
                     try
@@ -266,11 +240,11 @@ namespace Server
             }
         }
 
-        public void receiveServer(string name, string url, int roundId, string players, string monsters, string atecoins, string deadplayers)
+        public void receiveServer(string name, string url, BoardInfo board)
         {
             Console.WriteLine("ConnectServer........");
             firstServer = false;
-            UpdateBoard(roundId, players, monsters, atecoins, deadplayers);
+            UpdateBoard(board);
             try
             {
                 IServerReplication serverProxy = (IServerReplication)Activator.GetObject(
@@ -297,8 +271,7 @@ namespace Server
                     Console.WriteLine("ConnectServer........");
                     serversConnected.Add(name, serverProxy);
                     serverProxy.receiveServer(Program.SERVERNAME, "tcp://" + Util.GetLocalIPAddress() + ":" + Util.ExtractPortFromURL(url) + "/Server",
-                        serverForm.roundID, serverForm.playerLocation(),
-                        serverForm.lastMonster, serverForm.atecoin, serverForm.lastDeadPlayer);
+                        serverForm.boardByRound[serverForm.boardByRound.Count-1]);
                     break;
                 }
                 catch
@@ -307,11 +280,6 @@ namespace Server
                 }
             }
             
-        }
-
-        public void requestRound(int id)
-        {
-            throw new NotImplementedException();
         }
 
         public void Freeze()
@@ -360,18 +328,25 @@ namespace Server
                 */
         }
 
-        public void UpdateBoard(int roundID, string pl, string monst, string coin, string deadplayers)
+        public void UpdateBoard(BoardInfo board)
         {
-            Console.WriteLine("player: " + pl);
-            Console.WriteLine("monster: " + monst);
-            Console.WriteLine("coin: " + coin);
-            Console.WriteLine("dead player: " + deadplayers);
-            serverForm.UpdateBoard(roundID,pl,monst,coin, deadplayers);
+            Console.WriteLine("round: " + board.RoundID);
+            Console.WriteLine("player: " + board.Players);
+            Console.WriteLine("monster: " + board.Monsters);
+            Console.WriteLine("coin: " + board.AteCoins);
+            Console.WriteLine("dead player: " + board.PlayerDead);
+            serverForm.UpdateBoard(board);
+        }
+
+
+        public BoardInfo getLocalState(int roundID)
+        {
+            return serverForm.getLocalState(roundID);
         }
         //debug function
         public void CheckUserScore()
         {
-            foreach(Client c in clientList)
+            foreach(ConnectedClient c in clientList)
             {
                 Console.WriteLine("client: "+c.nick+"=> score="+c.score);
             }
