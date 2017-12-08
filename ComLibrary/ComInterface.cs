@@ -43,7 +43,7 @@ namespace ComLibrary
     {
         void Freeze();
         void Unfreeze();
-        void InjectDelay(string pid1, string pid2);
+        void InjectDelay(string pid2);
         void newServerCreated(string servername, string serverURL);
         BoardInfo getLocalState(int roundID);
     }

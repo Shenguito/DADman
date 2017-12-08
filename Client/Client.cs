@@ -499,7 +499,7 @@ namespace Client
             }
             messageHolder = new Dictionary<int, MessageInfo>();
         }
-        public void InjectDelay(string pid1, string pid2)
+        public void InjectDelay(string pid2)
         {
             int delay = 5000;
             if (!delayLog.ContainsKey(pid2))

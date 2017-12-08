@@ -286,33 +286,33 @@ namespace Client
                     foreach (ConnectedClient connectedClient in clients)
                     {
                         
-                            if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
-                            {
-                                Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
-                                thread.Start();
-                            }
-                            else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
-                            {
-                                Action act3 = () => {
-                                    try
-                                    {
-                                        connectedClient.clientProxy.send(nickname, msg, mId);
-                                    }
-                                    catch (SocketException exception)
-                                    {
-                                        //Client Disconnected
-                                        connectedClient.connected = false;
-                                        Console.WriteLine("Debug: " + exception.ToString());
+                        if (delayLog.ContainsKey(connectedClient.nick) && connectedClient.connected)
+                        {
+                            Thread thread = new Thread(() => delayThread(msg, mId, connectedClient));
+                            thread.Start();
+                        }
+                        else if (!connectedClient.nick.Equals(nickname) && connectedClient.connected)
+                        {
+                            Action act3 = () => {
+                                try
+                                {
+                                    connectedClient.clientProxy.send(nickname, msg, mId);
+                                }
+                                catch (SocketException exception)
+                                {
+                                    //Client Disconnected
+                                    connectedClient.connected = false;
+                                    Console.WriteLine("Debug: " + exception.ToString());
 
-                                    }
-                                };
-                                Thread thread3 = new Thread((new ThreadStart(act3)));
-                                thread3.Start();
-                            }
-                            else if (connectedClient.nick.Equals(nickname))
-                            {
-                                myself = connectedClient.clientProxy;
-                            }
+                                }
+                            };
+                            Thread thread3 = new Thread((new ThreadStart(act3)));
+                            thread3.Start();
+                        }
+                        else if (connectedClient.nick.Equals(nickname))
+                        {
+                            myself = connectedClient.clientProxy;
+                        }
                         
                     }
                     if (myself != null)
