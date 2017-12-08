@@ -59,7 +59,10 @@ namespace Client
         public Dictionary<string, IServer> serversConnected = new Dictionary<string, IServer>();
 
         public Dictionary<int, BoardInfo> boardByRound;
-        private ReceivingInput moveThread;
+
+        public Thread movePool;
+        private List<Movement> listMove;
+        private threadLock tlock;
 
 
         public ClientForm()
@@ -73,7 +76,11 @@ namespace Client
             this.Text += ": " + nickname;
             label2.Visible = false;
 
-            moveThread = new ReceivingInput();
+            listMove = new List<Movement>();
+            //ThreadStart, this thread may have at most 25 threads
+            tlock = new threadLock();
+            movePool = new Thread(new ThreadStart(retrieveMove));
+            movePool.Start();
 
             Init();
 
@@ -140,48 +147,24 @@ namespace Client
             }
         }
 
-        private void doMove(string move)
-        {
-            //TODO IMPORTANT Queria thread pool para fazer estes moves
-            while (!started)
-            {
-                Thread.Sleep(1);
-                if (started)
-                    break;
-            }
-            while (sent || freeze)
-            {
-                Thread.Sleep(1);
-                if (!sent && !freeze)
-                    break;
-            }
-            if (!dead)
-            {
+        // part1
 
-                foreach (KeyValuePair<string, IServer> entry in serversConnected) {
-                    if (move.Equals("LEFT"))
-                    {
-                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "LEFT"));
-                        sent = true;
-                    }
-                    else if (move.Equals("RIGHT"))
-                    {
-                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "RIGHT"));
-                        sent = true;
-                    }
-                    else if (move.Equals("UP"))
-                    {
-                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "UP"));
-                        sent = true;
-                    }
-                    else if (move.Equals("DOWN"))
-                    {
-                        entry.Value.sendMove(new Movement(roundID, nickname, myNumber, "DOWN"));
-                        sent = true;
-                    }
-                }
+        //Add list
+
+        public void addMove(Movement move)
+        {
+            tlock.add(ref listMove, move);
+            tbChat.AppendText("\r\nAdd: " + listMove.Count);
+        }
+        public void retrieveMove()
+        {
+            while (true)
+            {
+                tlock.ret(ref listMove, ref roundID, ref dead, ref sent, ref serversConnected);
+                tbChat.AppendText("\r\nRet: " + listMove.Count);
             }
         }
+        // part1 end
 
 
         //Todo, sending only if he can
@@ -345,7 +328,7 @@ namespace Client
         {
             if (!started)
             {
-                roundID = 0;
+                roundID = 1;
                 for (int i = 2; i <= playerNumbers; i++)
                     getPictureBoxByName("pictureBoxPlayer" + i).Visible = true;
                 started = true;
@@ -373,7 +356,7 @@ namespace Client
                         string[] fields = parser.ReadFields();
                         try
                         {
-                            moveThread.AssyncInvoke(new Movement(roundID, nickname, myNumber, fields[1]), ref tbChat);
+                            addMove(new Movement(roundID, nickname, myNumber, fields[1]));
                         }
                         catch
                         {

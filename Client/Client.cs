@@ -197,10 +197,12 @@ namespace Client
              */
             if (form.boardByRound.ContainsValue(board))
                 return;
+
+            //TODO same pool sheng
             while (!freeze && temporaryBoard.Count != 0 && !temporaryBoard.ContainsKey(board.RoundID))
             {
                 form.debugFunction("\r\n Let's Sleep");
-                Thread.Sleep(1);
+                Thread.Sleep(100);
                 form.debugFunction("\r\nSleeping");
                 if (!freeze && temporaryBoard.Count == 0)
                 {
@@ -245,9 +247,6 @@ namespace Client
                 temporaryBoard.Add(board.RoundID, board);
                 return;
             }
-
-            //TODO roundID received by server
-            //form.writeToFile(roundID);
 
         }   
         

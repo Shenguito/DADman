@@ -113,7 +113,8 @@ namespace Server
 
         public void sendMove(Movement move)
         {
-            Console.WriteLine(move.roundID + "-round");
+            //testing round
+            //Console.WriteLine(move.roundID + "-round");
             this.serverForm.ReceivingMove(move);
         }
         
