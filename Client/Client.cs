@@ -213,15 +213,30 @@ namespace Client
                 //TODO function 1
                 if (board.move != "")
                 {
-                    movePlayer(board.RoundID, board.move);
+                    Action act = () =>
+                     {
+                        movePlayer(board.RoundID, board.move);
+                                            };
+                    Thread thread = new Thread((new ThreadStart(act)));
+                    thread.Start();
                 }
                 if (board.Monsters != "")
                 {
-                    moveGhost(board.RoundID, board.Monsters);
+                    Action act2 = () =>
+                     {
+                        moveGhost(board.RoundID, board.Monsters);
+                                            };
+                    Thread thread2 = new Thread((new ThreadStart(act2)));
+                    thread2.Start();
                 }
                 if (board.Coins != "")
                 {
-                    coinEaten(board.RoundID, board.Coins);
+                    Action act3 = () =>
+                     {
+                        coinEaten(board.RoundID, board.Coins);
+                                            };
+                    Thread thread3 = new Thread((new ThreadStart(act3)));
+                    thread3.Start();
                 }
                 form.roundID = board.RoundID + 1;
                 form.debugFunction("\r\nID:" + form.roundID);
