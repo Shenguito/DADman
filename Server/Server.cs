@@ -272,7 +272,7 @@ namespace Server
             throw new NotImplementedException();
         }
 
-        public void InjectDelay(string pid1, string pid2)
+        public void InjectDelay(string pid2)
         {
             //TODO
             throw new NotImplementedException();
