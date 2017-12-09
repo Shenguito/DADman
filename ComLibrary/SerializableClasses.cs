@@ -27,8 +27,6 @@ namespace ComLibrary
     [Serializable]
     public class ConnectedClient
     {
-        
-
         public string nick;
         public int playernumber;
         public string url;

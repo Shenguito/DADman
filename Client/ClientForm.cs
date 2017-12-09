@@ -161,7 +161,7 @@ namespace Client
             while (true)
             {
                 tlock.ret(ref listMove, ref roundID, ref dead, ref sent, ref serversConnected);
-                tbChat.AppendText("\r\nRet: " + listMove.Count);
+                //tbChat.AppendText("\r\nRet: " + listMove.Count);
             }
         }
         // part1 end
@@ -250,7 +250,7 @@ namespace Client
         //TODO receber messageID, Player+Move, Ghost+move
         public void updateMove(int playernumber, string move)
         {
-            tbChat.AppendText("\r\nUpdateMode:"+move);
+            //tbChat.AppendText("\r\nUpdateMode:"+move);
             goleft = goright = goup = godown = false;
             PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playernumber);
 

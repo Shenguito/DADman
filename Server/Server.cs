@@ -6,11 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +55,7 @@ namespace Server
         }
         
     }
-
+    
     public class RemoteServer : MarshalByRefObject, IServer, IServerReplication, IGeneralControlServices
     {
         public List<ConnectedClient> clientList = new List<ConnectedClient>();
@@ -86,11 +88,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void connectClient(string nick, string url)
         {
-            
-            
             Console.WriteLine("SERVER: cliente tenta ligar com url "+url+".");
-           
-
             IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),
                 url
@@ -220,10 +218,9 @@ namespace Server
         }
 
         //RECEIVE CONNECTION FROM SERVER
-        public void receiveServer(string name, string url, BoardInfo board, List<ConnectedClient> clients)
+        public void receiveServer(string name, string url, BoardInfo board)
         {
             Console.WriteLine("ConnectedServer........");
-            clientList = clients;
             UpdateBoard(board);
             try
             {
@@ -238,10 +235,9 @@ namespace Server
             }
         }
 
-        //CONNECT DO SERVER
+        //CONNECT TO SERVER
         public void connectServer(string name, string url)
         {
-
             IServerReplication serverProxy = null;
             while (serverProxy == null)
             {
@@ -256,7 +252,7 @@ namespace Server
                         serversConnected.Add(name, serverProxy);
                     serverProxy.receiveServer(Program.SERVERNAME,
                         "tcp://" + Util.GetLocalIPAddress() + ":" + Program.PORT + "/Server",
-                        serverForm.boardByRound[serverForm.boardByRound.Count-1], clientList);
+                        serverForm.boardByRound[serverForm.boardByRound.Count-1]);
                     Console.WriteLine("ConnectedServer........");
                     break;
                 }

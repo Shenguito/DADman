@@ -153,7 +153,7 @@ namespace Client
 
                 string[] rawClient = arg.Split('-');
 
-                this.form.debugFunction("debug:\r\n" + arg);
+                //this.form.debugFunction("debug:\r\n" + arg);
 
                 for (int i = 1; i < rawClient.Length; i++)
                 {
@@ -239,7 +239,7 @@ namespace Client
                     thread3.Start();
                 }
                 form.roundID = board.RoundID + 1;
-                form.debugFunction("\r\nID:" + form.roundID);
+                //form.debugFunction("\r\nID:" + form.roundID);
                 //error, duplicate
                 try
                 {
@@ -289,6 +289,7 @@ namespace Client
         }
         public void newServerCreated(string servername, string serverURL)
         {
+            form.debugFunction("\r\nnewserver:" + servername);
             new Thread(() => this.form.connectToServer(servername, serverURL)).Start();
         }
 

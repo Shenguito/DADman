@@ -66,7 +66,6 @@ namespace Client
                         }
                     }
                 }
-                Console.WriteLine("List removed move: " + move.move);
             }
         }
     }
