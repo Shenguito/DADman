@@ -323,12 +323,10 @@ namespace Client
                         }
                         catch (SocketException e)
                         {
-                            //Client Disconnected
                             connectedClient.connected = false;
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Debug: " + e.ToString());
                         }
                     }
                     else
@@ -365,7 +363,6 @@ namespace Client
                 int i = 1;
                 while (i <= max)
                 {
-                    //TODO
                     if (!msgLog.ContainsKey(i))
                     {
                         msgLog.Add(i, "");
@@ -401,12 +398,10 @@ namespace Client
                             }
                             catch (SocketException e)
                             {
-                                //Client Disconnected
                                 connectedClient.connected = false;
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine("Debug: " + e.ToString());
                             }
 
                         }
@@ -434,10 +429,7 @@ namespace Client
                         }
                         catch (SocketException exception)
                         {
-                            //Client Disconnected
                             connectedClient.connected = false;
-                            Console.WriteLine("Debug: " + exception.ToString());
-
 
                         }
                     }
@@ -460,7 +452,6 @@ namespace Client
             }
 
             this.form.injectDelay(pid2, delay);
-            form.debugFunction("\r\nInjected Delay to " + pid2);
         }
 
         public void delayThread(string nickname, string msg, int mId, ConnectedClient conn)
@@ -472,9 +463,7 @@ namespace Client
             }
             catch (SocketException exception)
             {
-                //Client Disconnected
                 conn.connected = false;
-                Console.WriteLine("Debug: " + exception.ToString());
 
             }
         }
@@ -530,9 +519,7 @@ namespace Client
                 }
                 catch (SocketException exception)
                 {
-                    //Client Disconnected
                     connectedClient.connected = false;
-                    Console.WriteLine("Debug: " + exception.ToString());
                 }
 
             }

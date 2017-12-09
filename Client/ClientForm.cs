@@ -47,7 +47,6 @@ namespace Client
         //player speed
         int speed = 5;
         int score = 0;
-        //TODO to define when game is over
         int total_coins = 61;
         Dictionary<string, int> delayLog;
         ConnectedClient lider;
@@ -336,7 +335,6 @@ namespace Client
                     parser.SetDelimiters(",");
                     while (!parser.EndOfData)
                     {
-                        //Processing row
                         string[] fields = parser.ReadFields();
                         try
                         {
@@ -413,9 +411,7 @@ namespace Client
                                 }
                                 catch (SocketException exception)
                                 {
-                                    //Client Disconnected
                                     connectedClient.connected = false;
-                                    Console.WriteLine("Debug: " + exception.ToString());
 
                                 }
                             };
@@ -445,13 +441,11 @@ namespace Client
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Debug: " + exception.ToString());
             }
         }
 
         public void injectDelay(string nick, int delay)
         {
-            //delay value defined
             if (!delayLog.ContainsKey(nick))
             {
                 delayLog.Add(nick, delay);
@@ -471,9 +465,7 @@ namespace Client
                 }
                 catch (SocketException exception)
                 {
-                    //Client Disconnected
                     conn.connected = false;
-                    Console.WriteLine("Debug: " + exception.ToString());
 
                 }
         }
@@ -532,9 +524,7 @@ namespace Client
                             }
                             catch (SocketException exception)
                             {
-                                //Client Disconnected
                                 connectedClient.connected = false;
-                                Console.WriteLine("Debug: " + exception.ToString());
 
                             }
                         };
@@ -567,9 +557,7 @@ namespace Client
                     }
                     catch (SocketException exception)
                     {
-                        //Client Disconnected
                         liderCli.connected = false;
-                        Console.WriteLine("Debug: " + exception.ToString());
                         takeLider(liderCli);
                     }
                 };
@@ -594,7 +582,6 @@ namespace Client
                 try
                 {
                     lider.connected = false;
-                    Console.WriteLine("Debug: lider died " + ex.ToString());
                     Action act = () =>
                     {
                         takeLider(lider);
