@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    class ThreadLock
+    class ThreadMove
     {
-
-        
         public void add(ref List<Movement>listMove, Movement move)
         {
             lock (this)

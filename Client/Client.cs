@@ -22,7 +22,7 @@ namespace Client
     public delegate void delmove(int playernumber, string move);
     public delegate void delmoveGhost(int g1, int g2, int g3x, int g3y);
     public delegate void delDead(int playerNumber);
-    public delegate void delCoin(string pictureBoxName);
+    public delegate void delCoin(string pictureBoxName, string playernumber);
     public delegate void delImageVisible(int playerNumber);
     public delegate void delDebug(string msg);
     public delegate void delLider(ConnectedClient nick);
@@ -132,11 +132,9 @@ namespace Client
 
             for (int i = 1; i < coin_tok.Length; i++)
             {
-                form.Invoke(new delCoin(form.updateCoin), new object[] { coin_tok[i] });
+                form.Invoke(new delCoin(form.updateCoin), new object[] { coin_tok[i].Split('_')[0], coin_tok[i].Split('_')[1].Trim() });
             }
         }
-
-        
 
         public void playerDead(int playerNumber)
         {
@@ -232,7 +230,7 @@ namespace Client
                 if (board.Coins != "")
                 {
                     Action act3 = () =>
-                     {
+                    {
                         coinEaten(board.RoundID, board.Coins);
                                             };
                     Thread thread3 = new Thread((new ThreadStart(act3)));

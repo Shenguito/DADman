@@ -62,7 +62,7 @@ namespace Client
 
         public Thread movePool;
         private List<Movement> listMove;
-        private ThreadLock tlock;
+        private ThreadMove tlock;
 
 
         public ClientForm()
@@ -78,7 +78,7 @@ namespace Client
 
             listMove = new List<Movement>();
             //ThreadStart, this thread may have at most 25 threads
-            tlock = new ThreadLock();
+            tlock = new ThreadMove();
             movePool = new Thread(new ThreadStart(retrieveMove));
             movePool.Start();
 
@@ -313,8 +313,13 @@ namespace Client
               pb.Top = 25; */
         }
 
-        internal void updateCoin(string pictureBoxName)
+        internal void updateCoin(string pictureBoxName, string playernumber)
         {
+            if (myNumber == Int32.Parse(playernumber))
+            {
+                this.score++;
+                label1.Text = "score: " + score;
+            }
             foreach (Control x in this.Controls)
             {
                 if (x is PictureBox && x.Tag == "coin" && x.Name.Equals(pictureBoxName))

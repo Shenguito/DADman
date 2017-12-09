@@ -111,7 +111,7 @@ namespace Server {
                             getPictureBoxByName(x.Name).Visible = false;
                             Controls.Remove(x);
                             server.clientList.FirstOrDefault(t => t.playernumber == playerNumber).score++;
-                            coins_arg += "-" + x.Name;
+                            coins_arg = "-" + x.Name+"_"+ playerNumber;
                             sendCoinEaten(playerNumber, x.Name);
                         }
                     }
@@ -219,7 +219,7 @@ namespace Server {
             string players = "";
             for (int i=1; i <= server.clientList.Count; i++)
             {
-                players += "-"+
+                players += "_"+
                     getPictureBoxByName("pictureBoxPlayer"+i).Top + ":" +
                     getPictureBoxByName("pictureBoxPlayer" + i).Left;
 
@@ -244,7 +244,7 @@ namespace Server {
         {
             //tbOutput.Text += ("Ronda " + roundID + " \r\n");
             roundID++;
-            players_arg = "";
+            players_arg = coins_arg = "";
             
             foreach (KeyValuePair<int, string> entry in listMove)
             {
@@ -267,19 +267,23 @@ namespace Server {
 
         public void UpdateBoard(BoardInfo board)
         {
-            tbOutput.AppendText("updating");
             this.roundID = board.RoundID;
             boardByRound.Add(roundID, board);
-            string[] pl_tok = board.Players.Split('-');
-            
+            string[] pl_tok = board.Players.Split('_');
+            tbOutput.AppendText("\r\n**" + pl_tok[1]);
+            tbOutput.AppendText("\r\n**" + pl_tok[2]);
             string[] coin_tok = board.Coins.Split('-');
-            
-            for (int i = 1; i < pl_tok.Length; i++)
+            try
             {
-                PictureBox pb = getPictureBoxByName("pictureBoxPlayer"+i);
-                pb.Top = Int32.Parse(pl_tok[i].Split(':')[0]);
-                pb.Left = Int32.Parse(pl_tok[i].Split(':')[1]);
-                pb.Visible = true;
+                for (int i = 1; i < pl_tok.Length; i++)
+                {
+                    PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + i);
+                    pb.Top = Int32.Parse(pl_tok[i].Split(':')[0].Trim());
+                    pb.Left = Int32.Parse(pl_tok[i].Split(':')[1].Trim());
+                    pb.Visible = true;
+                }
+            }
+            catch (Exception e) {
             }
 
             //monsters_arg = redGhost.Left + ":" + yellowGhost.Left + ":" + pinkGhost.Left + ":" + pinkGhost.Top;
@@ -318,8 +322,8 @@ namespace Server {
 
         public void ReceivingMove(Movement move)
         {
-            //TODO IMPORTANTE roundIDsheng, aqui está o problema do 6 players a por mesma roundid
-            if (!listMove.ContainsKey(move.roundID))
+            //TODO IMPORTANTE roundIDsheng,
+            if (!listMove.ContainsKey(move.playernumber))
                 try
                 {
                     listMove.Add(move.playernumber, move.move);
@@ -332,9 +336,11 @@ namespace Server {
         }
         public void timer1_Tick(object sender, EventArgs e)
         {
-            //try delegate
             Thread t = new Thread(new ThreadStart(processingTimer));
             t.Start();
+            /*
+            //try delegate
+            MethodInvoker simpleDelegate = new MethodInvoker(processingTimer);            simpleDelegate.Invoke();*/
         }
 
         //Get Picture by String
