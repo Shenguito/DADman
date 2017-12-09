@@ -67,8 +67,7 @@ namespace Server
         public Dictionary<string, IServerReplication> serversConnected = new Dictionary<string, IServerReplication>();
         
 
-        public bool freeze=false;
-        public bool delay=false;
+        
         
 
         public RemoteServer()
@@ -269,19 +268,19 @@ namespace Server
         public void Freeze()
         {
             //TODO
-            freeze = true;
+            serverForm.freeze = true;
         }
 
         public void Unfreeze()
         {
             //TODO
-            freeze = false;
+            serverForm.freeze = false;
         }
 
         public void InjectDelay(string pid2)
         {
             //TODO
-            delay = true;
+            serverForm.delay = true;
         }
 
         public void newServerCreated(string serverName, string serverURL)

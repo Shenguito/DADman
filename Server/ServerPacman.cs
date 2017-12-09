@@ -33,6 +33,9 @@ namespace Server {
 
         public int roundID = 0;
 
+        public bool delay = false;
+        public bool freeze = false;
+
         int boardRight = 320;
         int boardBottom = 320;
         int boardLeft = 0;
@@ -336,8 +339,24 @@ namespace Server {
         }
         public void timer1_Tick(object sender, EventArgs e)
         {
+            if (freeze)
+            {
+                return;
+            }
+            if (delay)
+            {
+                timer1.Stop();
+                Thread.Sleep(10000);
+                timer1.Start();
+                delay = false;
+            }
             Thread t = new Thread(new ThreadStart(processingTimer));
             t.Start();
+            if (delay)
+            {
+                timer1.Interval = Program.MSSEC;
+                
+            }
             /*
             //try delegate
             MethodInvoker simpleDelegate = new MethodInvoker(processingTimer);            simpleDelegate.Invoke();*/
