@@ -30,29 +30,8 @@ namespace Server
                     FIRSTSERVER = true;
 
             }
-            Console.WriteLine("info: "+ SERVERNAME);
-            Console.WriteLine("info: " + PORT);
-            Console.WriteLine("info: " + MSSEC);
-            Console.WriteLine("info: " + PLAYERNUMBER);
-            Console.WriteLine("info: " + FIRSTSERVER);
             new Server();
             Console.ReadLine();
-
-
-            /*TODO, TESTING THREADPOOL
-
-            //ThrPool(thread, task);
-            ThrPool tpool = new ThrPool(5, 10);
-            //ThrWork work = null;
-            for (int i = 0; i < 5; i++)
-            {
-                A a = new A(i);
-                tpool.AssyncInvoke(new ThrWork(a.DoWorkA));
-                B b = new B(i);
-                tpool.AssyncInvoke(new ThrWork(b.DoWorkB));
-            }
-            Console.ReadLine();
-            */
         }
     }
 }

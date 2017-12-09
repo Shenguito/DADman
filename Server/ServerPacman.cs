@@ -51,23 +51,14 @@ namespace Server {
         public string lastMonster = "";
         public string lastDeadPlayer = "";
 
-        //TO define when the game is over
-        int total_coins = 61;
-
-        //ghost speed for the one direction ghosts
+        
         int ghost1 = 5;
         int ghost2 = 5;
         
-        //x and y directions for the bi-direccional pink ghost
         int ghost3x = 5;
         int ghost3y = 5;
 
         private RemoteServer server;
-
-        /*public Timer getTimer()
-        {
-            return this.timer1;
-        }*/
 
         public ServerForm(RemoteServer remoteServer) {
             
@@ -85,8 +76,6 @@ namespace Server {
             {
                 this.timer1.Interval = 2000;
             }
-
-            tbOutput.Text += "ServerForm criado." + timer1.ToString(); ;
 
         }
 
@@ -122,7 +111,7 @@ namespace Server {
             }
             catch (Exception e)
             {
-                Console.WriteLine("Start: \r\n" + e.ToString() + "\r\nEnd");
+                Console.WriteLine("Processing move failure, trying again...");
             }
 
         }
@@ -245,7 +234,6 @@ namespace Server {
 
         private void processingTimer()
         {
-            //tbOutput.Text += ("Ronda " + roundID + " \r\n");
             roundID++;
             players_arg = coins_arg = "";
             
@@ -255,7 +243,6 @@ namespace Server {
             }
             listMove = new Dictionary<int, string>();
             updateGhostsPosition();
-            //to remember players_arg=LEFT:D  && playerLocation=-x:y
             BoardInfo thisround = new BoardInfo(roundID, playerLocation(), players_arg, monsters_arg, coins_arg);
             try
             {
@@ -273,8 +260,6 @@ namespace Server {
             this.roundID = board.RoundID;
             boardByRound.Add(roundID, board);
             string[] pl_tok = board.Players.Split('_');
-            tbOutput.AppendText("\r\n**" + pl_tok[1]);
-            tbOutput.AppendText("\r\n**" + pl_tok[2]);
             string[] coin_tok = board.Coins.Split('-');
             try
             {
@@ -303,10 +288,9 @@ namespace Server {
                 Controls.Remove(pb);
             }
             //TODO, TIMER SYNCHRONIZATION
-            tbOutput.AppendText("set timer");
             //timer1.Elapsed += timer1_Tick;
             //timer1.Start();
-            tbOutput.AppendText("timer setted");
+
         }
 
         public void startGame(int playerNumbers)
@@ -325,7 +309,6 @@ namespace Server {
 
         public void ReceivingMove(Movement move)
         {
-            //TODO IMPORTANTE roundIDsheng,
             if (!listMove.ContainsKey(move.playernumber))
                 try
                 {
@@ -333,7 +316,6 @@ namespace Server {
                 }
                 catch
                 {
-                    //TODO problem
                     tbOutput.AppendText("\r\n"+move.nick + ":" + move.roundID+" already exists");
                 }
         }
@@ -357,9 +339,6 @@ namespace Server {
                 timer1.Interval = Program.MSSEC;
                 
             }
-            /*
-            //try delegate
-            MethodInvoker simpleDelegate = new MethodInvoker(processingTimer);            simpleDelegate.Invoke();*/
         }
 
         //Get Picture by String

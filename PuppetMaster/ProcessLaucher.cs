@@ -10,19 +10,6 @@ namespace PuppetMaster
 {
     class ProcessLaucher
     {
-        /*  a unique identiﬁer PID (of type String) via the PCS listening at the url: PCS URL
-        * 
-        *  The parameters MSEC PER ROUND and NUM PLAYERS specify the time duration of a round
-        *  in msecs and the number of players in each game 
-        * 
-        *  The server shall expose its services at the address SERVER URL
-        *  
-        *  The client shall expose its services at the address CLIENT URL.
-        *  If the optional parameter ﬁlename is speciﬁed,
-        *  the client shall feed its actions from the speciﬁed trace ﬁle.
-        *  Else, commands are read from keyboard
-        * 
-        */
         private Dictionary<string, Process> processes;
         private Dictionary<string, IPuppetMasterLauncher> pcs;
         private Dictionary<string, IGeneralControlServices> remotingProcesses;
@@ -70,7 +57,6 @@ namespace PuppetMaster
                     Console.WriteLine("Connect to other pc fail: " + e);
                 }
             }
-            Console.WriteLine("ControlService URL: " + args.Split(' ')[2]);
             IGeneralControlServices service = Activator.GetObject(
                     typeof(IGeneralControlServices), args.Split(' ')[2])
                     as IGeneralControlServices;
@@ -176,10 +162,10 @@ namespace PuppetMaster
             {
                 BoardInfo board = remotingProcesses[input[1].Trim()].getLocalState(Int32.Parse(input[2].Trim()));
                 Console.WriteLine("localstate of "+ input[1].Trim() + ":");
-                for (int i = 1; i < board.Players.Split('_')[0].Split('-').Length; i++)
+                for (int i = 1; i < board.Players.Split('_').Length; i++)
                 {
-                    Console.WriteLine("player"+i+"=" + board.Players.Split('_')[0].Split('-')[i].Split(':')[0] + ":"+
-                        board.Players.Split('_')[0].Split('-')[i].Split(':')[1]+" is "+ board.Players.Split('_')[0].Split('-')[i].Split(':')[2]);
+                    Console.WriteLine("player"+i+"=" + board.Players.Split('_')[i].Split(':')[0] + ":"+
+                        board.Players.Split('_')[i].Split(':')[1]+" is "+ board.Players.Split('_')[i].Split(':')[2]);
                 }
                 for (int i = 0, j = 0; j < board.Monsters.Split(':').Length; i++, j += 2)
                 {
@@ -187,9 +173,8 @@ namespace PuppetMaster
                 }
                 for (int i = 1; i < board.Coins.Split('-').Length; i++)
                 {
-                    Console.WriteLine("Eaten Coins: " + board.Coins.Split('-')[i]);
+                    Console.WriteLine("Eaten Coins: " + board.Coins.Split('-')[i].Split('_')[0]);
                 }
-                
                 Console.WriteLine();
             }
             catch

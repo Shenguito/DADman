@@ -15,16 +15,12 @@ namespace Client {
         public static int PORT = 0;
         public static string FILENAME = "";
         public static string SERVERURL= "";
-        //public static int MSSEC = 0;
-        //public static int PLAYERNUMBER = 0;
         static void Main(string[] args)
         {
             if (args.Length != 0)
             {
                 PLAYERNAME = args[0].Trim();
                 PORT = Int32.Parse(Util.ExtractPortFromURL(args[2]).Trim());
-                //MSSEC = Int32.Parse(args[3].Trim());
-                //PLAYERNUMBER = Int32.Parse(args[4].Trim());
                 SERVERURL = args[5].Trim();
                 if (args.Length > 6)
                 {

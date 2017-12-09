@@ -55,10 +55,4 @@ namespace ComLibrary
         void receiveServer(string nick, string url, BoardInfo board);
         void UpdateBoard(BoardInfo board);
     }
-
-    //TODO not applied yet
-    public interface IremotingException
-    {
-        void MyException(SerializationInfo info, StreamingContext context);
-    }
 }

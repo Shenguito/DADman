@@ -11,8 +11,6 @@ namespace PuppetMaster
 {
     class PuppetMaster
     {
-        // Handle the ApplicationExit event to know when the application is exiting.
-        //ArrayList processes = new ArrayList();
         private Dictionary<string, int> processes = new Dictionary<string, int>();
 
         private ProcessLaucher processLaucher = new ProcessLaucher();

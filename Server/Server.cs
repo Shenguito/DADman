@@ -37,7 +37,6 @@ namespace Server
             if (Directory.Exists(DIRECTORY))
             {
                 Directory.Delete(DIRECTORY, true);
-                Console.WriteLine("Deleted: " + DIRECTORY);
             }
 
             Directory.CreateDirectory(DIRECTORY);
@@ -87,24 +86,22 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void connectClient(string nick, string url)
         {
-            Console.WriteLine("SERVER: cliente tenta ligar com url "+url+".");
-            IClient clientProxy = (IClient)Activator.GetObject(
+            try
+            {
+                IClient clientProxy = (IClient)Activator.GetObject(
                 typeof(IClient),
                 url
-            );
+                );
 
-            try { Console.WriteLine("SERVER: " + clientProxy.ToString()); }
-            catch (Exception e){ Console.WriteLine(e); }
+                numberPlayersConnected++;
+                ConnectedClient c = new ConnectedClient(nick, numberPlayersConnected, url, clientProxy);
 
-            numberPlayersConnected++;
-            ConnectedClient c = new ConnectedClient(nick, numberPlayersConnected, url, clientProxy);
-            //Create a connected client with below parameters:
-
-            clientList.Add(c);
-            
+                clientList.Add(c);
+            }
+            catch (Exception e) { Console.WriteLine(e);
+            }
             if (numberPlayersConnected == Program.PLAYERNUMBER&&Program.FIRSTSERVER)
             {
-                //TODO3, fix when a server start don't startgame before knowing if he is the first
                 Thread thread = new Thread(() =>  sendStartGame());
                 thread.Start();
             }
@@ -113,8 +110,6 @@ namespace Server
 
         public void sendMove(Movement move)
         {
-            //testing round
-            //Console.WriteLine(move.roundID + "-round");
             this.serverForm.ReceivingMove(move);
         }
         
@@ -142,20 +137,8 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendRoundUpdate(BoardInfo board) 
         {
-            /*
-            Console.WriteLine("start:");
-            Console.WriteLine("round: " + board.RoundID);
-            Console.WriteLine("player: " + board.Players + " : " + board.PlayerDead);
-            Console.WriteLine("Monster: " + board.Monsters);
-            Console.WriteLine("AteCoins: " + board.AteCoins);
-            Console.WriteLine("Coins: " + board.Coins);
-            Console.WriteLine("end...");
-            */
             foreach (ConnectedClient c in clientList)
             {
-                //TODO1, WHETHER NEED A THREAD TO RECEIVE ROUND UPDATE, probably a delegate
-                //new Thread(() => 
-                //if(c.connected)
                 if(!disconnectedPlayers.Contains(c.playernumber))
                 try
                 {
@@ -166,7 +149,6 @@ namespace Server
                     disconnectedPlayers.Add(c.playernumber);
                     Console.WriteLine("Client "+c.nick+" receiving is down...");
                 }
-                //).Start();
             }
         }
         
@@ -219,7 +201,6 @@ namespace Server
         //RECEIVE CONNECTION FROM SERVER
         public void receiveServer(string name, string url, BoardInfo board)
         {
-            Console.WriteLine("ConnectedServer........");
             UpdateBoard(board);
             try
             {
@@ -245,20 +226,17 @@ namespace Server
                 url);
                 try
                 {
-                    Console.WriteLine("ConnectServer........"+name);
-                    Console.WriteLine("ConnectServer........" + url);
                     if(!serversConnected.ContainsKey(name))
                         serversConnected.Add(name, serverProxy);
                     serverProxy.receiveServer(Program.SERVERNAME,
                         "tcp://" + Util.GetLocalIPAddress() + ":" + Program.PORT + "/Server",
                         serverForm.boardByRound[serverForm.boardByRound.Count-1]);
-                    Console.WriteLine("ConnectedServer........");
                     break;
                 }
                 catch(Exception e)
                 {
                     Console.WriteLine("Exception" + e);
-                    Thread.Sleep(10000);
+                    Thread.Sleep(200);
                     serverProxy = null;
                 }
             }
@@ -267,25 +245,21 @@ namespace Server
 
         public void Freeze()
         {
-            //TODO
             serverForm.freeze = true;
         }
 
         public void Unfreeze()
         {
-            //TODO
             serverForm.freeze = false;
         }
 
         public void InjectDelay(string pid2)
         {
-            //TODO
             serverForm.delay = true;
         }
 
         public void newServerCreated(string serverName, string serverURL)
         {
-            Console.WriteLine("Enter new server: "+serverName);
             new Thread(() => connectServer(serverName, serverURL)).Start();
         }
         
@@ -304,8 +278,7 @@ namespace Server
         {
             return serverForm.getLocalState(roundID);
         }
-
-        //debug function
+        
         public void CheckUserScore()
         {
             foreach(ConnectedClient c in clientList)

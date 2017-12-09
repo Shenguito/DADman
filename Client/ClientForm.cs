@@ -77,7 +77,6 @@ namespace Client
             label2.Visible = false;
 
             listMove = new List<Movement>();
-            //ThreadStart, this thread may have at most 25 threads
             tlock = new ThreadMove();
             movePool = new Thread(new ThreadStart(retrieveMove));
             movePool.Start();
@@ -96,7 +95,6 @@ namespace Client
 
 
             
-            // Registro do cliente
             RemoteClient rmc = new RemoteClient(this);
             string clientServiceName = "Client";
             
@@ -122,11 +120,9 @@ namespace Client
 
         public void connectToServer(string servername, string serverURL)
         {
-            //try catch missed
             IServer serverProxy = null;
             while (serverProxy == null)
             {
-                //TODO, CONNECT TO THE SERVER PROBLEM, WHEN SERVER STARTED BEFORE OR AFTER
 
                 try
                 {
@@ -146,28 +142,20 @@ namespace Client
                 }
             }
         }
-
-        // part1
-
-        //Add list
+        
 
         public void addMove(Movement move)
         {
             tlock.add(ref listMove, move);
-            tbChat.AppendText("\r\nAdd: " + listMove.Count);
         }
         public void retrieveMove()
         {
             while (true)
             {
                 tlock.ret(ref listMove, ref roundID, ref dead, ref sent, ref serversConnected);
-                //tbChat.AppendText("\r\nRet: " + listMove.Count);
             }
         }
-        // part1 end
-
-
-        //Todo, sending only if he can
+        
         private void keyisdown(object sender, KeyEventArgs e)
         {
             if (!sent && !freeze)
@@ -240,17 +228,14 @@ namespace Client
 
             }
         }
-
-        //TODO receber messageID, Player+Move, Ghost+move
+        
         public void updateChat(string nick, string msg)
         {
         tbChat.AppendText("\r\n" +nick + ": " + msg);
         }
-
-        //TODO receber messageID, Player+Move, Ghost+move
+        
         public void updateMove(int playernumber, string move)
         {
-            //tbChat.AppendText("\r\nUpdateMode:"+move);
             goleft = goright = goup = godown = false;
             PictureBox pb = getPictureBoxByName("pictureBoxPlayer" + playernumber);
 
@@ -307,10 +292,6 @@ namespace Client
                 label2.Visible = true;
                 getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.Black;
             }
-            /*  PictureBox pb = retrievePicture(playerNumber);
-
-              pb.Left = 0;
-              pb.Top = 25; */
         }
 
         internal void updateCoin(string pictureBoxName, string playernumber)
@@ -339,8 +320,6 @@ namespace Client
                 started = true;
 
                 getPictureBoxByName("pictureBoxPlayer" + myNumber).BackColor = Color.LightSkyBlue;
-                tbChat.Text += "My Number " + myNumber;
-
                 Thread thread = new Thread((new ThreadStart(doWork)));
                 thread.Start();
             }
@@ -372,8 +351,7 @@ namespace Client
             }
         }
  
-
-        //Get Picture by String
+        
         private PictureBox getPictureBoxByName(string name)
         {
             foreach (object p in this.Controls)
@@ -382,7 +360,7 @@ namespace Client
                     if (((PictureBox)p).Name == name)
                         return (PictureBox)p;
             }
-            return new PictureBox(); //OR return null;
+            return new PictureBox();
         }
 
 

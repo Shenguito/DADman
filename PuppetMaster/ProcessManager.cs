@@ -77,7 +77,6 @@ namespace PuppetMaster
             }
             else if (text.Split(' ').Length == 2 && text.Split(' ')[0].Equals("Freeze"))
             {
-                // https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
                 processLaucher.freezeProcess(text.Split(' ')[1]);
 
             }
@@ -106,25 +105,6 @@ namespace PuppetMaster
             {
                 processLaucher.check();
             }
-            /*
-            else if (text.Split(' ')[0].Equals("ServerLog"))
-            {
-                if (File.Exists(pathLog))
-                {
-                    // Open the file to read from.
-
-                    using (StreamReader sr = File.OpenText(pathLog))
-                    {
-
-                        string s = "";
-                        while ((s = sr.ReadLine()) != null)
-                        {
-                            Console.WriteLine(s);
-                        }
-                    }
-                }
-            }
-            */
         }
     }
 }

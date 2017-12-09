@@ -35,7 +35,6 @@ namespace Client
                     Monitor.Wait(this);
                 }
                 Movement move = listMove[0];
-                //tbChat.AppendText("\r\nplayer: " + move.nick + ":" + move.move);
                 listMove.RemoveAt(0);
                 move.roundID = roundId;
                 if (!dead)

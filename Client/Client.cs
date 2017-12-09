@@ -57,7 +57,6 @@ namespace Client
     }
     public class RemoteClient : MarshalByRefObject, IClient, IGeneralControlServices
     {
-        //CREATE DELEGATE
         private delegate void GetCustomerByIdDelegate(int intCustId);
 
         public static int clientMessageId = 1;
@@ -90,13 +89,6 @@ namespace Client
             delayLog = new Dictionary<string, int>();
             this.form = form;
             nick = Program.PLAYERNAME;
-            /*
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(RemoteClient),
-                "Client",
-                WellKnownObjectMode.Singleton
-            );
-            */
         }
 
         public void movePlayer(int roundID, string players_arg)
@@ -108,16 +100,6 @@ namespace Client
                 if(!tok_moves[i].Split(':')[1].Equals("null"))
                 this.form.Invoke(new delmove(form.updateMove), new object[] { Int32.Parse(tok_moves[i].Split(':')[0]), tok_moves[i].Split(':')[1] });
             }
-            /*
-            if (dead_arg != "")
-            {
-                string[] tok_dead = dead_arg.Split('-');
-                for (int i = 1; i < tok_dead.Length; i++)
-                {
-                    this.form.Invoke(new delDead(form.updateDead), new object[] { Int32.Parse(tok_dead[i]) });
-                }
-            }
-            */
 
         }
         public void moveGhost(int roundID, string monster_arg)
@@ -143,15 +125,10 @@ namespace Client
 
         public void startGame(int numberPlayersConnected, string arg)
         {
-            // Remember: in the server we sent arg as:
-            // "-" +c.nick+":"+ c.playernumber + ":" + c.url
-            // in for nick=c[0] playernumber=c[1] url=c[2]
             if (arg != null&&!form.started)
             {
 
                 string[] rawClient = arg.Split('-');
-
-                //this.form.debugFunction("debug:\r\n" + arg);
 
                 for (int i = 1; i < rawClient.Length; i++)
                 {
@@ -187,20 +164,12 @@ namespace Client
         }   
         private void receiveUpdate2(BoardInfo board)
         {
-            /*TODO1, threadasd
-             * if freeze, add to queue 
-             * if !freeze && updateLog.Count != 0 && !updateLog.ContainsKey(roundID) wait
-             * if !freeze run delegate function
-             */
             if (form.boardByRound.ContainsValue(board))
                 return;
-
-            //TODO same pool sheng
+            
             while (!freeze && temporaryBoard.Count != 0 && !temporaryBoard.ContainsKey(board.RoundID))
             {
-                form.debugFunction("\r\n Let's Sleep");
                 Thread.Sleep(100);
-                form.debugFunction("\r\nSleeping");
                 if (!freeze && temporaryBoard.Count == 0)
                 {
                     break;
@@ -208,7 +177,6 @@ namespace Client
             }
             if (!freeze)
             {
-                //TODO function 1
                 if (board.move != "")
                 {
                     Action act = () =>
@@ -237,8 +205,6 @@ namespace Client
                     thread3.Start();
                 }
                 form.roundID = board.RoundID + 1;
-                //form.debugFunction("\r\nID:" + form.roundID);
-                //error, duplicate
                 try
                 {
                     form.boardByRound.Add(board.RoundID, board);
@@ -259,11 +225,9 @@ namespace Client
         {
             freeze = true;
             form.freeze = true;
-            form.debugFunction("\r\nFreezed");
         }
         public void Unfreeze()
         {
-            form.debugFunction("\r\nUnfreezed");
             freeze = false;
             form.freeze = false;
             foreach (KeyValuePair<int, BoardInfo> entry in temporaryBoard)
@@ -287,7 +251,6 @@ namespace Client
         }
         public void newServerCreated(string servername, string serverURL)
         {
-            form.debugFunction("\r\nnewserver:" + servername);
             new Thread(() => this.form.connectToServer(servername, serverURL)).Start();
         }
 
